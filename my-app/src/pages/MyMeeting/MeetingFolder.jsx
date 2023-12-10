@@ -1,6 +1,8 @@
+import React from 'react';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from '../../supabaseClient.js';
+import Navbar from '../../components/Navbar/Navbar.jsx'
 
 function MyMeeting() {
   const navigate = useNavigate();
@@ -25,10 +27,13 @@ function MyMeeting() {
         {Object.keys(user).length !== 0 ?
           <>
         <header>
-          <button onClick={()=>{navigate("/Profile")}}>Profile Page</button>
-            <button onClick={()=>{navigate("/MyMeeting")}}>MyMeetingPage</button>
-            <button onClick={()=>{navigate("/SharedMeeting")}}>SharedMeeting Page</button>
-          </header>
+        <Navbar props={user}/>
+        </header>
+        <div className='App'>
+        <botton className="Button" onClick={() => navigate("/EditMeeting")}> Edit Meeting</botton>
+        <botton className="Button" onClick={() => navigate("/EditMeeting")}> + New Folder</botton>
+        </div>
+       
        <h1>This is MyMeeting Page</h1>
        </>
        :

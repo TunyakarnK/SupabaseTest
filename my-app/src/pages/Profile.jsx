@@ -2,8 +2,11 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { supabase } from '../supabaseClient';
 import { useNavigate } from "react-router-dom";
-import MyMeeting from "./MyMeeting/MeetingFolder"
-import SharedMeeting from "./SharedMeeting/SharedMeetingFoldder";
+// import MyMeeting from "./MyMeeting/MeetingFolder"
+// import SharedMeeting from "./SharedMeeting/SharedMeetingFoldder";
+import Navbar from '../components/Navbar/Navbar'
+import Sidebar from "src/components/Sidebar";
+
 
 function Profile() {
     const navigate = useNavigate();
@@ -25,21 +28,6 @@ function Profile() {
       getUserData();
     }, [])
 
-  
-    // async function isRegister(user) {     
-    //   const { data,error } = await supabase
-    //   .from('Profile')
-    //   .select(`username, website, avatar_url`)
-    //   .eq('id', user.id)
-    //   .single()
-    //     if (error) {
-    //     console.log(error);
-    //     alert('cannot add email', error);
-    //   }
-    //   if (data){
-    //     alert("Welcome! ", session.user.email );
-    //   }
-    // }
     
     async function signOut() {
       await supabase.auth.signOut();
@@ -54,10 +42,10 @@ function Profile() {
     async function getMeeting() {
       const { data,error } = await supabase.from("meeting").select();
         setMeeting(data);
-        if (error) {
-          console.log(error);
-          alert('cannot add Meeting', error);
-        }
+        // if (error) {
+        //   console.log(error);
+        //   alert('cannot add Meeting', error);
+        // }
     }
   
   const addThai = async () =>{
@@ -101,11 +89,13 @@ function Profile() {
           {Object.keys(user).length !== 0 ?
           <>
           <header>
-          <button onClick={()=>{navigate("/Profile")}}>Profile Page</button>
-            <button onClick={()=>{navigate("/MyMeeting")}}>MyMeetingPage</button>
-            <button onClick={()=>{navigate("/SharedMeeting")}}>SharedMeeting Page</button>
+            <Navbar props={user}/>
           </header>
-            <h2>Hey there {user.email}</h2>
+          {/* <div className="container">
+              <Sidebar />*/}
+              <div className="App"> 
+
+              
             <button onClick={addThai}>Add Thailand</button>
             <button onClick={delThai}>Delete Thailand</button>
             <h1>Supabase Doc React JSX App template</h1>
@@ -121,13 +111,15 @@ function Profile() {
             ))}
 
             <button onClick={() => signOut()}>Sign Out</button>
-
+            {/* </div>*/}
+          </div> 
           </>
           :
           <>
             {/* if error,do something */}
           </>
-          } 
+          }
+           
         </div>
         
       );

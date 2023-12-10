@@ -1,12 +1,13 @@
-// import { useNavigate } from "react-router-dom";
+import React from 'react'
+import "../../App.css"
 import { useEffect, useState } from "react";
 import { supabase } from '../../supabaseClient.js';
 import Navbar from '../../components/Navbar/Navbar.jsx'
+import { useNavigate } from "react-router-dom";
 
-function SharedMeeting() {
-  // const navigate = useNavigate();
-
+function EditMeeting() {
     const [user, setUser] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() =>{
       async function getUserData() {
@@ -20,21 +21,23 @@ function SharedMeeting() {
       }
       getUserData();
     }, [])
-      
-    return (
-      <div className="App">
+  return (
+    <div className='App'>
         {Object.keys(user).length !== 0 ?
           <>
         <header>
         <Navbar props={user}/>
         </header>
-       <h1>This is SharedMeeting Page</h1>
+       <h1>EditMeeting</h1>
+       <botton onClick={() => navigate("/MyMeeting")}> Edit Meeting</botton>
        </>
        :
        <></>
        }
+       
       </div>
-    );
-  }
-  
-  export default SharedMeeting;
+    
+  )
+}
+
+export default EditMeeting
