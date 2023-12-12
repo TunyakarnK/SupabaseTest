@@ -1,9 +1,10 @@
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from '../../supabaseClient.js';
+import Navbar from '../../components/Navbar/Navbar.jsx'
 
 function SharedMeeting() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
     const [user, setUser] = useState({});
 
@@ -25,10 +26,8 @@ function SharedMeeting() {
         {Object.keys(user).length !== 0 ?
           <>
         <header>
-          <button onClick={()=>{navigate("/Profile")}}>Profile Page</button>
-            <button onClick={()=>{navigate("/MyMeeting")}}>MyMeetingPage</button>
-            <button onClick={()=>{navigate("/SharedMeeting")}}>SharedMeeting Page</button>
-          </header>
+        <Navbar props={user}/>
+        </header>
        <h1>This is SharedMeeting Page</h1>
        </>
        :
