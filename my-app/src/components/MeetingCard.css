@@ -1,0 +1,9 @@
+.myCard{
+  background-color: #EE5D20;
+  max-width: auto;
+  margin: 20 20;
+  padding: 20 20;
+  height: 100%;
+  display:inline-block;
+}
+
