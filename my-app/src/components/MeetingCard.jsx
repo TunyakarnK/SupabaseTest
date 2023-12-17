@@ -24,6 +24,8 @@ function MeetingCard(props) {
   // const [ meetStartTime, setMeetStartTime]= useState ([]);
   // const [ meetEndTime, setMeetEndTime]= useState ([]);
 
+
+
     async function updateMeeting() {
         try {
             const { data, error } = await supabase
@@ -75,8 +77,8 @@ function MeetingCard(props) {
                     //     {/* <NavLink to="/EditMeeting" props = {meetId}></NavLink> */}
                     //     {/* <EditMeeting props = {meetId} /> */}
                     // </>
-                    navigate('/EditMeeting')
-                    
+                    navigate('/EditMeeting', {state: {meeting}})
+                    // console.log({meeting})
                 }
             
         </div></div>
