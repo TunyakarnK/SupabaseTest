@@ -64,7 +64,7 @@ function MeetingCard(props) {
                  { editing == false ?
                     <>
                     <div className='myCard'>
-                        <h3>{meeting.meetName}</h3>
+                        <h3><Link to={'/MeetingPage/'+meeting.meetId}>{meeting.meetName}</Link></h3>
                         <h3>{meeting.meetId}</h3>
                         <h3>{meeting.meetStartDate}</h3>
                         <button onClick={() => deleteMeeting()}>Delete Meeting</button>

@@ -11,11 +11,17 @@
   },
   "dependencies": {
     "@react-icons/all-files": "^4.1.0",
-    "@supabase/supabase-js": "^2.38.5",
+    "@supabase/auth-helpers-react": "^0.4.2",
+    "@supabase/auth-ui-react": "^0.4.6",
+    "@supabase/auth-ui-shared": "^0.1.8",
+    "@supabase/supabase-js": "^2.39.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
-    "react-router-dom": "^6.20.0"
+    "react-router-dom": "^6.20.1",
+    "reactjs-popup": "^2.0.6",
+    "survey-core": "^1.9.123",
+    "survey-react-ui": "^1.9.123"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",

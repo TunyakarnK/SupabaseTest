@@ -1,0 +1,11 @@
+.content {
+    display:  none;
+}
+
+.show-content {
+    display: inline;
+}
+
+.tabside{
+    list-style-type: none
+}

@@ -28,7 +28,7 @@ function Navbar (props) {
               <li>
                 <NavLink to="/SharedMeeting">SharedMeeting</NavLink>
               </li>
-              <li>{props.props.user_metadata.name}
+              <li>{props.props.user_metadata.name} {props.props.id}
               </li><div>
                 <img className="avatar"
                     src={props.props.user_metadata.avatar_url}

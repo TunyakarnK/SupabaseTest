@@ -15,6 +15,11 @@ function MyMeeting() {
   const [folderName, setFolderName] = useState([]);
   const [newMeeting, setNewMeeting] = useState([]);
   const [newMeetName, setNewMeetName] = useState([]);
+
+  
+
+
+
     useEffect(() =>{
       async function getUserData() {
         await supabase.auth.getUser().then((value) =>{

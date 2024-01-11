@@ -12,20 +12,20 @@ function EditMeeting(props) {
     const [user, setUser] = useState({});
     const navigate = useNavigate();
 
-    const [ meeting, setMeeting ]= useState ([]);
+    const [ meeting, setMeeting ]= useState ('');
     // const [ meetId, setMeetId ]= useState ([]);
-    const [ meetName, setMeetName ] = useState ([]);
+    const [ meetName, setMeetName ] = useState ('');
     const [ ownerId, setOwnerId]= useState ([]);
-    const [ meetStartDate, setMeetStartDate] = useState ([]);
-    const [ folderId, setFolderId]= useState ([]);
-    const [ meetEndDate, setMeetEndDate]= useState ([]);
-    const [ meetTagId, setMeetTagId]= useState ([]);
-    const [ meetDes, setMeetDes]= useState ([]);
-    const [ meetStatus, setMeetStatus]= useState ([]);
-    const [ meetCreate, setMeetCreate]= useState ([]);
-    const [ meetStartTime, setMeetStartTime]= useState ([]);
-    const [ meetEndTime, setMeetEndTime]= useState ([]);
-
+    const [ meetStartDate, setMeetStartDate] = useState ('');
+    const [ folderId, setFolderId]= useState (null);
+    const [ meetEndDate, setMeetEndDate]= useState ('');
+    const [ meetTagId, setMeetTagId]= useState ('');
+    const [ meetDes, setMeetDes]= useState ('');
+    const [ meetStatus, setMeetStatus]= useState ('');
+    const [ meetCreate, setMeetCreate]= useState ('');
+    const [ meetStartTime, setMeetStartTime]= useState ('');
+    const [ meetEndTime, setMeetEndTime]= useState ('');
+    const [formError, setFormError] = useState(null)
 
     useEffect(() =>{
       async function getUserData() {
@@ -41,7 +41,7 @@ function EditMeeting(props) {
       // getMeeting();
       console.log('from edit page')
       console.log(state.meeting.meetId)
-    }, [])
+    },)
 
     // async function getMeeting() {
     //   try {
@@ -64,16 +64,16 @@ function EditMeeting(props) {
           const { data, error } = await supabase
               .from("meeting")
               .update({
-                  folderId: BigInt(folderId),
-                  meetCreate: meetCreate,
+                  folderId: folderId,
+                  // meetCreate: meetCreate,
                   meetDes: meetDes,
-                  meetEndDate: meetEndDate,
-                  meetEndTime: meetEndTime,
+                  // meetEndDate: meetEndDate,
+                  // meetEndTime: meetEndTime,
                   meetName: meetName,
-                  meetStartDate: meetStartDate,
-                  meetStartTime: meetStartTime,
-                  meetStatus: meetStatus,
-                  meetTagId: meetTagId,
+                  // meetStartDate: meetStartDate,
+                  // meetStartTime: meetStartTime,
+                  // meetStatus: meetStatus,
+                  // meetTagId: meetTagId,
               })
               .eq("meetId", state.meeting.meetId)
           
@@ -109,23 +109,23 @@ function EditMeeting(props) {
                   onChange={(e) => setFolderId(e.target.value)} />
              </label>
 
-             <label>setMeetStartDate
+             {/* <label>setMeetStartDate
               <input type="date" 
                   defaultValue={state.meeting.meetStartDate}
                   onChange={(e) => setMeetStartDate(e.target.value)} />
-             </label>
+             </label> */}
 
-             <label>setMeetEndDate
+             {/* <label>setMeetEndDate
               <input type="date" 
                   defaultValue={state.meeting.meetEndDate}
                   onChange={(e) => setMeetEndDate(e.target.value)} />
-             </label>
-
+             </label> */}
+{/* 
              <label>setMeetTagId
-              <input type="text" 
+              <input type="number" 
                   defaultValue={state.meeting.meetTagId}
                   onChange={(e) => setMeetTagId(e.target.value)} />
-             </label>
+             </label> */}
 
              <label>setMeetDes
               <input type="text" 
@@ -133,7 +133,7 @@ function EditMeeting(props) {
                   onChange={(e) => setMeetDes(e.target.value)} />
              </label>
 
-             <label>setMeetStartTime
+             {/* <label>setMeetStartTime
               <input type="time" 
                   defaultValue={state.meeting.meetStartTime}
                   onChange={(e) => setMeetStartTime(e.target.value)} />
@@ -143,7 +143,7 @@ function EditMeeting(props) {
               <input type="time" 
                   defaultValue={state.meeting.meetEndTime}
                   onChange={(e) => setMeetEndTime(e.target.value)} />
-             </label>
+             </label> */}
 
              </form>
              <br></br>
@@ -161,5 +161,3 @@ function EditMeeting(props) {
 }
 
 export default EditMeeting
-
- 
