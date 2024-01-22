@@ -18,7 +18,6 @@ const [ toggle, setToggle ] = useState(1)
 const [isEnded, setIsEnded ] = useState(false);
 
 
-
 function updateToggle(id) {
   setToggle(id)
 }
@@ -58,13 +57,16 @@ const handleButtonClick = () => {
 
   return (
 <>
-    <div className='col-6 tab p-5'>
-    <Link to="/MyMeeting"><button variant="contained">Go to update</button></Link>
-      <ul className='tabside' >
-        <li className ="cursor: pointer; "onClick={() => updateToggle(1)}><button>Detail</button></li>
+<Link to="/MyMeeting"><button variant="contained">Go to update</button></Link>
+    <div className='tabside'>
+      <ul>
+        <li onClick={() => updateToggle(1)}><button>Detail</button></li>
         <li onClick={() => updateToggle(2)}><button>FeedBack</button></li>
-        <li onClick={() => updateToggle(3)}>{isEnded ? (<p>Ended</p>):
-    (<button onClick={handleButtonClick}>{isRunning ? 'STOP' : 'START'}</button>)}</li>
+        <li><Link to={"/Inmeeting/"+id}><button >START</button></Link></li>
+
+         {/* li onClick={() => updateToggle(3)}>{isEnded ? (<p>Ended</p>): */}
+          {/* // (<Link><button onClick={handleButtonClick}>{isRunning ? 'STOP' : 'START'}</button></Link>)}</li> */}
+    
       </ul>
     </div>
 
@@ -86,11 +88,11 @@ const handleButtonClick = () => {
       <h1>FeedBack</h1>
       <Feedback />
     </div>
-
+{/* 
     <div className={toggle === 3 ? "show-content" : "content"}>
       <h1>กำลังประชุม</h1>
       <InmeetingPage />
-    </div>
+    </div> */}
 </>
   )
 }
