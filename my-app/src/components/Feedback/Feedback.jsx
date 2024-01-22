@@ -107,7 +107,6 @@ function Feedback() {
         {/* Radio button for "Male" */}
         {scores.map((score)=> {
           return(
-
             <label>
             <input
               type="radio"
@@ -122,7 +121,6 @@ function Feedback() {
         {/* Radio button for "Male" */}
         {scores.map((score)=> {
           return(
-
             <label>
             <input
               type="radio"
@@ -137,7 +135,6 @@ function Feedback() {
         {/* Radio button for "Male" */}
         {scores.map((score)=> {
           return(
-
             <label>
             <input
               type="radio"
@@ -152,7 +149,6 @@ function Feedback() {
         {/* Radio button for "Male" */}
         {scores.map((score)=> {
           return(
-
             <label>
             <input
               type="radio"

@@ -16,10 +16,6 @@ function MyMeeting() {
   const [newMeeting, setNewMeeting] = useState([]);
   const [newMeetName, setNewMeetName] = useState([]);
 
-  
-
-
-
     useEffect(() =>{
       async function getUserData() {
         await supabase.auth.getUser().then((value) =>{
