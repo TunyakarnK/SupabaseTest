@@ -10,7 +10,8 @@ import MyMeeting from "./pages/MyMeeting/MeetingFolder"
 import SharedMeeting from "./pages/SharedMeeting/SharedMeetingFoldder";
 import EditMeeting from "./pages/MyMeeting/EditMeeting";
 import MeetingPage from "./pages/MyMeeting/MeetingPage";
-
+import InmeetingPage from "./pages/MyMeeting/InmeetingPage";
+import Conclusion from "./pages/MyMeeting/Conclusion";
 
 
 function App() {
@@ -22,6 +23,8 @@ function App() {
       <Route path="/SharedMeeting" element={<SharedMeeting />} />
       <Route path="/EditMeeting" element={<EditMeeting />} />
       <Route path="/MeetingPage/:id" element={<MeetingPage />} />
+      <Route path="/Inmeeting/:id" element={<InmeetingPage />} />
+      <Route path="/Conclusion/:id" element={<Conclusion />} />
       {/* <Route path="/SignUp" element={<SignUp />} /> */}
     </Routes>
 
