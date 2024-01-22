@@ -6,6 +6,15 @@
     display: inline;
 }
 
-.tabside{
-    list-style-type: none
+.tabside ul{
+    list-style-type: none;
+    gap: 5px;
+    display: flex;
+    flex-direction: row;
+}
+
+.tabside ul li{
+    border: 2px solid #d18c32;
+    list-style: none;
+
 }
