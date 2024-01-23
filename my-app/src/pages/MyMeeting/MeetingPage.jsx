@@ -55,6 +55,8 @@ const handleButtonClick = () => {
   };
 
 
+
+
   return (
 <>
 <Link to="/MyMeeting"><button variant="contained">Go to update</button></Link>
@@ -62,7 +64,7 @@ const handleButtonClick = () => {
       <ul>
         <li onClick={() => updateToggle(1)}><button>Detail</button></li>
         <li onClick={() => updateToggle(2)}><button>FeedBack</button></li>
-        <li><Link to={"/Inmeeting/"+id}><button >START</button></Link></li>
+        <li><Link to={"/Inmeeting/"+id}><button className="btn-con">Start Meeting</button></Link></li>
 
          {/* li onClick={() => updateToggle(3)}>{isEnded ? (<p>Ended</p>): */}
           {/* // (<Link><button onClick={handleButtonClick}>{isRunning ? 'STOP' : 'START'}</button></Link>)}</li> */}
@@ -72,8 +74,8 @@ const handleButtonClick = () => {
 
 
     {/* ปุ่ม START/ STOP เหลือ assign เพื่มใน database ว่าประชุมเสร็จแล้ว*/}
-    {isEnded ? (<p>Ended</p>):
-    (<button onClick={handleButtonClick}>{isRunning ? 'STOP' : 'START'}</button>)}
+    {/* {isEnded ? (<p>Ended</p>):
+    (<button onClick={handleButtonClick()}>{isRunning ? 'STOP' : 'START'}</button>)} */}
     
     {/* บอกเวลา */}
     {/* {meetStartTime1 && <p>Start Time: {meetStartTime1.toLocaleTimeString()}</p>}
