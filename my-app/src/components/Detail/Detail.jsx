@@ -142,9 +142,9 @@ function Detail() {
       
       {meetData.map((meetData, index) => (
         <div key={index}>
-          <p> Meeting Name: {meetData?.meetName || "ยังไม่มีจ้า"}</p>
+          <p> Meeting Name: {meetData?.meetName || "ยังไม่มีงับ"}</p>
           <p>Description:</p>
-          <p>{meetData?.meetDes || "ยังไม่มีจ้า"}</p>
+          <p>{meetData?.meetDes || "ยังไม่มีงับ"}</p>
         </div>
       ))}
       <div>

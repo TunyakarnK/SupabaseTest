@@ -101,7 +101,6 @@ function Feedback() {
 
   return (
     <div>
-      <h3>{id}</h3>
 <form >
         <h3>ท่านได้รับข้อมูลชุดใหม่ที่มีความสำคัญกับท่านมากน้อยแค่ไหน</h3>
         {/* Radio button for "Male" */}
