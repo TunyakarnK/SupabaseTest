@@ -1,14 +1,25 @@
 import React from "react";
 import "./Navbar.css";
+import { supabase } from "src/supabaseClient";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Navbar (props) {
+  const navigate = useNavigate();
     const [showNavbar, setShowNavbar] = React.useState(false);
     // console.log(props)
      
     const handleShowNavbar = () => {
       setShowNavbar(!showNavbar);
     };
+
+    async function signOut() {
+      await supabase.auth.signOut();
+      navigate("/");
+    }
+    // const isClicked = () =>{
+    //   console.log("isClicked")
+    // }
   
     return (
       <nav className="navbar">
@@ -28,7 +39,8 @@ function Navbar (props) {
               <li>
                 <NavLink to="/SharedMeeting">SharedMeeting</NavLink>
               </li>
-              <li>{props.props.user_metadata.name}
+              <li>
+                <div onClick={signOut}>{props.props.user_metadata.name}</div>
               </li><div>
                 <img className="avatar"
                     src={props.props.user_metadata.avatar_url}

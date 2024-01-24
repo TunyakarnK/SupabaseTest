@@ -1,0 +1,18 @@
+.content {
+    display:  none;
+}
+
+.show-content {
+    display: inline;
+}
+
+.tabside ul{
+    list-style-type: none;
+    gap: 5px;
+    display: flex;
+    flex-direction: row;
+}
+
+.tabside ul li{
+    list-style: none;
+}
