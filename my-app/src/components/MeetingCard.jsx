@@ -2,7 +2,6 @@ import React from 'react'
 import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import "src/components/MeetingCard.css"
-import EditMeeting from 'src/pages/MyMeeting/EditMeeting';
 import { Link,NavLink,useNavigate } from 'react-router-dom';
 
 function MeetingCard(props) {
@@ -26,22 +25,22 @@ function MeetingCard(props) {
 
 
 
-    async function updateMeeting() {
-        try {
-            const { data, error } = await supabase
-                .from("meeting")
-                .update({
-                    name: meetName,
-                    meetStartDate: meetStartDate
-                })
-                .eq("id", meeting.id)
+    // async function updateMeeting() {
+    //     try {
+    //         const { data, error } = await supabase
+    //             .from("meeting")
+    //             .update({
+    //                 name: meetName,
+    //                 meetStartDate: meetStartDate
+    //             })
+    //             .eq("id", meeting.id)
             
-            if (error) throw error;
-            window.location.reload();
-        } catch (error) {
-            alert(error.message);
-        }
-    }
+    //         if (error) throw error;
+    //         window.location.reload();
+    //     } catch (error) {
+    //         alert(error.message);
+    //     }
+    // }
 
     async function deleteMeeting() {
         try {
@@ -60,14 +59,16 @@ function MeetingCard(props) {
 
   return (
     <div className='myCard'>
-      <div>
+      
                  { editing == false ?
                     <>
-                    <div className='myCard'>
-                        <h3>{meeting.meetName}</h3>
-                        <h3>{meeting.meetId}</h3>
-                        <h3>{meeting.meetStartDate}</h3>
+                    <div className=''>
+                    <h3><Link to={'/MeetingPage/'+meeting.meetId}>{meeting.meetName}</Link></h3>
+                        {/* <p>{meeting.meetId}</p> */}
+                        <p>meeting start time: </p>
+                        <p>{meeting.meetStartDate}</p>
                         <button onClick={() => deleteMeeting()}>Delete Meeting</button>
+                        {/* <button onClick={() => navigate('/StartMeeting', {state: {meeting}})}>Start Meeting</button> */}
                         <button onClick={() => setEditing(true)}>Edit Meeting</button>
                       </div>
                     </>
@@ -81,7 +82,7 @@ function MeetingCard(props) {
                     // console.log({meeting})
                 }
             
-        </div></div>
+        </div>
   )
 }
 
