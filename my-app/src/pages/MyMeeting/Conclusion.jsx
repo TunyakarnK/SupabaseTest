@@ -29,18 +29,6 @@ function Conclusion() {
     setArrFol((current) => [...current, fol]);
     console.log(arrFol.length);
     console.log(setArrFol);
-    // supabase
-    //   .from("meetObj")
-    //   .insert({
-    //     folderId: meetData[0]?.folderId,
-    //     meetId: id,
-    //     objDes: newObj,
-    //   })
-    //   .then((result) => {
-    //     console.log(result);
-    //     fetchObj();
-    //     setNewObj("");
-    //   });
   }
   //
 
@@ -53,25 +41,23 @@ function Conclusion() {
       .from("meetObj")
       .insert({
         folderId: meetObjData[0]?.folderId,
-        meetId: id,
+        // meetId: id,
         objDes: arrFol[i],
       })
       .then((result) => {
         console.log(result);
-        // fetchObj();
-        // setNewObj("");
       });
     }
   }
 
-  const delteObj = (e) => {
+  const deltefol = (e) => {
     const name = e.target.value;
     console.log("jjjj", name);
     setArrFol(arrFol.filter((items) => items !== name));
   };
   return (
     <div>
-      <button onClick={() => sendData()}>End meeting</button>
+      <Link to={'/MeetingPage/'+id}><button className="btn-con" onClick={() => sendData()}>End meeting</button></Link>
       <div className="flex-container">
         <div>
         <p className="p">Objective</p>
@@ -86,7 +72,7 @@ function Conclusion() {
         {arrFol.map((listfol) => (
           <div>
             {listfol}
-            <button value={listfol} onClick={delteObj}>
+            <button value={listfol} onClick={deltefol}>
               x
             </button>
           </div>
@@ -95,7 +81,7 @@ function Conclusion() {
           class="form-control"
           type="text"
           value={fol}
-          placeholder="Add Todo"
+          placeholder="follow-up"
           onChange={(e) => setFol(e.target.value)}
         ></input>
         <button class="btn btn-primary" onClick={() => addFol(fol)}>

@@ -34,7 +34,8 @@ function InmeetingPage() {
     const { data, error } = await supabase
       .from("meetObj")
       .select("objId, objDes, objStatus")
-      .eq("meetId", id);
+      .eq("meetId", id)
+      .eq("objStatus", false);
     if (data) {
       console.log(data);
       setMeetObjData(data);
