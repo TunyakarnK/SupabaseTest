@@ -15,15 +15,30 @@ function Profile() {
       await supabase.auth.getUser().then((value) => {
         if (value.data?.user) {
           setUser(value.data.user);
-          console.log(value)
+          // console.log(value)
         }
       });
     }
-
+    
     getUserData();
+    // handleSignInWithGoogle(user);
     getCountries();
     getMeeting();
+    
   }, []);
+
+  async function handleSignInWithGoogle(response) {
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: response.credential,
+      nonce: 'NONCE', // must be the same one as provided in data-nonce (if any)
+    })
+    console.log("handleSignInWithGoogle")
+    console.log(data)
+    console.log(response)
+
+  }
+  
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -74,37 +89,37 @@ function Profile() {
 
   
  
-    const loadGoogleApi = async () => {
-      try {
-        // Load the Google API client library
-        await new Promise((resolve, reject) => {
-          window.gapi.load('client:auth2', 'v3', resolve);
-          if (reject) {
-            console.log(reject);
-          }
-        });
+    // const loadGoogleApi = async () => {
+    //   try {
+    //     // Load the Google API client library
+    //     await new Promise((resolve, reject) => {
+    //       window.gapi.load('client:auth2', 'v3', resolve);
+    //       if (reject) {
+    //         console.log(reject);
+    //       }
+    //     });
 
-        // Initialize the Google API client
-        await window.gapi.client.init({
-          apiKey: 'AIzaSyDYoFTA7hVwkmijam-AkpLYfLgISUrTZaA',
-          clientId: '743410676927-p1ob0g0i2qvkigeacnvhspc0t9nh0arp.apps.googleusercontent.com',
-          discoveryDocs: ['https://www.googleapis.com/calendar/v3/calendars/primary/events'],
-          scope: 'https://www.googleapis.com/auth/calendar',
-        });
+    //     // Initialize the Google API client
+    //     await window.gapi.client.init({
+    //       apiKey: 'AIzaSyDYoFTA7hVwkmijam-AkpLYfLgISUrTZaA',
+    //       clientId: '743410676927-p1ob0g0i2qvkigeacnvhspc0t9nh0arp.apps.googleusercontent.com',
+    //       discoveryDocs: ['https://www.googleapis.com/calendar/v3/calendars/primary/events'],
+    //       scope: 'https://www.googleapis.com/auth/calendar',
+    //     });
 
-        // Check if the user is signed in
-        const isSignedIn = window.gapi.auth2.getAuthInstance().isSignedIn.get();
+    //     // Check if the user is signed in
+    //     const isSignedIn = window.gapi.auth2.getAuthInstance().isSignedIn.get();
 
-        if (isSignedIn) {
-          // Call functions to interact with Google Calendar API
-          listUpcomingEvents();
-        } else {
-          console.log('User is not signed in to Google.');
-        }
-      } catch (error) {
-        console.error('Error loading Google API client:', error);
-      }
-    };
+    //     if (isSignedIn) {
+    //       // Call functions to interact with Google Calendar API
+    //       listUpcomingEvents();
+    //     } else {
+    //       console.log('User is not signed in to Google.');
+    //     }
+    //   } catch (error) {
+    //     console.error('Error loading Google API client:', error);
+    //   }
+    // };
 
     
   
@@ -150,7 +165,7 @@ function Profile() {
             ))}
 
             <button onClick={() => signOut()}>Sign Out</button>
-            <button onClick={loadGoogleApi}>List Upcoming Events</button>
+            {/* <button onClick={loadGoogleApi}>List Upcoming Events</button> */}
           </div>
         </>
       ) : (

@@ -71,7 +71,7 @@ async function endTheMeeting() {
 
 
   return (
-    <div>
+    <div style={{margin:"20px"}}>
          <div className='App'>
         {Object.keys(user).length !== 0 ?
           <>

@@ -83,7 +83,7 @@ function InmeetingPage() {
   }
 
   return (
-    <div>
+    <div style={{margin:"20px"}}>
       <Link to={"/Conclusion/"+id}><button className="btn-con">Conclusion</button></Link>
       <p className="p">Objective</p>
       {meetObjData.map( meetObj  => (
@@ -102,9 +102,9 @@ function InmeetingPage() {
           onChange={(e) => setNewObj(e.target.value)}
         ></input>
         <button class="btn btn-primary">+</button>
-        {meetData[0]?.folderId}
+        {/* {meetData[0]?.folderId}
         {newObj}
-        {meetObjData[0]?.objId}
+        {meetObjData[0]?.objId} */}
       </form>
       {/* {true ? (<form></form> :)} */}
     </div>

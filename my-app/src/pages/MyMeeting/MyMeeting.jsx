@@ -6,6 +6,8 @@ import { supabase } from '../../supabaseClient.js';
 import Navbar from '../../components/Navbar/Navbar.jsx'
 import MeetingCard from 'src/components/MeetingCard';
 
+
+
 function MyMeeting() {
   const navigate = useNavigate();
   
@@ -15,7 +17,7 @@ function MyMeeting() {
   const [folderName, setFolderName] = useState([]);
   const [newMeeting, setNewMeeting] = useState([]);
   const [newMeetName, setNewMeetName] = useState([]);
-
+  
     useEffect(() =>{
       async function getUserData() {
         await supabase.auth.getUser().then((value) =>{
@@ -106,7 +108,7 @@ function MyMeeting() {
         <h1>My Meeting</h1>
         <div className=''>
             {newMeeting.map((newMeeting) => (
-            <MeetingCard meeting = {newMeeting} />
+            <MeetingCard meeting = {newMeeting} user = {user} />
           ))}
             </div>
        <div>

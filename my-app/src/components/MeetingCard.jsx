@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import "src/components/MeetingCard.css"
 import { Link,NavLink,useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 function MeetingCard(props) {
   const meeting = props.meeting;
+  const user = props.user;
   const navigate = useNavigate();
-
+  const [thisUser, setThisUser] = useState({});
   const [ editing, setEditing ] = useState(false);
   const [ meetId, setMeetId ]= useState ([]);
   const [ meetName, setMeetName ] = useState ([]);
@@ -24,6 +26,20 @@ function MeetingCard(props) {
   // const [ meetEndTime, setMeetEndTime]= useState ([]);
 
 
+  useEffect(() => {
+    async function getUserData() {
+      await supabase.auth.getUser().then((value) => {
+        if (value.data?.user) {
+          setThisUser(value.data.user);
+          // console.log(value)
+        }
+      });
+    }
+    
+    getUserData();
+    console.log(user);
+    console.log(thisUser);
+  }, []);
 
     // async function updateMeeting() {
     //     try {
@@ -63,8 +79,9 @@ function MeetingCard(props) {
                  { editing == false ?
                     <>
                     <div className=''>
-                    <h3><Link to={'/MeetingPage/'+meeting.meetId}>{meeting.meetName}</Link></h3>
+                    <h3><Link to={{ pathname: '/MeetingPage/' + meeting.meetId, state: { user: user } }}>{meeting.meetName}</Link></h3>
                         {/* <p>{meeting.meetId}</p> */}
+                        <p>owner: {user.user_metadata.full_name}</p>
                         <p>meeting start time: </p>
                         <p>{meeting.meetStartDate}</p>
                         <button onClick={() => deleteMeeting()}>Delete Meeting</button>

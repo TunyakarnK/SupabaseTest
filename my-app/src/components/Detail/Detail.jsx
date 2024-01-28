@@ -2,6 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "src/supabaseClient";
+import { Text } from "@mantine/core";
 
 function Detail() {
   const { id } = useParams();
@@ -126,6 +127,7 @@ function Detail() {
   console.log(userData);
   return (
     <>
+    <Text size="xl">Details:</Text>
       {userData.map((userData, index) => (
         <div key={index}>
           <p>

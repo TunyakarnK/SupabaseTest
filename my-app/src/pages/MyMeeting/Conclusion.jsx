@@ -56,11 +56,11 @@ function Conclusion() {
     setArrFol(arrFol.filter((items) => items !== name));
   };
   return (
-    <div>
+    <div style={{margin:"20px"}}>
       <Link to={'/MeetingPage/'+id}><button className="btn-con" onClick={() => sendData()}>End meeting</button></Link>
       <div className="flex-container">
         <div>
-        <p className="p">Objective</p>
+        {/* <p className="p">Objective</p> */}
         </div>
 
         
@@ -87,7 +87,7 @@ function Conclusion() {
         <button class="btn btn-primary" onClick={() => addFol(fol)}>
           +
         </button>
-        {fol}
+        {/* {fol} */}
         </div>
       </div>
     </div>
