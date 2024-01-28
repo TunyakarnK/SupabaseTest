@@ -2,13 +2,14 @@ import React from 'react'
 import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import "src/components/MeetingCard.css"
-import EditMeeting from 'src/pages/MyMeeting/EditMeeting';
 import { Link,NavLink,useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 function MeetingCard(props) {
   const meeting = props.meeting;
+  const user = props.user;
   const navigate = useNavigate();
-
+  const [thisUser, setThisUser] = useState({});
   const [ editing, setEditing ] = useState(false);
   const [ meetId, setMeetId ]= useState ([]);
   const [ meetName, setMeetName ] = useState ([]);
@@ -25,23 +26,37 @@ function MeetingCard(props) {
   // const [ meetEndTime, setMeetEndTime]= useState ([]);
 
 
-
-    async function updateMeeting() {
-        try {
-            const { data, error } = await supabase
-                .from("meeting")
-                .update({
-                    name: meetName,
-                    meetStartDate: meetStartDate
-                })
-                .eq("id", meeting.id)
-            
-            if (error) throw error;
-            window.location.reload();
-        } catch (error) {
-            alert(error.message);
+  useEffect(() => {
+    async function getUserData() {
+      await supabase.auth.getUser().then((value) => {
+        if (value.data?.user) {
+          setThisUser(value.data.user);
+          // console.log(value)
         }
+      });
     }
+    
+    getUserData();
+    console.log(user);
+    console.log(thisUser);
+  }, []);
+
+    // async function updateMeeting() {
+    //     try {
+    //         const { data, error } = await supabase
+    //             .from("meeting")
+    //             .update({
+    //                 name: meetName,
+    //                 meetStartDate: meetStartDate
+    //             })
+    //             .eq("id", meeting.id)
+            
+    //         if (error) throw error;
+    //         window.location.reload();
+    //     } catch (error) {
+    //         alert(error.message);
+    //     }
+    // }
 
     async function deleteMeeting() {
         try {
@@ -60,14 +75,17 @@ function MeetingCard(props) {
 
   return (
     <div className='myCard'>
-      <div>
+      
                  { editing == false ?
                     <>
-                    <div className='myCard'>
-                        <h3><Link to={'/MeetingPage/'+meeting.meetId}>{meeting.meetName}</Link></h3>
-                        <h3>{meeting.meetId}</h3>
-                        <h3>{meeting.meetStartDate}</h3>
+                    <div className=''>
+                    <h3><Link to={{ pathname: '/MeetingPage/' + meeting.meetId, state: { user: user } }}>{meeting.meetName}</Link></h3>
+                        {/* <p>{meeting.meetId}</p> */}
+                        <p>owner: {user.user_metadata.full_name}</p>
+                        <p>meeting start time: </p>
+                        <p>{meeting.meetStartDate}</p>
                         <button onClick={() => deleteMeeting()}>Delete Meeting</button>
+                        {/* <button onClick={() => navigate('/StartMeeting', {state: {meeting}})}>Start Meeting</button> */}
                         <button onClick={() => setEditing(true)}>Edit Meeting</button>
                       </div>
                     </>
@@ -81,7 +99,7 @@ function MeetingCard(props) {
                     // console.log({meeting})
                 }
             
-        </div></div>
+        </div>
   )
 }
 

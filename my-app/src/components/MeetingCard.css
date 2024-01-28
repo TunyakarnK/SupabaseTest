@@ -1,9 +1,30 @@
 .myCard{
-  background-color: #EE5D20;
-  max-width: auto;
-  margin: 20 20;
-  padding: 20 20;
-  height: 100%;
-  display:inline-block;
+  background-color: #eddecf;
+  display: inline-flex;
+  padding: 20px;
+  border-radius: 10px;
+  border-color: #202F34;
+  margin: 5px 5px;
+  text-decoration: none;
 }
 
+/* folders list */
+.folders > a {
+  display: block;
+  background: rgba(238, 93, 32, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  border-color: #202F34;
+  margin: 5px 0;
+  text-decoration: none;
+}
+.folders > a:hover p {
+  color: #EE5D20;
+}
+.folders p {
+  margin: 0;
+}
+.folders > a p:last-child {
+ font-size: 0.8em;
+ color: #202F34;
+}

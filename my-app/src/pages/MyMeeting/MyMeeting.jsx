@@ -1,10 +1,12 @@
 import React from 'react';
-import { useNavigate } from "react-router-dom";
+import '../../components/MeetingCard.css'
+import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from '../../supabaseClient.js';
 import Navbar from '../../components/Navbar/Navbar.jsx'
 import MeetingCard from 'src/components/MeetingCard';
 import { useSession } from '@supabase/auth-helpers-react';
+
 
 function MyMeeting() {
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ function MyMeeting() {
   const [folderName, setFolderName] = useState([]);
   const [newMeeting, setNewMeeting] = useState([]);
   const [newMeetName, setNewMeetName] = useState([]);
-
+  
     useEffect(() =>{
       async function getUserData() {
         await supabase.auth.getUser().then((value) =>{
@@ -30,7 +32,23 @@ function MyMeeting() {
       getFolder();
       getNewMeeting();
     }, [])
-      
+
+    async function deletefolder() {
+      try {
+          const { data, error } = await supabase
+              .from("folders")
+              .delete()
+              .eq("folderName", folder.folderName)
+          
+          if (error) throw error;
+          window.location.reload();
+      } catch (error) {
+          alert(error.message);
+      }
+  }
+  const delfol = ()=>{
+    console.log(folder.folderName)
+  }
 
     async function getNewMeeting() {
       try {
@@ -87,31 +105,41 @@ function MyMeeting() {
         <header>
         <Navbar props={user}/>
         </header>
-        <div className='App'>
-        <button className="Button" onClick={() => navigate("/EditMeeting")}> Edit Meeting</button>
-        
-        </div>
-       <div>
-        <h1>New Meeting</h1>
+       <div className='body-container'>
+        <h1>My Meeting</h1>
         <div className=''>
             {newMeeting.map((newMeeting) => (
-            <MeetingCard meeting = {newMeeting} />
+            <MeetingCard meeting = {newMeeting} user = {user} />
           ))}
             </div>
-       </div>
        <div>
-       <h1>My Meeting</h1>
+       {/* <h1>My Meeting</h1> */}
        <button className="Button" onClick={() => setCreateFolder(true)}> + New Folder</button>
        { createFolder == false ?
         <>
-            <div>
+          <div className="folders">
+            {folder.map(folder => (
+              <div className="folders">
+              <Link to={String(folder.folderId)} key={folder.folderId} >
+                <p>{folder.folderId}{folder.folderName}</p>
+                {/* <button style={{display: "flex",}} 
+                onClick={delfol}
+                >Delete folder</button> */}
+              </Link>  
+              </div>
+            ))}
+            
+          </div>
+
+          {/* <div>
             {folder.map((folder) => (
             <li key = {folder.folderName}>
               {folder.folderName}
-              {/* <div folder={folder} />  */}
+            
             </li>
           ))}
-            </div>
+            </div> */}
+            
         </>
           : 
         <>            
@@ -129,6 +157,7 @@ function MyMeeting() {
         </div>
         </>
        }
+       </div>
        </div>
        
        </>

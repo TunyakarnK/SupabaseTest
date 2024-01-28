@@ -3,9 +3,10 @@ import { Model } from "survey-core";
 import { Survey } from "survey-react-ui";
 import { supabase } from "src/supabaseClient";
 import { useParams } from "react-router-dom";
+import { Grid, Text } from "@mantine/core";
 // import "survey-core/defaultV2.min.css";
-import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
+// import Popup from 'reactjs-popup';
+// import 'reactjs-popup/dist/index.css';
  
 import { useState } from "react";
 
@@ -101,6 +102,7 @@ function Feedback() {
 
   return (
     <div>
+      <Grid grow style={{height:"auto"}}><Grid.Col span='auto' >
 <form >
         <h3>ท่านได้รับข้อมูลชุดใหม่ที่มีความสำคัญกับท่านมากน้อยแค่ไหน</h3>
         {/* Radio button for "Male" */}
@@ -177,6 +179,10 @@ function Feedback() {
           Submit
         </button>
       </form>
+      </Grid.Col>
+      <Grid.Col span='auto' style={{backgroundColor: "#EE5D20"}}><div >comment</div></Grid.Col>
+      </Grid>
+
       </div>
   )
 }
