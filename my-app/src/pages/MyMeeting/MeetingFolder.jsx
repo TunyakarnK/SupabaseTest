@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { supabase } from '../../supabaseClient.js';
 import Navbar from '../../components/Navbar/Navbar.jsx'
 import MeetingCard from 'src/components/MeetingCard';
-
+import { useSession } from '@supabase/auth-helpers-react';
 
 function MyMeeting() {
   const navigate = useNavigate();
-  
+  const session = useSession();
   const [user, setUser] = useState({});
   const [createFolder, setCreateFolder] = useState(false);
   const [folder, setFolder] = useState([]);
@@ -37,6 +37,7 @@ function MyMeeting() {
         const { data, error } = await supabase
           .from("meeting")
           .select("*")
+          .eq("creatorId", session.user.id)
           //จริงๆๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
         if (error) throw error;
         if (data != null) {
