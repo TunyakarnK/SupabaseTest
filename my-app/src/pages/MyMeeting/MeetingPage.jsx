@@ -5,17 +5,38 @@ import { useParams, Link } from 'react-router-dom'
 import "./meetingpage.css"
 import Feedback from '../../components/Feedback/Feedback'
 import Detail from 'src/components/Detail/Detail';
-import InmeetingPage from './InmeetingPage';
+import { useSession } from '@supabase/auth-helpers-react';
 
 function MeetingPage() {
 
 const { id } = useParams();
-const [ meetData, setMeetData ] = useState ([]);
+const [ meetData, setMeetData ] = useState (null);
 const [ isRunning, setIsRunning ] = useState(false);
 const [ meetStartTime, setMeetStartTime ] = useState('');
 const [ meetStopTime, setMeetEndTime ] = useState('');
 const [ toggle, setToggle ] = useState(1)
 const [isEnded, setIsEnded ] = useState(false);
+const session = useSession();
+
+const fetchCreator = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("meeting")
+      .select("creatorId")
+      .eq("meetId", id)
+      .eq("creatorId", session.user.id);
+    if (data) {
+      console.log(",,,", data[0].creatorId);
+      setMeetData(data[0].creatorId);
+    }
+  } catch (error) {
+    console.error("creatorId not equal current user!", error);
+  }
+};
+
+useEffect(() => {
+  fetchCreator()
+}, []);
 
 
 function updateToggle(id) {
@@ -56,7 +77,6 @@ const handleButtonClick = () => {
 
 
 
-
   return (
 <>
 <Link to="/MyMeeting"><button variant="contained">Go to update</button></Link>
@@ -64,11 +84,12 @@ const handleButtonClick = () => {
       <ul>
         <li onClick={() => updateToggle(1)}><button>Detail</button></li>
         <li onClick={() => updateToggle(2)}><button>FeedBack</button></li>
+        {/* <li><Link to={"/Inmeeting/"+id}><button className="btn-con">Start Meeting</button></Link></li> */}
+        {meetData === session.user.id && (
         <li><Link to={"/Inmeeting/"+id}><button className="btn-con">Start Meeting</button></Link></li>
-
+      )}        
          {/* li onClick={() => updateToggle(3)}>{isEnded ? (<p>Ended</p>): */}
           {/* // (<Link><button onClick={handleButtonClick}>{isRunning ? 'STOP' : 'START'}</button></Link>)}</li> */}
-    
       </ul>
     </div>
 
