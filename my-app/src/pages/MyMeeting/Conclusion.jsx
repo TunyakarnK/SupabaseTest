@@ -29,12 +29,25 @@ function Conclusion() {
     setArrFol((current) => [...current, fol]);
     console.log(arrFol.length);
     console.log(setArrFol);
+    setFol("")
   }
   //
 
   function sendData() {
     console.log(arrFol);
-    // supabase.from("meet")
+    // send conclusion
+    supabase
+    .from("conclusion")
+    .insert({
+      meetId: id,
+      // meetId: id,
+      con: con,
+    })
+    .then((result) => {
+      console.log(result);
+    });
+
+    // send follow up
     for (var i = 0; i <= arrFol.length + 1; i++) {
       console.log(arrFol[i]);
       supabase
@@ -63,10 +76,12 @@ function Conclusion() {
         <p className="p">Objective</p>
         </div>
 
-        
         <div>
         <p className="p">Conclusion</p>
-        <textarea className="text-con" rows="5" cols="45"></textarea>
+          <textarea className="text-con" rows="5" cols="45"
+           placeholder="Add Conclusion"
+           onChange={e => setCon(e.target.value)}></textarea>
+          {con}
         <br />
         <p className="p">Follow-Up</p>
         {arrFol.map((listfol) => (
