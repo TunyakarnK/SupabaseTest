@@ -9,28 +9,6 @@ function Detail() {
   const [userData, setUserData] = useState([]);
   const [meetObjData, setMeetObjData] = useState([]);
 
-
-  // const fetchMeeting = async () => {
-  //   // try{
-  //     const { data, error } = await supabase
-  //     .from("meeting")
-  //     .select()
-  //     .eq("meetId", id);
-  //     // .then(data => {
-  //     //   console.log(data);
-  //     //   setMeetData(data);
-  //     //   fetchObj();
-  //     // });
-  //   if (data) {
-  //     console.log(data);
-  //     setMeetData(data);
-  //     fetchObj();
-  //   }
-  //   // }catch(error){
-  //   //   return;
-  //   // }
-  // };
-
   const fetchMeeting = async () => {
     try {
       const { data, error } = await supabase
@@ -40,25 +18,24 @@ function Detail() {
       if (data) {
         console.log(data);
         setMeetData(data);
-        fetchObj()
+        fetchObj();
       }
     } catch (error) {
       console.error("Error fetching meeting:", error);
     }
   };
-  
-  const fetchOwner = async () => {
+
+  const fetchCreator = async () => {
     const { data, error } = await supabase
       .from("meeting")
       .select(
         `
         folderId,
-        ownerId,
+        creatorId,
         meetId,
-        users(
-          userId,
-          firstName,
-          lastName
+        user(
+          id,
+          full_name
         )
       `
       )
@@ -70,31 +47,18 @@ function Detail() {
     }
   };
 
-  // const fetchObj = async () => {
-  //   // var a = meetData[0].folderId
-  //   const { data, error } = await supabase
-  //     .from("meetObj")
-  //     .select("objDes")
-  //     // .lte("meetId", id)
-  //     .eq("folderId", userData[0].folderId)
-  //     .eq("objStatus", false);
-  //   if (data) {
-  //     console.log(data);
-  //     setMeetObjData(data);
-  //   }
-  // };
   const fetchObj = async () => {
     try {
-        const { data, error } = await supabase
-          .from("meetObj")
-          .select("objDes")
-          .lte("meetId", id)
-          .eq("folderId", userData[0].folderId)
-          .eq("objStatus", false);
-        if (data) {
-          console.log(data);
-          setMeetObjData(data);
-        }
+      const { data, error } = await supabase
+        .from("meetObj")
+        .select("objDes")
+        .lte("meetId", id)
+        .eq("folderId", userData[0].folderId)
+        .eq("objStatus", false);
+      if (data) {
+        console.log(data);
+        setMeetObjData(data);
+      }
     } catch (error) {
       console.error("Error fetching meetObj:", error);
     }
@@ -103,24 +67,12 @@ function Detail() {
   useEffect(() => {
     fetchMeeting();
 
-    fetchOwner();
-  }, [])
+    fetchCreator();
+  }, []);
+
 
   useEffect(() => {
-
-    // fetchMeeting();
-
-    // fetchOwner();
-    
     fetchObj();
-    
-    // const fetchData = async () => {
-    //   await fetchMeeting();
-    //   fetchOwner();
-    //   fetchObj();
-    // };
-    // fetchData();
-    
   }, [meetData]);
 
   console.log(userData);
@@ -131,15 +83,14 @@ function Detail() {
           <p>
             {" "}
             Owner:{" "}
-            {userData.users &&
-            userData.users.firstName &&
-            userData.users.lastName
-              ? `${userData.users.firstName} ${userData.users.lastName}`
+            {userData.user &&
+            userData.user.full_name 
+              ? `${userData.user.full_name}`
               : "Have no data"}
           </p>
         </div>
       ))}
-      
+
       {meetData.map((meetData, index) => (
         <div key={index}>
           <p> Meeting Name: {meetData?.meetName || "ยังไม่มีงับ"}</p>
@@ -157,15 +108,6 @@ function Detail() {
           </div>
         ))}
       </div>
-
-      {/* <div>
-        {mapMeeting.ownerId}
-      </div>
-      {filterOwner.map((filterOwner, index) => (
-        <div>
-          <p> Owner: {filterOwner.firstName}</p>
-        </div>
-      ))} */}
     </>
   );
 }
