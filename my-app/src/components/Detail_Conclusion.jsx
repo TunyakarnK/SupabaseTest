@@ -6,85 +6,28 @@ import { Text } from "@mantine/core";
 
 function Detail_Conclusion() {
     const { id } = useParams();
-    const [meetData, setMeetData] = useState([]);
-    const [userData, setUserData] = useState([]);
-    const [meetObjData, setMeetObjData] = useState([]);
+    const [meetCon, setMeetCon] = useState("");
 
-    const fetchMeeting = async () => {
-        try {
-          const { data, error } = await supabase
-            .from("meeting")
-            .select()
-            .eq("meetId", id);
-          if (data) {
-            console.log('MeetingData',data);
-            setMeetData(data);
-            fetchObj()
-          }
-        } catch (error) {
-          console.error("Error fetching meeting:", error);
-        }
-      };
-      
-      const fetchOwner = async () => {
-        const { data, error } = await supabase
-          .from("meeting")
-          .select(
-            `
-            folderId,
-            ownerId,
-            meetId,
-            users(
-              userId,
-              firstName,
-              lastName
-            )
-          `
-          )
-          .eq("meetId", id);
-        if (data) {
-          console.log('Userdata:',data);
-          setUserData(data);
-          // console.log(data);
-        }
-      };
-      const fetchObj = async () => {
-        try {
-            const { data, error } = await supabase
-              .from("meetObj")
-              .select("objDes")
-              .lte("meetId", id)
-              .eq("folderId", userData[0].folderId)
-              .eq("objStatus", false);
-            if (data) {
-              console.log(data);
-              setMeetObjData(data);
-            }
-        } catch (error) {
-          console.error("Error fetching meetObj:", error);
-        }
-      };
+    const fetchCon = async () => {
+      const { data, error } = await supabase
+      .from("conclusion")
+      .select("con")
+      .eq("meetId", id)
+      if (data) {
+        setMeetCon(data)
+        console.log(data);
+      } else {console.log(error);}
+    }
 
       useEffect(() => {
-        fetchMeeting();
-        fetchOwner();
+        fetchCon();
       }, [])
-    
-      useEffect(() => {
-        fetchObj(); 
-      }, [meetData]);
 
   return (
-  <>
     <Text size="xl">
     {/* Meeting Name */}
-      {meetData.map((meetData, index) => (
-        <div key={index}>
-          <p>Conclusion from {meetData?.meetName || "ยังไม่มีงับ"}</p>     
-        </div>       
-      ))}
+    {meetCon[0]?.con || "ยังไม่มีงับ"}
     </Text>
-      </>
   )
 }
 
