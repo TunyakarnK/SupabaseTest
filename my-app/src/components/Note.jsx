@@ -80,7 +80,8 @@ function Note() {
     {/* Meeting Name */}
       {meetData.map((meetData, index) => (
         <div key={index}>
-          <p>Note from {meetData?.meetName || "ยังไม่มีงับ"}</p>     
+          <p>Note from </p>  
+          <p>{meetData?.meetName || "ยังไม่มีงับ"}</p>     
         </div>       
       ))}
     </Text>
