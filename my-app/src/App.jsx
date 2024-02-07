@@ -35,8 +35,8 @@ function App() {
       <Route path="/EditMeeting" element={<EditMeeting />} />
       <Route path="/StartMeeting" element={<StartMeeting />} />
       <Route path="/MeetingPage/:id" element={<MeetingPage />} />
-      <Route path="/Detail_Note/:id" element={<Note />} />
-      <Route path="/Detail_Conclusion/:id" element={<Detail_Conclusion />} />
+      {/* <Route path="/Detail_Note/:id" element={<Note />} /> */}
+      {/* <Route path="/Detail_Conclusion/:id" element={<Detail_Conclusion />} /> */}
       <Route path="/Inmeeting/:id" element={<InmeetingPage />} />
       <Route path="/Conclusion/:id" element={<Conclusion />} />
       {/* <Route path="/MyMeeting/:folder" render={(props) => <MeetingDetails {...props} items={[]} />}

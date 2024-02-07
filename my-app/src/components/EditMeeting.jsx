@@ -1,5 +1,5 @@
 import React from 'react'
-import { Select, NativeSelect, rem, TextInput} from '@mantine/core';
+import { Select, NativeSelect, rem, TextInput, TagsInput, Grid,Textarea,Button, Group } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 
 // import "../../App.css"
@@ -25,7 +25,7 @@ function EditMeeting(props) {
     const [ meetName, setMeetName ] = useState (""); //
     // const [ ownerId, setOwnerId]= useState (""); //
     const [ meetStartDate, setMeetStartDate] = useState ();
-    const [ folderId, setFolderId]= useState ("");
+    const [ folderId, setFolderId]= useState ();
     const [ meetEndDate, setMeetEndDate]= useState ();
     const [ meetTagId, setMeetTagId]= useState ();
     const [ meetDes, setMeetDes]= useState ("");
@@ -33,7 +33,8 @@ function EditMeeting(props) {
     const [ meetCreate, setMeetCreate]= useState ();
     const [ meetStartTime, setMeetStartTime]= useState ();
     const [ meetEndTime, setMeetEndTime]= useState ();
-
+    const [ meetObj, setMeetObj]= useState ();
+    const [ meetParti, setMeetParti]= useState ();
 
     useEffect(() =>{
       async function getUserData() {
@@ -47,11 +48,38 @@ function EditMeeting(props) {
       }
       getUserData();
       getMeeting();
-      // getMeeting();
+      // getObj();
       console.log('from edit page')
       console.log(state.meeting.meetId)
       console.log(state.meeting)
     }, [])
+
+    //ดึงข้อมูล Objective ของ meeting
+    // async function getObj() {
+    //   try {
+        
+    //   } catch (error) {
+    //     alert(error.message);
+    //   }
+    // }
+
+    //ดึงข้อมูล Folder ของ meeting
+    // async function getFolder() {
+    //   try {
+        
+    //   } catch (error) {
+    //     alert(error.message);
+    //   }
+    // }
+
+    //ดึงข้อมูล Participant ของ meeting
+    // async function getParti() {
+    //   try {
+        
+    //   } catch (error) {
+    //     alert(error.message);
+    //   }
+    // }
 
     async function getMeeting() {
       try {
@@ -97,16 +125,7 @@ function EditMeeting(props) {
       }
   }
 
-  // const MeetTagId = (meetTag) =>{
-  //   if (meetTag == 'Decision-Making'){
-  //     setMeetTagId("1");
-  //   }else if (meetTag == 'Problem-Solving'){
-  //     setMeetTagId("2");
-  //   }else if (meetTag == 'Info/Opinion-Sharing'){
-  //     setMeetTagId("3");
-  //   }
-  //   console.log(meetTagId)
-  // }
+
 
 
 
@@ -118,121 +137,210 @@ function EditMeeting(props) {
         <header>
         <Navbar props={user}/>
         </header>
-       {/* <botton className="Button" onClick={() => navigate("/MyMeeting")}> Edit Meeting</botton> */}
        <div style={{margin:"20px"}}>
-             <h1>Edit Meeting</h1>
-             <TextInput
-                placeholder={state.meeting.meetName}
-                defaultValue={state.meeting.meetName}
-                label="Meeting Name"
-                onChange={(event) => setMeetName(event.currentTarget.value)}
-                styles={{
-                  input: {
-                    width: rem(300),
-                    marginRight: rem(-2),
-                  },
-                }}
-              />
+             <h1 style={{color: "#EE5D20", marginTop: '2%', marginLeft:"20px"}}>Edit Meeting</h1>
+             <Grid style={{margin:"20px", backgroundColor: '#FDEFE9',padding:"20px"}}>
+              <Grid.Col span={6}>
+                <TextInput
+                
+                    placeholder={state.meeting.meetName}
+                    defaultValue={state.meeting.meetName}
+                    label="Meeting Name"
+                    onChange={(event) => setMeetName(event.currentTarget.value)}
+                    styles={{
+                      input: {
+                        color:'#EE5D20',
+                        borderColor:'#EE5D20',
+                        backgroundColor:'#FDEFE9',
+                        width: rem(300),
+                        marginRight: rem(-2),
+                      },
+                    }}
+                />
 
-            <div style={{width: "300px"}}>
-              <NativeSelect
-                mt="md"
-                // comboboxProps={{ withinPortal: true }}
-                data={data}
-                placeholder="meeting type"
-                label="Meeting Type"
-                onChange={(event) => setMeetTagId(event.currentTarget.value)}
+                <div style={{width: "300px"}}>
+                  <NativeSelect
+                    mt="md"
+                    // comboboxProps={{ withinPortal: true }}
+                    data={data}
+                    placeholder="meeting type"
+                    label="Meeting Type"
+                    onChange={(event) => setMeetTagId(event.currentTarget.value)}
+                    styles={{
+                      input: {
+                        color:'#EE5D20',
+                        borderColor:'#EE5D20',
+                        backgroundColor:'#FDEFE9',
+                        fontWeight: 500,
+                        borderTopLeftRadius: 0,
+                        borderBottomLeftRadius: 0,
+                        // width: rem(300),
+                        marginRight: rem(-2),
+                      },
+                    }}
+                  />
+                </div>
+               
+
+                  <div style={{marginTop:"15px"}}>
+                  {/* <DatePickerInput
+                    placeholder={state.meeting.meetDes}
+                    label="Meeting Description"
+                    onChange={(event) => setMeetDes(event.currentTarget.value)}
+                    styles={{
+                      input: {
+                        borderBottom: rem(5),
+                        width: rem(300),
+                        marginRight: rem(-2),  
+                      },
+                    }}
+                  /> */}
+
+                  {/* <DatePickerInput
+                    label="Pick date"
+                    placeholder="Pick date"
+                    value={state.meeting.meetStartDate}
+                    onChange={setMeetStartDate}
+                  /> */}
+                  </div>
+
+                  <div style={{marginTop:"15px"}}>
+                <form>
+                <label  >Meeting Start-Date
+                  <input type="date" 
+                      defaultValue={state.meeting.meetStartDate}
+                      onChange={(e) => setMeetStartDate(e.target.value)} 
+                      style={{margin:"15px"}}
+                  />
+                </label>
+
+                <label>Meeting Start-Time
+                  <input type="time" 
+                      defaultValue={state.meeting.meetStartTime}
+                      onChange={(e) => setMeetStartTime(e.target.value)} 
+                      style={{margin:"15px"}}
+                    />
+                </label>
+                </form>
+                </div>
+
+                <form>
+                <label>Meeting End-Date&nbsp;
+                  
+                  <input type="date" 
+                      defaultValue={state.meeting.meetEndDate}
+                      onChange={(e) => setMeetEndDate(e.target.value)} 
+                      style={{margin:"15px"}}
+                    />
+                </label>                 
+
+                <label>Meeting End-Time&nbsp;
+                  <input type="time" 
+                      defaultValue={state.meeting.meetEndTime}
+                      onChange={(e) => setMeetEndTime(e.target.value)} 
+                      style={{margin:"15px" ,}}
+                    />
+                </label> 
+                </form>
+                
+                <div style={{marginTop:"15px"}}>
+                  <Textarea
+                    placeholder={state.meeting.meetDes}
+                    defaultValue={state.meeting.meetDes}
+                    label="Meeting Description"
+                    onChange={(event) => setMeetDes(event.currentTarget.value)}
+                    styles={{
+                      input: {
+                        color:'#EE5D20',
+                        borderColor:'#EE5D20',
+                        backgroundColor:'#FDEFE9',
+                        width: "85%",
+                        height: rem(150),
+                        marginRight: rem(-2),  
+                      },
+                    }}
+                  />
+                  </div>
+              </Grid.Col>            
+              
+ 
+              <Grid.Col span={6} styles={{
+                      input: {
+                        marginRight: rem(20),
+                      },
+                    }}>
+
+                {/* Folder */}
+                <div style={{width: "300px",}}>
+                  <NativeSelect
+                    mt="md"
+                    // comboboxProps={{ withinPortal: true }}
+                    data={folderId}
+                    placeholder="Select Folder"
+                    label="Folder"
+                    onChange={(event) => setMeetTagId(event.currentTarget.value)}
+                    styles={{
+                      input: {
+                        color:'#EE5D20',
+                        borderColor:'#EE5D20',
+                        backgroundColor:'#FDEFE9',
+                        fontWeight: 500,
+                        borderTopLeftRadius: 0,
+                        borderBottomLeftRadius: 0,
+                        // width: rem(300),
+                        marginRight: rem(-2),
+                      },
+                    }}
+                  />
+                </div>
+
+              {/* Objective */}
+              <div style={{marginTop:"15px"}}>
+              <TagsInput
+                label="Meeting Objective"
+                placeholder="Press Enter to submit Objective"
+                defaultValue={meetObj}
+                clearable
                 styles={{
                   input: {
-                    fontWeight: 500,
-                    borderTopLeftRadius: 0,
-                    borderBottomLeftRadius: 0,
-                    // width: rem(300),
+                    color:'#EE5D20',
+                    borderColor:'#EE5D20',
+                    backgroundColor:'#FDEFE9',
+                    width: "90%",
+                    height: rem(100),
                     marginRight: rem(-2),
-                  },
-                }}
-              />
-            </div>
-             
-            <div style={{marginTop:"15px"}}>
-              <TextInput
-                placeholder={state.meeting.meetDes}
-                defaultValue={state.meeting.meetDes}
-                label="Meeting Description"
-                onChange={(event) => setMeetDes(event.currentTarget.value)}
-                styles={{
-                  input: {
-                    width: rem(300),
-                    marginRight: rem(-2),  
                   },
                 }}
               />
               </div>
 
               <div style={{marginTop:"15px"}}>
-              {/* <DatePickerInput
-                placeholder={state.meeting.meetDes}
-                label="Meeting Description"
-                onChange={(event) => setMeetDes(event.currentTarget.value)}
+              <TagsInput
+                label="Participant"
+                placeholder="Press Enter to submit Participant"
+                defaultValue={meetParti}
+                clearable
                 styles={{
                   input: {
-                    borderBottom: rem(5),
-                    width: rem(300),
-                    marginRight: rem(-2),  
+                    color:'#EE5D20',
+                    borderColor:'#EE5D20',
+                    backgroundColor:'#FDEFE9',
+                    width: "90%",
+                    height: rem(100),
+                    marginRight: rem(-2),
                   },
                 }}
-              /> */}
-
-              {/* <DatePickerInput
-                label="Pick date"
-                placeholder="Pick date"
-                value={state.meeting.meetStartDate}
-                onChange={setMeetStartDate}
-              /> */}
-              </div>
-
-              <div style={{marginTop:"15px"}}>
-             <form>
-             <label  >Meeting Start-Date
-              <input type="date" 
-                  defaultValue={state.meeting.meetStartDate}
-                  onChange={(e) => setMeetStartDate(e.target.value)} 
-                  style={{margin:"15px"}}
               />
-             </label>
-
-             <label>Meeting Start-Time
-              <input type="time" 
-                  defaultValue={state.meeting.meetStartTime}
-                  onChange={(e) => setMeetStartTime(e.target.value)} 
-                  style={{margin:"15px"}}
-                />
-             </label>
-             </form>
-             </div>
-
-             <form>
-             <label>Meeting End-Date
-              <input type="date" 
-                  defaultValue={state.meeting.meetEndDate}
-                  onChange={(e) => setMeetEndDate(e.target.value)} 
-                  style={{margin:"15px"}}
-                />
-             </label>  
-
-             
-
-             <label>Meeting End-Time
-              <input type="time" 
-                  defaultValue={state.meeting.meetEndTime}
-                  onChange={(e) => setMeetEndTime(e.target.value)} 
-                  style={{margin:"15px"}}
-                />
-             </label>
-             </form>
-
-             <br></br>
-             <button className="Button" onClick={() => updateMeeting()}>update meeting</button>
+              </div>
+              {/* <div style={{width: "90%",marginTop:"30px", justifyItems:'end'}}> */}
+              <Group justify="flex-end" mt="md" style={{ marginRight:'10%' , marginTop:"30%" }}>
+              <Button color='#EE5D20' radius="xl" style={{ marginTop:"10%" }} onClick={() => updateMeeting()}>Update Meeting</Button>
+            </Group>
+                
+              {/* </div> */}
+              </Grid.Col>
+             </Grid>
+              
         </div>
        
        </>
