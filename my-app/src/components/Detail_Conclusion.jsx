@@ -80,7 +80,8 @@ function Detail_Conclusion() {
     {/* Meeting Name */}
       {meetData.map((meetData, index) => (
         <div key={index}>
-          <p>Conclusion from {meetData?.meetName || "ยังไม่มีงับ"}</p>     
+          <p>Conclusion from </p>
+          <p>{meetData?.meetName || "ยังไม่มีงับ"}</p>     
         </div>       
       ))}
     </Text>

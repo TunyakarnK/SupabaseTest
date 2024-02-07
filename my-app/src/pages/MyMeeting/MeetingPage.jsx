@@ -10,8 +10,10 @@ import Detail_Conclusion from 'src/components/Detail_Conclusion';
 import Navbar from 'src/components/Navbar/Navbar';
 import InmeetingPage from './InmeetingPage';
 import { useNavigate } from "react-router-dom";
-import { SegmentedControl, Text, rem } from '@mantine/core';
+import { Grid, GridCol, SegmentedControl, Text, rem, Button } from '@mantine/core';
 import classes from 'src/components/Detail/NavbarSegmented.module.css';
+import { useSession } from '@supabase/auth-helpers-react';
+
 
 
 
@@ -32,7 +34,6 @@ const tabs = {
 
 function MeetingPage(props) {
 const [thisUser, setThisUser] = useState({});  
-const [user, setUser] = useState();
 const navigate = useNavigate();
 const { id } = useParams();
 // const {user} = useParams();
@@ -44,26 +45,36 @@ const [ toggle, setToggle ] = useState(1)
 const [isEnded, setIsEnded ] = useState(false);
 const [section, setSection] = useState('Details');
 const [active, setActive] = useState('Billing');
+const session = useSession();
 
 
 
-  async function getUserData() {
-    await supabase.auth.getUser().then((value) => {
-      if (value.data?.user) {
-        setThisUser(value.data.user);
-        // console.log(value)
-      }
-    });
-  }
-  console.log("isLoad");
-  getUserData();
-  console.log(thisUser);
+// useEffect(() =>{
+//   // fetchMeeting();
+//   console.log(data);
+//   console.log(meetData);
+// }, [])
 
 function updateToggle(id) {
   setToggle(id)
 }
 const meetEndTime1 = new Date();
 const meetStartTime1 = new Date();
+
+const fetchMeeting = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("meeting")
+      .select()
+      .eq("meetId", id);
+    if (data) {
+      console.log(data);
+      setMeetData(data);
+    }
+  } catch (error) {
+    console.error("Error fetching meeting:", error);
+  }
+};
 
 const handleButtonClick = () => {
     if (isRunning) {
@@ -95,8 +106,7 @@ const handleButtonClick = () => {
     }
   };
 
-  const links = tabs[section].map((item) => (
-   
+  const links = tabs[section].map((item) => (  
     <text
       // className={classes.link}
       data-active={item.label === active || undefined}
@@ -113,22 +123,40 @@ const handleButtonClick = () => {
 
 
   return (
-<>
-{/* <Navbar props={user} /> */}
-<div style={{margin:"20px"}}>
+<><div style={{ }}>
+<Navbar props={session.user} />
+<div style={{margin:"20px", }}>
 {/* <Navbar></Navbar> */}
-<Link to="/MyMeeting"><button variant="contained">Back</button></Link>
-    <div className='tabside'>
-      <ul>
-        <li onClick={() => updateToggle(1)}><button>Detail</button></li>
-        <li onClick={() => updateToggle(2)}><button>FeedBack</button></li>
-        <li><Link to={"/Inmeeting/"+id}><button className="btn-con">Start Meeting</button></Link></li>
-
-         {/* li onClick={() => updateToggle(3)}>{isEnded ? (<p>Ended</p>): */}
-          {/* // (<Link><button onClick={handleButtonClick}>{isRunning ? 'STOP' : 'START'}</button></Link>)}</li> */}
+<Grid>
+  <Grid.Col span={{ base: 12, xs: 4 }}>
+    <Link to="/MyMeeting" style={{marginLeft:"20px", }}><Button color='#EE5D20' radius="xl">Back</Button></Link>
+  </Grid.Col>
+  <Grid.Col span={{ base: 12, xs: 6 }}>  
+  </Grid.Col>
+  <Grid.Col span={{ base: 12, xs: 2 }} justify="flex-end">
     
-      </ul>
-    </div>
+  </Grid.Col></Grid>
+<div>      
+      
+</div>
+<div>
+<Grid>
+  <Grid.Col span={{ base: 12, xs: 4 }}>
+  <Text size='xl' style={{marginLeft:'20px'}}>My Meeting
+   {/* {meetData.map((meetData, index) => (
+        <div key={index}>
+          <p> My Meeting {meetData?.meetName || "ยังไม่มีงับ"}</p> 
+        </div>
+      ))} */}
+      </Text>
+  </Grid.Col>
+  <Grid.Col span={{ base: 12, xs: 5 }}></Grid.Col>
+  <Grid.Col span={{ base: 12, xs: 1 }}></Grid.Col>
+  <Grid.Col span={{ base: 12, xs: 2 }} justify="flex-end">
+    <Link to={"/Inmeeting/"+id} style={{}}><Button color='#EE5D20' radius="xl">Start Meeting</Button></Link>  
+  </Grid.Col></Grid>
+  
+</div>
     {/* <div>user:{state.user.user_metadata.full_name}</div> */}
     <nav className={classes.navbar}>
       <div>      
@@ -136,7 +164,10 @@ const handleButtonClick = () => {
           value={section}
           onChange={(value) => setSection(value)}
           transitionTimingFunction="ease"
-          style={{ width: rem(700) }}
+          color='#EE5D20'
+          style={{ width: rem(700) , 
+            backgroundColor:'#FDEFE9',
+          }}
           data={[
             { label: 'Details', value: 'Details' },
             { label: 'Note', value: 'Note' },
@@ -181,7 +212,7 @@ const handleButtonClick = () => {
       <h1>กำลังประชุม</h1>
       <InmeetingPage />
     </div> */}
-    </div>
+    </div></div>
 </>
   )
 }

@@ -102,7 +102,7 @@ function Detail() {
   };
 
   useEffect(() => {
-    fetchMeeting();
+    fetchMeeting()
 
     fetchOwner();
   }, [])
@@ -126,7 +126,9 @@ function Detail() {
 
   console.log(userData);
   return (
-    <>
+    <><div 
+    // style={{ backgroundColor:'#FDEFE9' }}
+    >
     <Text size="xl">Details:</Text>
       {userData.map((userData, index) => (
         <div key={index}>
@@ -167,7 +169,7 @@ function Detail() {
         <div>
           <p> Owner: {filterOwner.firstName}</p>
         </div>
-      ))} */}
+      ))} */}</div>
     </>
   );
 }
