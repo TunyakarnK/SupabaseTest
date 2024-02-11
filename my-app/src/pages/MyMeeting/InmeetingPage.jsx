@@ -17,7 +17,6 @@ function InmeetingPage() {
         .from("meeting")
         .select()
         .eq("meetId", id);
-
       if (data) {
         console.log("lllll", data);
         setMeetData(data);
