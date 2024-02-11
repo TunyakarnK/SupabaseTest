@@ -5,9 +5,30 @@ import { useParams, Link } from 'react-router-dom'
 import "./meetingpage.css"
 import Feedback from '../../components/Feedback/Feedback'
 import Detail from 'src/components/Detail/Detail';
+import Note from 'src/components/Note';
+import Detail_Conclusion from 'src/components/Detail_Conclusion';
+import Navbar from 'src/components/Navbar/Navbar';
 import { useSession } from '@supabase/auth-helpers-react';
+import { useNavigate } from "react-router-dom";
+import { SegmentedControl, Text, rem } from '@mantine/core';
+import classes from 'src/components/Detail/NavbarSegmented.module.css';
 
 function MeetingPage() {
+
+  const tabs = {
+    Details: [
+      { label: 'Details', value: <Detail /> },
+    ],
+    Note: [
+      { label: 'Note', value: <Note />},
+    ],
+    Conclusion: [
+      { label: 'Conclusion', value: <Detail_Conclusion /> },
+    ],
+    Feedback: [
+      {  label: 'Feedback', value: <Feedback />},
+    ],
+  };
 
 const { id } = useParams();
 const [ meetData, setMeetData ] = useState (null);
@@ -16,6 +37,8 @@ const [ meetStartTime, setMeetStartTime ] = useState('');
 const [ meetStopTime, setMeetEndTime ] = useState('');
 const [ toggle, setToggle ] = useState(1)
 const [isEnded, setIsEnded ] = useState(false);
+const [section, setSection] = useState('Details');
+const [active, setActive] = useState('Billing');
 const session = useSession();
 
 const fetchCreator = async () => {
