@@ -1,6 +1,4 @@
 import React from "react";
-import { Model } from "survey-core";
-import { Survey } from "survey-react-ui";
 import { supabase } from "src/supabaseClient";
 import { useParams } from "react-router-dom";
 import { Grid, Text } from "@mantine/core";
@@ -12,10 +10,10 @@ import { useState } from "react";
 
 function Feedback() {
   const { id } = useParams();
-  const [selectedOption1, setSelectedOption1] = useState("Male")
-  const [selectedOption2, setSelectedOption2] = useState("Male")
-  const [selectedOption3, setSelectedOption3] = useState("Male")
-  const [selectedOption4, setSelectedOption4] = useState("Male")
+  const [selectedOption1, setSelectedOption1] = useState(null)
+  const [selectedOption2, setSelectedOption2] = useState(null)
+  const [selectedOption3, setSelectedOption3] = useState(null)
+  const [selectedOption4, setSelectedOption4] = useState(null)
   
   const scores = [1,2,3,4,5,6,7,8,9,10]
   // Function to handle the change in radio button selection
@@ -118,7 +116,8 @@ function Feedback() {
             {score}
           </label>
         )})}
-        <h3>การประชุมในครั้งนี้ช่วยให้เกิดการพัฒนาในส่วนของการทำงานร่วมกันเป็นทีมได้หรือไม่</h3>
+
+        <h3>การประชุมในครั้งนี้ช่วยให้เกิดการพัฒนาในส่วนของการทำงานร่วมกันเป็นทีมได้หรือไม่</h3> {selectedOption2}
         {/* Radio button for "Male" */}
         {scores.map((score)=> {
           return(
@@ -132,6 +131,7 @@ function Feedback() {
             {score}
           </label>
         )})}
+
         <h3>ท่านรู้สึกพึงพอใจแค่ไหนกับความสัมพันธ์ของเวลาในการเตรียมการ, การประชุม, และผลลัพธ์ที่ได้รับ</h3>
         {/* Radio button for "Male" */}
         {scores.map((score)=> {
@@ -146,8 +146,11 @@ function Feedback() {
             {score}
           </label>
         )})}
+
+        
         <h3>ท่านรู้สึกพึงพอใจกับการประชุมครั้งนี้มากน้อยแค่ไหน</h3>
         {/* Radio button for "Male" */}
+
         {scores.map((score)=> {
           return(
             <label>
@@ -160,11 +163,10 @@ function Feedback() {
             {score}
           </label>
         )})}
+
      
         <br/>
 
-        
- 
         <br/>
         <br/>
         
