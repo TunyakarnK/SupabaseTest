@@ -13,12 +13,11 @@ import EditMeeting from "./components/EditMeeting";
 import MeetingList from "./pages/MyMeeting/MeetingList";
 import StartMeeting from "./pages/MyMeeting/StartMeeting";
 import MeetingPage from "./pages/MyMeeting/MeetingPage";
+import FolderStatisticPage from "./components/FolderStatisticPage";
+import Feedback from "./components/Feedback/Feedback";
 import InmeetingPage from "./pages/MyMeeting/InmeetingPage";
 import Conclusion from "./pages/MyMeeting/Conclusion";
-import Note from "./components/Note";
-import Detail_Conclusion from "./components/Detail_Conclusion";
-import Navbar from "./components/Navbar/Navbar";
-
+import SharedMeetingList from "./pages/SharedMeeting/SharedMeetingList";
 
 function App() {
   return (
@@ -26,21 +25,19 @@ function App() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/Profile" element={<Profile />} />
-
-      <Route path="/MyMeeting" element={<MyMeeting />} >
-        <Route path="/MyMeeting/:folderId"  element={<MeetingList />} />
-      </Route>
-
-      <Route path="/SharedMeeting" element={<SharedMeeting />} />
-      <Route path="/EditMeeting" element={<EditMeeting />} />
-      <Route path="/StartMeeting" element={<StartMeeting />} />
+      <Route path="/MyMeeting" element={<MyMeeting />} />
+      <Route path="/Folder/:folderid" element={<MeetingList/>} />
+      <Route path="/Folder/:folderid/statistic" element={<FolderStatisticPage />} />
       <Route path="/MeetingPage/:id" element={<MeetingPage />} />
-      {/* <Route path="/Detail_Note/:id" element={<Note />} /> */}
-      {/* <Route path="/Detail_Conclusion/:id" element={<Detail_Conclusion />} /> */}
+      <Route path="/SharedMeeting" element={<SharedMeeting />} />
+      <Route path="/SharedMeeting/:folderid" element={<SharedMeetingList />} />
+      <Route path="/EditMeeting" element={<EditMeeting />} />
       <Route path="/Inmeeting/:id" element={<InmeetingPage />} />
       <Route path="/Conclusion/:id" element={<Conclusion />} />
-      {/* <Route path="/MyMeeting/:folder" render={(props) => <MeetingDetails {...props} items={[]} />}
-        /> */}
+      <Route path="/Feedback" element={<Feedback />} />
+      <Route path="/StartMeeting" element={<StartMeeting />} />
+      <Route path="/MeetingPage/:id" element={<MeetingPage />} />
+
       
       {/* <Route path="/SignUp" element={<SignUp />} /> */}
     </Routes>
