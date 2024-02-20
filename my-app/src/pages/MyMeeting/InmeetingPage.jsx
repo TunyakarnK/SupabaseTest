@@ -122,13 +122,12 @@ function addNote() {
     </div>
     <div style={{margin:"20px"}}>
       <Grid align='center' style={{ marginLeft:'70px' }}>
-      
       <Grid.Col span={8}>
-        <Text size="xl">Meeting: {meetData[0]?.meetName}</Text>
+      <Text size='30px' fw={'500'} style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>Meeting: {meetData[0]?.meetName}</Text>
       </Grid.Col>
       <Grid.Col span={1.5} />
       <Grid.Col span={1} >
-        <Link to={"/Conclusion/"+id}><Button radius='xl' color="#EE5D20" onClick={addNote}>Conclusion</Button></Link> 
+        <Link to={"/Conclusion/"+id}><Button radius='xl' color="#EE5D20" onClick={addNote} style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>Conclusion</Button></Link> 
       </Grid.Col>
       </Grid>
       
@@ -218,7 +217,9 @@ function addNote() {
    
       {/* {true ? (<form></form> :)} */}
       </div>
+      <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div>
     </div>
+    
     
   );
 }

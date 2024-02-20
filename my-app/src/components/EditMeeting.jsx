@@ -1,8 +1,5 @@
 import React from 'react'
 import { Select, NativeSelect, rem, TextInput, TagsInput, Grid,Textarea,Button, Group } from '@mantine/core';
-import { DatePickerInput } from '@mantine/dates';
-
-// import "../../App.css"
 import { useEffect, useState } from "react";
 import { supabase } from '../supabaseClient.js';
 import Navbar from './Navbar/Navbar.jsx'
@@ -20,8 +17,9 @@ function EditMeeting(props) {
       { value: 3, label: 'Info/Opinion-Sharing' },
     ];
 
-    // const [ meeting, setMeeting ]= useState ([]);
-    // const [ meetId, setMeetId ]= useState ([]);
+    const [meetData, setMeetData] = useState([]);
+    const [meetObjData, setMeetObjData] = useState([]);
+    const [newObj, setNewObj] = useState("");
     const [ meetName, setMeetName ] = useState (""); //
     // const [ ownerId, setOwnerId]= useState (""); //
     const [ meetStartDate, setMeetStartDate] = useState ();
@@ -33,7 +31,6 @@ function EditMeeting(props) {
     const [ meetCreate, setMeetCreate]= useState ();
     const [ meetStartTime, setMeetStartTime]= useState ();
     const [ meetEndTime, setMeetEndTime]= useState ();
-    const [ meetObj, setMeetObj]= useState ();
     const [ meetParti, setMeetParti]= useState ();
 
     useEffect(() =>{
@@ -46,22 +43,56 @@ function EditMeeting(props) {
           }
         })
       }
+      const fetchMeeting = async () => {
+        const { data, error } = await supabase
+          .from("meeting")
+          .select()
+          .eq("meetId", state.meeting.meetId);
+  
+        if (data) {
+          console.log( data);
+          setMeetData(data);
+          console.log(data[0]);
+        }
+      };
+      fetchMeeting();
       getUserData();
       getMeeting();
+      fetchObj();
       // getObj();
       console.log('from edit page')
       console.log(state.meeting.meetId)
       console.log(state.meeting)
     }, [])
 
-    //ดึงข้อมูล Objective ของ meeting
-    // async function getObj() {
-    //   try {
-        
-    //   } catch (error) {
-    //     alert(error.message);
-    //   }
-    // }
+    const fetchObj = async () => {
+      const { data, error } = await supabase
+        .from("meetObj")
+        .select("objId, objDes, objStatus")
+        .eq("meetId", state.meeting.meetId)
+        .eq("objStatus", false);
+      if (data) {
+        console.log(data);
+        setMeetObjData(data);
+      }
+    };
+
+    function addObj(e) {
+      e.preventDefault();
+      supabase
+        .from("meetObj")
+        .insert({
+          folderId: meetData[0]?.folderId,
+          meetId: state.meeting.meetId,
+          objDes: newObj,
+        })
+        .then((result) => {
+          console.log(result);
+          fetchObj(); 
+          setNewObj("");
+        });
+        updateMeeting();
+    }
 
     //ดึงข้อมูล Folder ของ meeting
     // async function getFolder() {
@@ -90,8 +121,10 @@ function EditMeeting(props) {
           //ต้องๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
         if (error) throw error;
         if (data != null) {
+          setMeetData(data)
           setMeetName(data.meetName); 
           setMeetDes(data.meetDes)
+          console.log('meet',data)
         }
       } catch (error) {
         alert(error.message);
@@ -117,6 +150,7 @@ function EditMeeting(props) {
           
           if (error) throw error;
           // window.location.reload();
+          addObj();
           navigate("/MyMeeting");
       } catch (error) {
           console.log(meetStartTime )
@@ -142,7 +176,6 @@ function EditMeeting(props) {
              <Grid style={{margin:"20px", backgroundColor: '#FDEFE9',padding:"20px"}}>
               <Grid.Col span={6}>
                 <TextInput
-                
                     placeholder={state.meeting.meetName}
                     defaultValue={state.meeting.meetName}
                     label="Meeting Name"
@@ -299,8 +332,15 @@ function EditMeeting(props) {
               <TagsInput
                 label="Meeting Objective"
                 placeholder="Press Enter to submit Objective"
-                defaultValue={meetObj}
+                defaultValue={meetObjData}
                 clearable
+                // value={newObj} 
+                onChange={(event) => setNewObj(event.currentTarget.value)}
+              //   onKeyDown={(event) => {
+              //     if (event.key === 'Enter') {
+              //         addObj(event);
+              //     }
+              // }}
                 styles={{
                   input: {
                     color:'#EE5D20',
@@ -334,7 +374,10 @@ function EditMeeting(props) {
               </div>
               {/* <div style={{width: "90%",marginTop:"30px", justifyItems:'end'}}> */}
               <Group justify="flex-end" mt="md" style={{ marginRight:'10%' , marginTop:"30%" }}>
-              <Button color='#EE5D20' radius="xl" style={{ marginTop:"10%" }} onClick={() => updateMeeting()}>Update Meeting</Button>
+              <Button color='#EE5D20' radius="xl" style={{ marginTop:"10%" }} 
+              onClick={()=>updateMeeting()}
+              // onClick={addObj}
+              >Update Meeting</Button>
             </Group>
                 
               {/* </div> */}
