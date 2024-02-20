@@ -4,8 +4,10 @@ import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from '../../supabaseClient.js';
 import Navbar from '../../components/Navbar/Navbar.jsx'
-import MeetingCard from 'src/components/MeetingCard';
-
+import MeetingCard from 'src/components/NewMeetingCard';
+import FolderCard from 'src/components/FolderCard';
+import { Grid, ScrollArea, TextInput,Text,rem, Button,Modal ,Radio,Group} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 
 
 function MyMeeting() {
@@ -16,6 +18,7 @@ function MyMeeting() {
   const [folder, setFolder] = useState([]);
   const [folderName, setFolderName] = useState([]);
   const [newMeeting, setNewMeeting] = useState([]);
+  const [opened, { open, close }] = useDisclosure(false);
   const [newMeetName, setNewMeetName] = useState([]);
   
     useEffect(() =>{
@@ -29,28 +32,12 @@ function MyMeeting() {
         })
       }
       getUserData();
-      getFolder();
-      getNewMeeting();
+      fetchFolder();
+      fetchNewMeeting();
+      console.log('meet'+newMeeting)
     }, [])
 
-    async function deletefolder() {
-      try {
-          const { data, error } = await supabase
-              .from("folders")
-              .delete()
-              .eq("folderName", folder.folderName)
-          
-          if (error) throw error;
-          window.location.reload();
-      } catch (error) {
-          alert(error.message);
-      }
-  }
-  const delfol = ()=>{
-    console.log(folder.folderName)
-  }
-
-    async function getNewMeeting() {
+    async function fetchNewMeeting() {
       try {
         const { data, error } = await supabase
           .from("meeting")
@@ -65,7 +52,7 @@ function MyMeeting() {
       }
     }
 
-    async function getFolder() {
+    async function fetchFolder() {
       try {
         const { data, error } = await supabase
           .from("folders")
@@ -100,66 +87,55 @@ function MyMeeting() {
     return (
       <div className="App">
         {Object.keys(user).length !== 0 ?
-          <>
+    <>
         <header>
         <Navbar props={user}/>
         </header>
-       <div className='body-container'>
-        <h1>My Meeting</h1>
+
+       <div style={{backgroundColor:'#FDEFE9', margin:"50px", padding:'20px'}}>
+
+        <Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>New Meeting</Text>
+        <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
+        <Grid.Col span={5}><Text c="#4f5b5f" style={{marginLeft:'10px'}}>Meeting Name</Text></Grid.Col>
+        <Grid.Col span={5.5} ><Text c="#4f5b5f">Meeting Date</Text></Grid.Col>
+        </Grid>
         <div className=''>
             {newMeeting.map((newMeeting) => (
-            <MeetingCard meeting = {newMeeting} user = {user} />
+            <MeetingCard meeting = {newMeeting} user = {user} key={newMeeting.MeetId}/>
           ))}
             </div>
        <div>
-       {/* <h1>My Meeting</h1> */}
-       <button className="Button" onClick={() => setCreateFolder(true)}> + New Folder</button>
-       { createFolder == false ?
-        <>
-          <div className="folders">
-            {folder.map(folder => (
-              <div className="folders">
-              <Link to={String(folder.folderId)} key={folder.folderId} >
-                <p>{folder.folderId}{folder.folderName}</p>
-                {/* <button style={{display: "flex",}} 
-                onClick={delfol}
-                >Delete folder</button> */}
-              </Link>  
-              </div>
+        <Grid align="center">
+          <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'50px',marginBottom:'30px'}}>My Meeting</Text></Grid.Col>
+          <Grid.Col span={1}><Button color='#EE5D20' radius={60} onClick={open} style={{marginTop:'30px'}}> + New Folder</Button></Grid.Col>
+        </Grid>
+       
+       
+       
+        <div>
+          <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
+          <Grid.Col span={5}><Text c="#4f5b5f" style={{marginLeft:'10px'}}>Folder Name</Text></Grid.Col>
+          <Grid.Col span={5.5} ><Text c="#4f5b5f">Owner</Text></Grid.Col>
+          </Grid>
+
+          <div>
+            {folder.map((folder) => (
+              <FolderCard folder = {folder} user = {user} key={folder.folderId} />
             ))}
             
           </div>
-
-          {/* <div>
-            {folder.map((folder) => (
-            <li key = {folder.folderName}>
-              {folder.folderName}
-            
-            </li>
-          ))}
-            </div> */}
-            
-        </>
-          : 
-        <>            
-        <div>
-             <h3>Create New Folder in Supabase Database</h3>
-             <form>
-              <label>Folder Name
-              <input type="text" 
-                  value={folderName}
-                  onChange={(e) => setFolderName(e.target.value)} />
-             </label>
-             </form>
-             <br></br>
-             <button className="Button" onClick={() => createNewFolder()}>Create Folder</button>
         </div>
-        </>
-       }
-       </div>
-       </div>
-       
-       </>
+          
+        <Modal opened={opened} onClose={close} title="Delete" centered>
+       <TextInput label="Rename Folder" defaultValue={folder.folderName} size="xs" onChange={(event) => setFolderName(event.currentTarget.value)} />
+              <Button color='#EE5D20' onClick={close} style={{marginTop:'10px',marginRight:'10px',marginLeft:'90px'}}>Cancle</Button>
+              <Button variant='outline' color='#EE5D20' style={{marginTop:'10px'}} onClick={() => createNewFolder()}>Create</Button>
+      </Modal>   
+            </div>
+            </div>
+            <div style={{height:'10px', backgroundColor:'white'}}></div> 
+           <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div> 
+    </>
        :
        <></>
        }
