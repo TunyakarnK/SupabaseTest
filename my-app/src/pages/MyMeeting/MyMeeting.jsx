@@ -9,7 +9,6 @@ import FolderCard from 'src/components/FolderCard';
 import { Grid, ScrollArea, TextInput,Text,rem, Button,Modal ,Radio,Group} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
-
 function MyMeeting() {
   const navigate = useNavigate();
   
@@ -41,8 +40,8 @@ function MyMeeting() {
       try {
         const { data, error } = await supabase
           .from("meeting")
-          .select("*")
-          //จริงๆๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
+          .select('*')
+          .is('folderId', null);
         if (error) throw error;
         if (data != null) {
           setNewMeeting(data); 
@@ -84,6 +83,22 @@ function MyMeeting() {
   
     console.log(folder);
 
+    async function createNewMeeting(){
+      try {
+        const { data, error } = await supabase
+          .from("meeting")
+          .insert({
+            meetName: 'Untitled Meeting',
+          })
+          .single()
+          
+        if (error) throw error;
+        window.location.reload();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
     return (
       <div className="App">
         {Object.keys(user).length !== 0 ?
@@ -93,13 +108,15 @@ function MyMeeting() {
         </header>
 
        <div style={{backgroundColor:'#FDEFE9', margin:"50px", padding:'20px'}}>
-
-        <Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>New Meeting</Text>
+        <Grid align="center">
+        <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>New Meeting</Text></Grid.Col>
+        <Grid.Col span={1}><Button color='#EE5D20' radius={60} onClick={()=>createNewMeeting()} style={{marginTop:'30px'}}> + New Meeting</Button></Grid.Col>
+        </Grid>
         <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
         <Grid.Col span={5}><Text c="#4f5b5f" style={{marginLeft:'10px'}}>Meeting Name</Text></Grid.Col>
         <Grid.Col span={5.5} ><Text c="#4f5b5f">Meeting Date</Text></Grid.Col>
         </Grid>
-        <div className=''>
+        <div >
             {newMeeting.map((newMeeting) => (
             <MeetingCard meeting = {newMeeting} user = {user} key={newMeeting.MeetId}/>
           ))}
