@@ -67,22 +67,6 @@ function SharedMeeting() {
       }
     }
   
-    async function createNewFolder() {
-      try {
-        const { data, error } = await supabase
-          .from("folders")
-          .insert({
-            folderName: folderName
-          })
-          .single()
-          
-        if (error) throw error;
-        window.location.reload();
-      } catch (error) {
-        alert(error.message);
-      }
-    }
-  
     console.log(folder);
       
     return (
@@ -98,7 +82,6 @@ function SharedMeeting() {
         <Grid align="center">
           <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'50px',marginBottom:'30px'}}>Shared with me</Text></Grid.Col>
         </Grid>
- 
         <div>
           <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
           <Grid.Col span={5}><Text c="#4f5b5f" style={{marginLeft:'10px'}}>Folder Name</Text></Grid.Col>

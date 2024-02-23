@@ -131,9 +131,10 @@ const handleButtonClick = () => {
 <div style={{ margin:"40px", padding:'20px'}}>
   
 <Grid align="center">
-  <Grid.Col span={9.5}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'30px'}}>My Meeting ❯ </Text></Grid.Col>
-  <Grid.Col span={1}><Link to="/MyMeeting" ><Button variant='outline' color='#EE5D20' radius="xl" style={{width:'auto'}}>Back</Button></Link></Grid.Col>
+<Grid.Col span={1}><Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto',marginBottom:'10px'}}>Back</Button></Grid.Col>
+  <Grid.Col span={8}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'30px'}}>My Meeting ❯ </Text></Grid.Col>
   {/* <Grid.Col span={2}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px'}}>Statistic</Button></Grid.Col> */}
+  <Grid.Col span={1.5}><Button color='#EE5D20' radius="xl" onClick={()=>feedBack()}>Feedback</Button></Grid.Col>
   <Grid.Col span={1}><Link to={"/Inmeeting/"+id} style={{}}><Button color='#EE5D20' radius="xl">Start Meeting</Button></Link></Grid.Col>
   <Grid.Col span={1}></Grid.Col>
 </Grid>
@@ -205,7 +206,6 @@ const handleButtonClick = () => {
       <InmeetingPage />
     </div> */}
     </div></div>
-    <Button onClick={()=>feedBack()}>Feedback</Button>
     <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div>
 </>
   )
