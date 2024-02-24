@@ -63,7 +63,7 @@ function MeetingCard(props) {
             const { data, error } = await supabase
                 .from("meeting")
                 .delete()
-                .eq("meetName", meeting.meetName)
+                .eq("meetId", meeting.meetId)
             
             if (error) throw error;
             window.location.reload();
@@ -104,5 +104,3 @@ function MeetingCard(props) {
 }
 
 export default MeetingCard
-
-
