@@ -17,6 +17,7 @@ function MyMeeting() {
   const [folderName, setFolderName] = useState([]);
   const [newMeeting, setNewMeeting] = useState([]);
   const [newMeetName, setNewMeetName] = useState([]);
+  const [ folderOwner, setFolderOwner ] = useState(null);
   
     useEffect(() =>{
       async function getUserData() {
@@ -55,31 +56,41 @@ function MyMeeting() {
         const { data, error } = await supabase
           .from("meeting")
           .select("*")
+          // .filter("folderId", 'is', null)
           .eq("creatorId", session.user.id)
           //จริงๆๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
         if (error) throw error;
         if (data != null) {
+          console.log("getNewMeeting",data);
           setNewMeeting(data); 
         }
       } catch (error) {
-        alert(error.message);
+        // alert(error.message);
+        console.log("getNewMeeting",error);
       }
     }
 
     async function getFolder() {
       try {
         const { data, error } = await supabase
-          .from("folders")
-          .select("*")
+          .from("userFolder")
+          .select(
+            `
+            userId,
+            folders(folderName,folderId)
+            `
+          )
+          .eq("checkOwner", true)
+          .eq("userId", session.user.id)
         if (error) throw error;
         if (data != null) {
+          console.log("getFolder", data);
           setFolder(data); 
         }
       } catch (error) {
-        alert(error.message);
+        // alert(error.message);
       }
     }
-  
     async function createNewFolder() {
       try {
         const { data, error } = await supabase
@@ -87,17 +98,33 @@ function MyMeeting() {
           .insert({
             folderName: folderName
           })
+          .select("folderId")
           .single()
-          
-        if (error) throw error;
-        window.location.reload();
+          .then((result) => {
+            console.log("create New Folder", result);
+            supabase
+            .from("userFolder")
+            .insert({
+              userId: session.user.id,
+              folderId: result.data.folderId,
+              checkOwner: true
+            })
+            .then((result) => {
+              console.log("user Folder", result);
+              setFolderOwner(result);
+              // window.location.reload();
+            });
+          });
+        if (result){
+          console.log("create New Folder", result);
+        }
       } catch (error) {
-        alert(error.message);
+        // alert(error.message);
       }
     }
   
     console.log(folder);
-
+    console.log(folderOwner);
     return (
       <div className="App">
         {Object.keys(user).length !== 0 ?
@@ -120,15 +147,14 @@ function MyMeeting() {
           <div className="folders">
             {folder.map(folder => (
               <div className="folders">
-              <Link to={String(folder.folderId)} key={folder.folderId} >
-                <p>{folder.folderId}{folder.folderName}</p>
+              <Link to={'/Folder/' + String(folder.folders.folderId)} key={folder.folders.folderId} >
+                <p>{folder.folders.folderName}</p>
                 {/* <button style={{display: "flex",}} 
                 onClick={delfol}
                 >Delete folder</button> */}
               </Link>  
               </div>
             ))}
-            
           </div>
 
           {/* <div>
