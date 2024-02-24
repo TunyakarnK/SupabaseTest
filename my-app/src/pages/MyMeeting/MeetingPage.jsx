@@ -8,38 +8,56 @@ import Detail from 'src/components/Detail/Detail';
 import Note from 'src/components/Note';
 import Detail_Conclusion from 'src/components/Detail_Conclusion';
 import Navbar from 'src/components/Navbar/Navbar';
-import { useSession } from '@supabase/auth-helpers-react';
+import InmeetingPage from './InmeetingPage';
 import { useNavigate } from "react-router-dom";
-import { SegmentedControl, Text, rem } from '@mantine/core';
+import { Grid, GridCol, SegmentedControl, Text, rem, Button } from '@mantine/core';
 import classes from 'src/components/Detail/NavbarSegmented.module.css';
+import { useSession } from '@supabase/auth-helpers-react';
+
+
+const tabs = {
+  Details: [
+    { label: 'Details', value: <Detail /> },
+  ],
+  Note: [
+    { label: 'Note', value: <Note />},
+  ],
+  Conclusion: [
+    { label: 'Conclusion', value: <Detail_Conclusion /> },
+  ],
+  Feedback: [
+    {  label: 'Feedback', value: <Feedback />},
+  ],
+};
 
 function MeetingPage() {
-
-  const tabs = {
-    Details: [
-      { label: 'Details', value: <Detail /> },
-    ],
-    Note: [
-      { label: 'Note', value: <Note />},
-    ],
-    Conclusion: [
-      { label: 'Conclusion', value: <Detail_Conclusion /> },
-    ],
-    Feedback: [
-      {  label: 'Feedback', value: <Feedback />},
-    ],
-  };
-
+const [thisUser, setThisUser] = useState({});  
+const navigate = useNavigate();
 const { id } = useParams();
-const [ meetData, setMeetData ] = useState (null);
+// const {user} = useParams();
+const [ meetData, setMeetData ] = useState ([]);
 const [ isRunning, setIsRunning ] = useState(false);
-const [ meetStartTime, setMeetStartTime ] = useState('');
+// const [ meetStartTime, setMeetStartTime ] = useState('');
 const [ meetStopTime, setMeetEndTime ] = useState('');
 const [ toggle, setToggle ] = useState(1)
 const [isEnded, setIsEnded ] = useState(false);
 const [section, setSection] = useState('Details');
 const [active, setActive] = useState('Billing');
 const session = useSession();
+
+
+
+// useEffect(() =>{
+//   // fetchMeeting();
+//   console.log(data);
+//   console.log(meetData);
+// }, [])
+
+function updateToggle(id) {
+  setToggle(id)
+}
+
+
 
 const fetchCreator = async () => {
   try {
@@ -61,45 +79,20 @@ useEffect(() => {
   fetchCreator()
 }, []);
 
-
-function updateToggle(id) {
-  setToggle(id)
-}
-
-const meetEndTime1 = new Date();
-const meetStartTime1 = new Date();
+const meetStartTime = new Date();
 const handleButtonClick = () => {
-    if (isRunning) {
-      setMeetEndTime(new Date());
-      
-      console.log(meetEndTime1.toLocaleTimeString("th-TH"));
-
-      supabase.from("meeting").update({
-        meetEndTime: meetEndTime1.toLocaleTimeString(),
-      })
-      .eq('meetId', id)
-      .then(result => {
-        console.log(result);
-      });
-    } else {
-      setMeetStartTime(new Date());
-      console.log(meetStartTime1.toLocaleTimeString("th-TH"));
-      supabase.from("meeting").update({
-        meetStartTime: meetStartTime1.toLocaleTimeString(),
-      })
-      .eq('meetId', id)
-      .then(result => {
-        console.log(result);
-      });
-    }
-    setIsRunning(!isRunning);
-    if (isRunning) {
-      setIsEnded(true);
-    }
+  supabase
+  .from("meeting")
+  .update({
+    meetStartTime: meetStartTime.toLocaleTimeString()
+  })
+  .eq('meetId', id)
+  .then(result => {
+    console.log(result);
+  });
   };
 
-  const links = tabs[section].map((item) => (
-   
+  const links = tabs[section].map((item) => (  
     <text
       // className={classes.link}
       data-active={item.label === active || undefined}
@@ -116,22 +109,46 @@ const handleButtonClick = () => {
 
 
   return (
-<>
-{/* <Navbar props={user} /> */}
-<div style={{margin:"20px"}}>
+<><div style={{ }}>
+<Navbar props={session.user} />
+<div style={{margin:"20px", }}>
 {/* <Navbar></Navbar> */}
-<Link to="/MyMeeting"><button variant="contained">Back</button></Link>
-    <div className='tabside'>
-      <ul>
-        <li onClick={() => updateToggle(1)}><button>Detail</button></li>
-        <li onClick={() => updateToggle(2)}><button>FeedBack</button></li>
-        <li><Link to={"/Inmeeting/"+id}><button className="btn-con">Start Meeting</button></Link></li>
+<Grid>
+  <Grid.Col span={{ base: 12, xs: 4 }}>
+    {meetData !== session.user.id ? (
+      <Link to="/SharedMeeting"><Button color='#EE5D20' radius="xl">Back</Button></Link>)
+        :
+      (<Link to="/MyMeeting" style={{marginLeft:"20px", }}><Button color='#EE5D20' radius="xl">Back</Button></Link>)}
 
-         {/* li onClick={() => updateToggle(3)}>{isEnded ? (<p>Ended</p>): */}
-          {/* // (<Link><button onClick={handleButtonClick}>{isRunning ? 'STOP' : 'START'}</button></Link>)}</li> */}
+  </Grid.Col>
+  <Grid.Col span={{ base: 12, xs: 6 }}>  
+  </Grid.Col>
+  <Grid.Col span={{ base: 12, xs: 2 }} justify="flex-end">
     
-      </ul>
-    </div>
+  </Grid.Col></Grid>
+<div>      
+      
+</div>
+<div>
+<Grid>
+  <Grid.Col span={{ base: 12, xs: 4 }}>
+  <Text size='xl' style={{marginLeft:'20px'}}>My Meeting
+   {/* {meetData.map((meetData, index) => (
+        <div key={index}>
+          <p> My Meeting {meetData?.meetName || "ยังไม่มีงับ"}</p> 
+        </div>
+      ))} */}
+      </Text>
+  </Grid.Col>
+  <Grid.Col span={{ base: 12, xs: 5 }}></Grid.Col>
+  <Grid.Col span={{ base: 12, xs: 1 }}></Grid.Col>
+  <Grid.Col span={{ base: 12, xs: 2 }} justify="flex-end">
+  {meetData === session.user.id && (
+        <Link to={"/Inmeeting/"+id}><button className="btn-con" onClick={() => handleButtonClick()}>Start Meeting</button></Link>  
+  )}
+        </Grid.Col></Grid>
+  
+</div>
     {/* <div>user:{state.user.user_metadata.full_name}</div> */}
     <nav className={classes.navbar}>
       <div>      
@@ -139,7 +156,10 @@ const handleButtonClick = () => {
           value={section}
           onChange={(value) => setSection(value)}
           transitionTimingFunction="ease"
-          style={{ width: rem(700) }}
+          color='#EE5D20'
+          style={{ width: rem(700) , 
+            backgroundColor:'#FDEFE9',
+          }}
           data={[
             { label: 'Details', value: 'Details' },
             { label: 'Note', value: 'Note' },
@@ -184,7 +204,7 @@ const handleButtonClick = () => {
       <h1>กำลังประชุม</h1>
       <InmeetingPage />
     </div> */}
-    </div>
+    </div></div>
 </>
   )
 }
