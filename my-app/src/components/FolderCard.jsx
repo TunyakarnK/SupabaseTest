@@ -8,7 +8,7 @@ function FolderCard() {
         const { data, error } = await supabase
             .from("meeting")
             .delete()
-            .eq("meetName", meeting.meetName)
+            .eq("meetId", meeting.meetId)
         
         if (error) throw error;
         window.location.reload();
@@ -20,10 +20,8 @@ function FolderCard() {
     // <div className=''>MyMeetingFolderCard</div>
     <div className="folders">
       {folder.map(career => (
-        <Link to={career.id.toString()} key={career.id}>
-          <p>{career.title}</p>
-          <p>Based in {career.location}</p>
-        </Link>
+        <Link to={'/Folder/' + career.id.toString()}>{career.title}</Link>
+        
       ))}
     </div>
   )
