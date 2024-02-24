@@ -9,6 +9,7 @@ function Detail() {
   const [meetData, setMeetData] = useState([]);
   const [userData, setUserData] = useState([]);
   const [meetObjData, setMeetObjData] = useState([]);
+  const [ meetAtten , setMeetAtten ] = useState([]);
 
   const fetchMeeting = async () => {
     try {
@@ -17,7 +18,7 @@ function Detail() {
         .select()
         .eq("meetId", id);
       if (data) {
-        console.log(data);
+        console.log("fetch Meeting", data);
         setMeetData(data);
         fetchObj();
       }
@@ -42,7 +43,7 @@ function Detail() {
       )
       .eq("meetId", id);
     if (data) {
-      console.log(data);
+      console.log("fetch Creator", data);
       setUserData(data);
       // console.log(data);
     }
@@ -57,7 +58,7 @@ function Detail() {
         .eq("folderId", userData[0].folderId)
         .eq("objStatus", false);
       if (data) {
-        console.log(data);
+        console.log("fetching meetObj:", data);
         setMeetObjData(data);
       }
     } catch (error) {
@@ -65,9 +66,34 @@ function Detail() {
     }
   };
 
+  const fetchAttendee = async () => {
+    try {
+      const { data, error } = await supabase
+      .from("meeting")
+      .select(
+        `
+        attendee(
+          userId,
+          members:user(full_name)
+          )
+        `
+      )
+      .eq("meetId", id)
+      .single();
+      if (data) {
+        console.log("fetching attendee", data.attendee);
+        setMeetAtten(data.attendee)
+      }if (error) {
+        console.error("Error fetching attendee:", error);
+      }
+    } catch (error) {
+      console.error("Error fetching attendee:", error);
+    }
+  };
+
   useEffect(() => {
     fetchMeeting();
-
+    fetchAttendee();
     fetchCreator();
   }, []);
 
@@ -76,9 +102,14 @@ function Detail() {
     fetchObj();
   }, [meetData]);
 
-  console.log(userData);
+  // useEffect(() => {
+    
+  // }, [meetAtten]);
+
   return (
-    <>
+    <><div 
+    // style={{ backgroundColor:'#FDEFE9' }}
+    >
     <Text size="xl">Details:</Text>
       {userData.map((userData, index) => (
         <div key={index}>
@@ -91,6 +122,10 @@ function Detail() {
               : "Have no data"}
           </p>
         </div>
+      ))}
+      <p> Attendee:</p>
+      {meetAtten.map((listAtten) => (
+        <div key={listAtten.members}>{listAtten.members.full_name}</div>
       ))}
       {meetData.map((meetData, index) => (
         <div key={index}>
@@ -109,6 +144,15 @@ function Detail() {
           </div>
         ))}
       </div>
+
+      {/* <div>
+        {mapMeeting.ownerId}
+      </div>
+      {filterOwner.map((filterOwner, index) => (
+        <div>
+          <p> Owner: {filterOwner.firstName}</p>
+        </div>
+      ))} */}</div>
     </>
   );
 }
