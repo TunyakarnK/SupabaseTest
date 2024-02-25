@@ -20,7 +20,7 @@ function EditMeeting(props) {
     ];
 
     const [ meetData, setMeetData ] = useState([]);
-    const [ meetName, setMeetName ] = useState (""); //
+    const [ meetName, setMeetName ] = useState (); //
     // const [ ownerId, setOwnerId]= useState (""); //
     const [ meetStartDate, setMeetStartDate] = useState ();
     const [ meetFolder, setMeetFolder]= useState ();
@@ -37,7 +37,7 @@ function EditMeeting(props) {
     const [ selectedFolder, setSelectedFolder ] = useState();
     const [ meetObjData, setMeetObjData ] = useState([]);
     const [ newObj, setNewObj ] = useState([]);
-
+    const [ meetAtten , setMeetAtten ] = useState([]);
     // console.log("meeting tag", data[1].value);
     console.log("meeting tag", meetTagId);
     useEffect(() =>{
@@ -67,6 +67,7 @@ function EditMeeting(props) {
       getMeeting();
       fetchFolder();
       fetchObj();
+      fetchAttendee();
       // getObj();
       console.log('from edit page')
       console.log(state.meeting.meetId)
@@ -88,13 +89,13 @@ function EditMeeting(props) {
 
     
   // delete Objective
-    async function deleteObj(objId) {
+    async function deleteObj(ob) {
       supabase
         .from("meetObj")
         .delete()
-        .eq('objId', objId.objId)
+        .eq('objId', obj.objId)
         .then(() => {
-          console.log("Deleted");
+          console.log("Deleted Objective");
           fetchObj();
         });
     }
@@ -126,17 +127,46 @@ function EditMeeting(props) {
     // }
 
     //ดึงข้อมูล Participant ของ meeting
-    // async function getParti() {
-    //   try {
-        
-    //   } catch (error) {
-    //     alert(error.message);
-    //   }
-    // }
+    const fetchAttendee = async () => {
+      try {
+        const { data, error } = await supabase
+        .from("meeting")
+        .select(
+          `
+          attendee(
+            userId, attId,
+            members:user(full_name)
+            )
+
+          `
+        )
+        .eq("meetId", state.meeting.meetId)
+        .single();
+        if (data) {
+          console.log("fetching attendee", data.attendee);
+          setMeetAtten(data.attendee)
+        }if (error) {
+          console.error("Error fetching attendee:", error);
+        }
+      } catch (error) {
+        console.error("Error fetching attendee:", error);
+      }
+    };
+
+    async function deleteAtt(att) {
+      supabase
+        .from("attendee")
+        .delete()
+        .eq('attId', att.attId)
+        .then((result) => {
+          console.log("Deleted attendee", result);
+          fetchAttendee();
+        });
+    }
 
     async function getMeeting() {
       try {
-        const { data, error } = await supabase
+        await supabase
           .from("meeting")
           .select()
           .eq("meetId", state.meeting.meetId)
@@ -154,7 +184,7 @@ function EditMeeting(props) {
           //ต้องๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
         // if (error) throw error;
       } catch (error) {
-        alert(error.message);
+        console.log("174", error.message);
       }
     }
 
@@ -417,6 +447,11 @@ function EditMeeting(props) {
             </button>
           </div>
         ))}
+          {meetObjData.map((meetObjData) => (
+          <div key={meetObjData.objId}>
+            {meetObjData.objDes}<button onClick={() => deleteObj(meetObjData)}>x</button>
+          </div>
+        ))}
               <TagsInput
                 label="Meeting Objective"
                 placeholder="Press Enter to submit Objective"
@@ -452,6 +487,11 @@ function EditMeeting(props) {
             <button value={listNewObj}>
               x
             </button>
+          </div>
+        ))}
+        {meetAtten.map((listAtten) => (
+          <div key={listAtten.members}>
+            {listAtten.members.full_name}<button onClick={() => deleteAtt(listAtten)}>x</button>
           </div>
         ))}
               <TagsInput
