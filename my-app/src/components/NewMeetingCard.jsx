@@ -8,7 +8,7 @@ import { Card, Table, Grid,Text,Button, ActionIcon,  Modal} from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks';
 import { IconTrash } from '@tabler/icons-react';
 
-function MeetingCard(props) {
+function NewMeetingCard(props) {
   
   const meeting = props.meeting;
   const user = props.user;
@@ -22,7 +22,6 @@ function MeetingCard(props) {
   // const [ ownerId, setOwnerId]= useState ([]);
   const [ meetStartDate, setMeetStartDate] = useState ([]);
   
-  //fetch status ของ meeting
 
   useEffect(() => {
     async function getUserData() {
@@ -42,7 +41,7 @@ function MeetingCard(props) {
             const { data, error } = await supabase
                 .from("meeting")
                 .delete()
-                .eq("meetId", meeting.meetId)
+                .eq("meetName", meeting.meetName)
             
             if (error) throw error;
             window.location.reload();
@@ -55,7 +54,7 @@ function MeetingCard(props) {
     } 
 
     function handleButtonClick (){
-        navigate('/MeetingPage/' + meeting.meetId, { state: { user } });    
+        navigate('/MeetingPage/${meeting.meetId}', { state: { user } });    
     }
 
 
@@ -68,13 +67,10 @@ function MeetingCard(props) {
     >                
       
         <Grid align="center" >
-        <Grid.Col span={4} onClick={handleButtonClick} ><Text >{meeting.meetName}</Text></Grid.Col>
-        <Grid.Col span={2}><Text c="#4f5b5f" >status</Text></Grid.Col>
-        <Grid.Col span={2} onClick={handleButtonClick} ><Text>{user.user_metadata.full_name}</Text></Grid.Col>
-        <Grid.Col span={2} onClick={ handleButtonClick} >{meeting.meetStartDate}</Grid.Col>
-
-        <Grid.Col span={1.5} ><Button variant='outline' color='#EE5D20' onClick={EditMeeting}>Edit Meeting</Button></Grid.Col>
-        <Grid.Col span={0.5} ><ActionIcon onClick={open} variant="subtle" color="#EE5D20"><IconTrash/></ActionIcon></Grid.Col>    
+        <Grid.Col span={5} onClick={handleButtonClick} ><Text >{meeting.meetName}</Text></Grid.Col>
+        <Grid.Col span={5.5} onClick={handleButtonClick} >{meeting.meetStartDate}</Grid.Col>
+        <Grid.Col span={1} ><Button variant='outline' color='#EE5D20' onClick={EditMeeting}>Edit Meeting</Button></Grid.Col>
+        {/* <Grid.Col span={0.5} ><ActionIcon onClick={open} variant="subtle" color="#EE5D20"><IconTrash/></ActionIcon></Grid.Col>     */}
         </Grid>            
         <Modal opened={opened} onClose={close} title="Delete" centered>
         <div style={{padding:'10px'}}>Do you want to delete {meeting.meetName} ?</div>
@@ -88,4 +84,6 @@ function MeetingCard(props) {
   )
 }
 
-export default MeetingCard
+export default NewMeetingCard
+
+

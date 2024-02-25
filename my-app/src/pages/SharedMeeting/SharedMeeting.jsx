@@ -6,6 +6,10 @@ import { useSession } from '@supabase/auth-helpers-react';
 import MeetingCard from 'src/components/MeetingCard';
 import '../../components/MeetingCard.css'
 import { useNavigate, Link } from "react-router-dom";
+import FolderCard from 'src/components/FolderCard';
+import { Grid, ScrollArea, TextInput,Text,rem, Button,Modal ,Radio,Group} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+
 
 function SharedMeeting() {
   // const navigate = useNavigate();
@@ -78,24 +82,35 @@ function SharedMeeting() {
     return (
       <div className="App">
         {Object.keys(user).length !== 0 ?
-          <>
+    <>
         <header>
         <Navbar props={user}/>
         </header>
-       <h1>This is SharedMeeting Page</h1>
-          <div className="folders">
-            {folder.map(folder => (
-              <div className="folders">
-              <Link to={'/SharedMeeting/Folder/' + String(folder.folders.folderId)} key={folder.folders.folderId} >
-                <p>{folder.folders.folderName}</p>
-                {/* <button style={{display: "flex",}} 
-                onClick={delfol}
-                >Delete folder</button> */}
-              </Link>  
-              </div>
+
+       <div style={{backgroundColor:'#FDEFE9', margin:"50px", padding:'20px',minHeight:'500px'}}>   
+       <div>
+        <Grid align="center">
+          <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'50px',marginBottom:'30px'}}>Shared with me</Text></Grid.Col>
+        </Grid>
+        <div>
+          <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
+          <Grid.Col span={5}><Text c="#4f5b5f" style={{marginLeft:'10px'}}>Folder Name</Text></Grid.Col>
+          <Grid.Col span={5.5} ><Text c="#4f5b5f">Owner</Text></Grid.Col>
+          </Grid>
+
+          <div>
+            {folder.map((folder) => (
+              <FolderCard folder = {folder} user = {user} key={folder.folderId} />
             ))}
+            
           </div>
-       </>
+        </div>
+          
+            </div>
+            </div>
+            <div style={{height:'10px', backgroundColor:'white'}}></div> 
+           <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div> 
+    </>
        :
        <></>
        }

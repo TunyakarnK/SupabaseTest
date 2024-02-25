@@ -1,8 +1,5 @@
 import React from 'react'
 import { Select, NativeSelect, rem, TextInput, TagsInput, Grid,Textarea,Button, Group } from '@mantine/core';
-import { DatePickerInput } from '@mantine/dates';
-
-// import "../../App.css"
 import { useEffect, useState } from "react";
 import { supabase } from '../supabaseClient.js';
 import Navbar from './Navbar/Navbar.jsx'
@@ -22,8 +19,7 @@ function EditMeeting(props) {
       { value: 3, label: 'Info/Opinion-Sharing' },
     ];
 
-    // const [ meeting, setMeeting ]= useState ([]);
-    // const [ meetId, setMeetId ]= useState ([]);
+    const [ meetData, setMeetData ] = useState([]);
     const [ meetName, setMeetName ] = useState (""); //
     // const [ ownerId, setOwnerId]= useState (""); //
     const [ meetStartDate, setMeetStartDate] = useState ();
@@ -54,6 +50,19 @@ function EditMeeting(props) {
           }
         })
       }
+      const fetchMeeting = async () => {
+        const { data, error } = await supabase
+          .from("meeting")
+          .select()
+          .eq("meetId", state.meeting.meetId);
+  
+        if (data) {
+          console.log( data);
+          setMeetData(data);
+          console.log(data[0]);
+        }
+      };
+      fetchMeeting();
       getUserData();
       getMeeting();
       fetchFolder();
@@ -181,7 +190,7 @@ function EditMeeting(props) {
               console.log(result);
             });
           }
-          // Insert attendee
+          // Insert attendee select id from where email
           for (var i = 0; i <= meetParti.length; i++) {
             console.log(meetParti[i]);
             supabase
@@ -191,6 +200,7 @@ function EditMeeting(props) {
             .then((result) => {
               console.log("Fetch user id where email", result.data[0].id)
               const user_id = result.data[0].id
+              // insert attendee
               supabase
               .from("attendee")
               .insert({
@@ -414,6 +424,12 @@ function EditMeeting(props) {
                 value={newObj}
                 onChange={setNewObj}
                 clearable
+                // value={newObj} 
+              //   onKeyDown={(event) => {
+              //     if (event.key === 'Enter') {
+              //         addObj(event);
+              //     }
+              // }}
                 styles={{
                   input: {
                     color:'#EE5D20',
@@ -459,7 +475,10 @@ function EditMeeting(props) {
               </div>
               {/* <div style={{width: "90%",marginTop:"30px", justifyItems:'end'}}> */}
               <Group justify="flex-end" mt="md" style={{ marginRight:'10%' , marginTop:"30%" }}>
-              <Button color='#EE5D20' radius="xl" style={{ marginTop:"10%" }} onClick={() => updateMeeting()}>Update Meeting</Button>
+              <Button color='#EE5D20' radius="xl" style={{ marginTop:"10%" }} 
+              onClick={()=>updateMeeting()}
+              // onClick={addObj}
+              >Update Meeting</Button>
             </Group>
                 
               {/* </div> */}

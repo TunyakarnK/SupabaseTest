@@ -1,21 +1,69 @@
 import React from "react";
 import { supabase } from "src/supabaseClient";
 import { useParams } from "react-router-dom";
-import { Grid, Text } from "@mantine/core";
+import { Grid, NativeSelect, rem, TextInput ,ScrollArea,Button,Radio,Group,Text} from "@mantine/core";
+import { Link, useNavigate } from "react-router-dom";
+import Navbar from "../Navbar/Navbar";
 // import "survey-core/defaultV2.min.css";
 // import Popup from 'reactjs-popup';
 // import 'reactjs-popup/dist/index.css';
- 
 import { useState } from "react";
+import { useSession } from '@supabase/auth-helpers-react';
+
+
+const dataComment = [
+  { value: 'None', label: '---' },
+  { value: 'Good', label: 'Good' },
+  { value: 'Natural', label: 'Natural' },
+  { value: 'Bad', label: 'Bad' },
+];
 
 function Feedback() {
   const { id } = useParams();
-  const [selectedOption1, setSelectedOption1] = useState(null)
-  const [selectedOption2, setSelectedOption2] = useState(null)
-  const [selectedOption3, setSelectedOption3] = useState(null)
-  const [selectedOption4, setSelectedOption4] = useState(null)
+  const navigate = useNavigate();
+  const [comment, setComment] = useState([]);
+  const [emote, setEmote] = useState([]);
+  const [commentCard, setCommentCard] = useState([]);
+  const session = useSession();
+  // const [user, setUser] = useState({});
+  const [selectedOption1, setSelectedOption1] = useState("Male")
+  const [selectedOption2, setSelectedOption2] = useState("Male")
+  const [selectedOption3, setSelectedOption3] = useState("Male")
+  const [selectedOption4, setSelectedOption4] = useState("Male")
+
+  function combinedcommentCardOnClick() {
+    // Create a new object representing the combined comment and emote
+    const combinedCommentObject = { id: commentCard.length + 1, comment: comment, emote: emote };
+    
+    // Update the commentCard array by adding the new object
+    setCommentCard(prevCommentCard => [...prevCommentCard, combinedCommentObject]);
+    
+    // Reset comment and emote to prepare for the next input
+    setComment([]);
+    setEmote([]);
+    console.log(commentCard)
+  }
   
+
   const scores = [1,2,3,4,5,6,7,8,9,10]
+  const select = (
+    <NativeSelect
+    onChange={(event) => setEmote(event.currentTarget.value)}
+    defaultValue={emote}
+      data={dataComment}
+      rightSectionWidth={28}
+      styles={{
+        input: {
+          fontWeight: 500,
+          borderTopLeftRadius: 0,
+          borderBottomLeftRadius: 0,
+          width: rem(92),
+          marginRight: rem(-2),
+        },
+      }}
+    />
+    );
+
   // Function to handle the change in radio button selection
   function onValueChange1(event){
       // Updating the state with the selected radio button's value
@@ -43,7 +91,7 @@ function Feedback() {
     // Logging the selected option
     console.log(selectedOption1)
     
-    //test 
+    test 
     const data = [{
       qId: 1,
       answer: selectedOption1, 
@@ -98,94 +146,120 @@ function Feedback() {
    console.log(id);
   }
 
+  const radioGroup = (
+    <Group mt="xs">
+        <Radio color="#EE5D20" value="1" label="1" />
+        <Radio color="#EE5D20" value="2" label="2" />
+        <Radio color="#EE5D20" value="3" label="3" />
+        <Radio color="#EE5D20" value="4" label="4" />
+        <Radio color="#EE5D20" value="5" label="5" />
+        <Radio color="#EE5D20" value="6" label="6" />
+        <Radio color="#EE5D20" value="7" label="7" />
+        <Radio color="#EE5D20" value="8" label="8" />
+        <Radio color="#EE5D20" value="9" label="9" />
+        <Radio color="#EE5D20" value="10" label="10" />
+      </Group>
+  )
+
   return (
+     <div className="App">
+        {Object.keys(session.user).length !== 0 ?
+    <>
+        <header>
+        <Navbar props={session.user} />
+        </header>
+
+       <div style={{backgroundColor:'#FDEFE9', margin:"30px", padding:'20px'}}>
+       <Grid align="center">
+          <Grid.Col span={9.5}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'30px'}}>FeedBack</Text></Grid.Col>
+          <Grid.Col span={1}></Grid.Col>
+          <Grid.Col span={0.5}></Grid.Col>
+          <Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto',marginBottom:'10px'}}>Back</Button>
+          <Grid.Col span={1}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px',marginBottom:'30px'}} >Statistic</Button></Grid.Col>
+        </Grid>
     <div>
       <Grid grow style={{height:"auto"}}><Grid.Col span='auto' >
-<form >
-        <h3>ท่านได้รับข้อมูลชุดใหม่ที่มีความสำคัญกับท่านมากน้อยแค่ไหน</h3>
-        {/* Radio button for "Male" */}
-        {scores.map((score)=> {
-          return(
-            <label>
-            <input
-              type="radio"
-              value={`${score}`}
-              // Checking this radio button if the selected option is "Male"
-              checked={selectedOption1 === `${score}`}
-              onChange={onValueChange1}/>
-            {score}
-          </label>
-        )})}
-
-        <h3>การประชุมในครั้งนี้ช่วยให้เกิดการพัฒนาในส่วนของการทำงานร่วมกันเป็นทีมได้หรือไม่</h3> {selectedOption2}
-        {/* Radio button for "Male" */}
-        {scores.map((score)=> {
-          return(
-            <label>
-            <input
-              type="radio"
-              value={`${score}`}
-              // Checking this radio button if the selected option is "Male"
-              checked={selectedOption2 === `${score}`}
-              onChange={onValueChange2}/>
-            {score}
-          </label>
-        )})}
-
-        <h3>ท่านรู้สึกพึงพอใจแค่ไหนกับความสัมพันธ์ของเวลาในการเตรียมการ, การประชุม, และผลลัพธ์ที่ได้รับ</h3>
-        {/* Radio button for "Male" */}
-        {scores.map((score)=> {
-          return(
-            <label>
-            <input
-              type="radio"
-              value={`${score}`}
-              // Checking this radio button if the selected option is "Male"
-              checked={selectedOption3 === `${score}`}
-              onChange={onValueChange3}/>
-            {score}
-          </label>
-        )})}
-
         
-        <h3>ท่านรู้สึกพึงพอใจกับการประชุมครั้งนี้มากน้อยแค่ไหน</h3>
-        {/* Radio button for "Male" */}
+    <Radio.Group
+      name="Q1"
+      label="ท่านได้รับข้อมูลชุดใหม่ที่มีความสำคัญกับท่านมากน้อยแค่ไหน"
+      size="lg"
+      style={{margin:'20px'}}
+      onClick={(event)=>setSelectedOption1(event.target.value)}
+      withAsterisk
+    >
+      {radioGroup}
+    </Radio.Group>
 
-        {scores.map((score)=> {
-          return(
-            <label>
-            <input
-              type="radio"
-              value={`${score}`}
-              // Checking this radio button if the selected option is "Male"
-              checked={selectedOption4 === `${score}`}
-              onChange={onValueChange4}/>
-            {score}
-          </label>
-        )})}
+    <Radio.Group
+      name="Q2"
+      label="การประชุมในครั้งนี้ช่วยให้เกิดการพัฒนาในส่วนของการทำงานร่วมกันเป็นทีมได้หรือไม่"
+      size="lg"
+      style={{margin:'20px'}}
+      onClick={(event)=>setSelectedOption2(event.target.value)}
+      withAsterisk
+    >
+      {radioGroup}
+    </Radio.Group>
 
-     
-        <br/>
+    <Radio.Group
+      name="Q3"
+      label="ท่านรู้สึกพึงพอใจแค่ไหนกับความสัมพันธ์ของเวลาในการเตรียมการ, การประชุม, และผลลัพธ์ที่ได้รับ"
+      size="lg"
+      style={{margin:'20px'}}
+      onClick={(event)=>setSelectedOption3(event.target.value)}
+      withAsterisk
+    >
+      {radioGroup}
+    </Radio.Group>
 
-        <br/>
-        <br/>
-        
-        {/* Displaying the selected option */}
-        {/* <div>
-          Selected option is : {selectedOption}
-        </div> */}
-        <br/>
-        
-        {/* Submit button */}
-        <button className="btn btn-default" onClick={submit} type="submit">
-          Submit
-        </button>
-      </form>
+    <Radio.Group
+      name="Q4"
+      label="ท่านรู้สึกพึงพอใจกับการประชุมครั้งนี้มากน้อยแค่ไหน"
+      size="lg"
+      style={{margin:'20px'}}
+      onClick={(event)=>setSelectedOption4(event.target.value)}
+      withAsterisk
+    >
+      {radioGroup}
+    </Radio.Group>
+    <Button style={{margin:'20px'}} color="#EE5D20" onClick={submit} type="submit">Submit</Button>
       </Grid.Col>
-      <Grid.Col span='auto' style={{backgroundColor: "#EE5D20"}}><div >comment</div></Grid.Col>
+      <Grid.Col span='auto' style={{backgroundColor: "#EE5D20",borderRadius:'5px',}}>
+        <ScrollArea h={430}>
+        <div >
+            {commentCard.map((commentCards) => (
+              
+            <div key={commentCards.id} style={{width:'auto', backgroundColor:'#FDEFE9', borderRadius:'5px', margin:'10px',padding:'10px'}}>
+              <Grid align="center">
+                <Grid.Col span={9.5} >{commentCards.comment}</Grid.Col>
+                <Grid.Col span={1} >{commentCards.emote}</Grid.Col>
+              </Grid></div>
+          ))}
+        </div>
+        </ScrollArea>
+        <Grid align="center" style={{backgroundColor: "#FDEFE9", borderRadius:'5px', padding:'5px'}}>
+        <Grid.Col span={9.5}>
+          <TextInput
+          defaultValue={comment}
+          onChange={(event) => setComment(event.currentTarget.value)}
+          type="text"
+          placeholder="Write a Comment"
+          rightSection={select}
+          rightSectionWidth={92}
+          /></Grid.Col>
+        <Grid.Col span={2.5}><Button color="#EE5D20" fullWidth onClick={()=>combinedcommentCardOnClick()}>Send</Button></Grid.Col>
+        </Grid>
+        
+        </Grid.Col>
       </Grid>
 
-      </div>
+      </div></div>
+      <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div>
+      </>
+      :
+      <></>
+      }</div>
   )
 }
 

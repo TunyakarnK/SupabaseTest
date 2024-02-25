@@ -13,6 +13,8 @@ import EditMeeting from "./components/EditMeeting";
 import MeetingList from "./pages/MyMeeting/MeetingList";
 import StartMeeting from "./pages/MyMeeting/StartMeeting";
 import MeetingPage from "./pages/MyMeeting/MeetingPage";
+import FolderStatisticPage from "./components/FolderStatisticPage";
+import Feedback from "./components/Feedback/Feedback";
 import InmeetingPage from "./pages/MyMeeting/InmeetingPage";
 import Conclusion from "./pages/MyMeeting/Conclusion";
 import Note from "./components/Note";
@@ -20,6 +22,7 @@ import Detail_Conclusion from "./components/Detail_Conclusion";
 import Navbar from "./components/Navbar/Navbar";
 import Folder from "./pages/MyMeeting/Folder";
 import SharedMeetingFoldder from "./pages/SharedMeeting/SharedMeetingFoldder";
+import SharedMeetingList from "./pages/SharedMeeting/SharedMeetingList";
 
 function App() {
   return (
@@ -35,8 +38,12 @@ function App() {
       <Route path="/SharedMeeting" element={<SharedMeeting />} />
       <Route path="/SharedMeeting/Folder/:id" element={<SharedMeetingFoldder />} />
       <Route path="/EditMeeting" element={<EditMeeting />} />
+      <Route path="/Inmeeting/:id" element={<InmeetingPage />} />
+      <Route path="/Conclusion/:id" element={<Conclusion />} />
+      <Route path="/Feedback" element={<Feedback />} />
       <Route path="/StartMeeting" element={<StartMeeting />} />
       <Route path="/MeetingPage/:id" element={<MeetingPage />} />
+      <Route path="/MeetingPage/feedback/:id" element={<Feedback />} />
       {/* <Route path="/Detail_Note/:id" element={<Note />} /> */}
       {/* <Route path="/Detail_Conclusion/:id" element={<Detail_Conclusion />} /> */}
       <Route path="/Inmeeting/:id" element={<InmeetingPage />} />

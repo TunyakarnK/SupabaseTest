@@ -8,7 +8,7 @@ import { supabase } from 'src/supabaseClient';
 import { Grid, ScrollArea, TextInput,Text,rem, Button,Modal } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 
-function MeetingList(props) { 
+function SharedMeetingList(props) { 
   const { folderid } = useParams();
   const navigate = useNavigate();
   const [meeting, setMeeting] = useState([]);
@@ -45,7 +45,7 @@ function MeetingList(props) {
     try {
       const { data, error } = await supabase
           .from("meeting")
-          .select().eq('folderId',folderid)
+          .select("*")
             //จริงๆๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
           if (error) throw error;
           if (data != null) {
@@ -74,9 +74,9 @@ function MeetingList(props) {
      
         
         <Grid align="center">
-        {/* <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folder[0].folderName}</Text></Grid.Col> */}
           <Grid.Col span={0.8}><Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto'}}>Back</Button></Grid.Col>
-          <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'25px'}}>My Meeting ❯ {folderid}</Text></Grid.Col>
+        {/* <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folder[0].folderName}</Text></Grid.Col> */}
+          <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folderid}</Text></Grid.Col>
           <Grid.Col span={1.3}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px'}}>Statistic</Button></Grid.Col>
         </Grid>
       
@@ -101,4 +101,4 @@ function MeetingList(props) {
   )
 }
 
-export default MeetingList
+export default SharedMeetingList
