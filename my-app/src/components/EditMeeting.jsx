@@ -1,13 +1,17 @@
 import React from 'react'
-import { Select, NativeSelect, rem, TextInput, TagsInput, Grid,Textarea,Button, Group } from '@mantine/core';
+import { Select, NativeSelect, rem, TextInput,Input, TagsInput, Grid,Textarea,Button, Group,InputBase, Pill} from '@mantine/core';
 import { useEffect, useState } from "react";
 import { supabase } from '../supabaseClient.js';
 import Navbar from './Navbar/Navbar.jsx'
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { useSession } from '@supabase/auth-helpers-react';
+import classes from '../components/Edit.module.css'
+
 
 function EditMeeting(props) {
   const { state } = useLocation();
+  const session = useSession();
     // const nameRef = props.nameRef
     const [user, setUser] = useState({});
     const navigate = useNavigate();
@@ -17,13 +21,11 @@ function EditMeeting(props) {
       { value: 3, label: 'Info/Opinion-Sharing' },
     ];
 
-    const [meetData, setMeetData] = useState([]);
-    const [meetObjData, setMeetObjData] = useState([]);
-    const [newObj, setNewObj] = useState("");
-    const [ meetName, setMeetName ] = useState (""); //
+    const [ meetData, setMeetData ] = useState([]);
+    const [ meetName, setMeetName ] = useState (); //
     // const [ ownerId, setOwnerId]= useState (""); //
     const [ meetStartDate, setMeetStartDate] = useState ();
-    const [ folderId, setFolderId]= useState ();
+    const [ meetFolder, setMeetFolder]= useState ();
     const [ meetEndDate, setMeetEndDate]= useState ();
     const [ meetTagId, setMeetTagId]= useState ();
     const [ meetDes, setMeetDes]= useState ("");
@@ -31,7 +33,15 @@ function EditMeeting(props) {
     const [ meetCreate, setMeetCreate]= useState ();
     const [ meetStartTime, setMeetStartTime]= useState ();
     const [ meetEndTime, setMeetEndTime]= useState ();
-    const [ meetParti, setMeetParti]= useState ();
+    const [ meetObj, setMeetObj]= useState ();
+    const [ meetParti, setMeetParti]= useState ([]);
+    const [ userFolder, setUserFolder ] = useState([]);
+    const [ selectedFolder, setSelectedFolder ] = useState();
+    const [ meetObjData, setMeetObjData ] = useState([]);
+    const [ newObj, setNewObj ] = useState([]);
+    const [ meetAtten , setMeetAtten ] = useState([]);
+  // console.log("meeting tag", data[1].value);
+    console.log("meeting tag", meetTagId);
 
     useEffect(() =>{
       async function getUserData() {
@@ -49,22 +59,28 @@ function EditMeeting(props) {
           .select()
           .eq("meetId", state.meeting.meetId);
   
-        if (data) {
-          console.log( data);
+        if (data) {         
           setMeetData(data);
           console.log(data[0]);
         }
       };
+
+      
       fetchMeeting();
       getUserData();
       getMeeting();
+      fetchFolder();
       fetchObj();
-      // getObj();
+      fetchAttendee();
+      // getObj();  
+      
       console.log('from edit page')
-      console.log(state.meeting.meetId)
       console.log(state.meeting)
+      console.log("obj", meetObjData)
+     
     }, [])
 
+    //ดึงข้อมูล Objective ของ meeting
     const fetchObj = async () => {
       const { data, error } = await supabase
         .from("meetObj")
@@ -72,62 +88,106 @@ function EditMeeting(props) {
         .eq("meetId", state.meeting.meetId)
         .eq("objStatus", false);
       if (data) {
-        console.log(data);
+        console.log("fetchObj", data);
         setMeetObjData(data);
       }
     };
 
-    function addObj(e) {
-      e.preventDefault();
+    
+    // delete Objective
+    async function deleteObj() {
       supabase
         .from("meetObj")
-        .insert({
-          folderId: meetData[0]?.folderId,
-          meetId: state.meeting.meetId,
-          objDes: newObj,
-        })
-        .then((result) => {
-          console.log(result);
-          fetchObj(); 
-          setNewObj("");
+        .delete()
+        .eq('objId', meetObjData.objId)
+        .then(() => {
+          console.log("Deleted Objective");
+          fetchObj();
         });
-        updateMeeting();
+    }
+
+    function addObj(e){
+      setNewObj(e);
     }
 
     //ดึงข้อมูล Folder ของ meeting
-    // async function getFolder() {
-    //   try {
-        
-    //   } catch (error) {
-    //     alert(error.message);
-    //   }
-    // }
+    const fetchFolder = async () => {
+      const { data , error } = await supabase
+        .from("user")
+        .select(
+         `
+         userFolder(
+          folders(
+            folderId,
+            folderName
+          )
+         )
+         `
+        )
+        .eq("id", session.user.id)
+      if ( data ){
+        console.log("fetch user folder", data[0].userFolder);
+        setUserFolder(data[0].userFolder)
+      }
+    }
 
     //ดึงข้อมูล Participant ของ meeting
-    // async function getParti() {
-    //   try {
-        
-    //   } catch (error) {
-    //     alert(error.message);
-    //   }
-    // }
+    const fetchAttendee = async () => {
+      try {
+        const { data, error } = await supabase
+        .from("meeting")
+        .select(
+          `
+          attendee(
+            userId, attId,
+            members:user(full_name)
+            )
+          `
+        )
+        .eq("meetId", state.meeting.meetId)
+        .single();
+        if (data) {
+          console.log("fetching attendee", data.attendee);
+          setMeetAtten(data.attendee)
+        }if (error) {
+          console.error("Error fetching attendee:", error);
+        }
+      } catch (error) {
+        console.error("Error fetching attendee:", error);
+      }
+    };
+
+    async function deleteAtt(att) {
+      supabase
+        .from("attendee")
+        .delete()
+        .eq('attId', att.attId)
+        .then((result) => {
+          console.log("Deleted attendee", result);
+          fetchAttendee();
+        });
+    }
 
     async function getMeeting() {
       try {
-        const { data, error } = await supabase
+        await supabase
           .from("meeting")
           .select()
           .eq("meetId", state.meeting.meetId)
-          //ต้องๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
-        if (error) throw error;
-        if (data != null) {
-          setMeetData(data)
-          setMeetName(data.meetName); 
-          setMeetDes(data.meetDes)
-          console.log('meet',data)
-        }
+          .then((result) => {
+            console.log("Fetch meeting", result.data[0]);
+            supabase
+            .from("folders")
+            .select("folderName")
+            .eq("folderId", result.data[0].folderId)
+            .then((result) => {
+              console.log("folder Name", result.data[0].folderName);
+              setMeetFolder(result.data[0].folderName);
+            });
+          });
+         
       } catch (error) {
-        alert(error.message);
+        console.log("174", error.message);
       }
     }
 
@@ -145,24 +205,63 @@ function EditMeeting(props) {
                   meetStartTime: meetStartTime,
                   meetStatus: meetStatus,
                   meetTagId: meetTagId,
+                  folderId: selectedFolder
               })
               .eq("meetId", state.meeting.meetId)
-          
           if (error) throw error;
           // window.location.reload();
-          addObj();
+          for (var i = 0; i <= newObj.length + 1; i++) {
+            console.log(newObj[i]);
+            supabase
+            .from("meetObj")
+            .insert({
+              folderId: state.meeting.folderId,
+              meetId: state.meeting.meetId,
+              objDes: newObj[i],
+            })
+            .then((result) => {
+              console.log(result);
+            });
+          }
+          // Insert attendee select id from where email
+          for (var i = 0; i <= meetParti.length; i++) {
+            console.log(meetParti[i]);
+            supabase
+            .from("user")
+            .select("id, email")
+            .eq("email", meetParti[i])
+            .then((result) => {
+              console.log("Fetch user id where email", result.data[0].id)
+              const user_id = result.data[0].id
+              // insert attendee
+              supabase
+              .from("attendee")
+              .insert({
+                meetId: state.meeting.meetId,
+                email: result.data[0].email,
+                userId: result.data[0].id
+              })
+              .then((result) => {
+                console.log("Insert attendee", result);
+                supabase
+                .from("userFolder")
+                .insert({
+                  userId: user_id,
+                  folderId: state.meeting.folderId
+                })
+                .then((result) => {
+                  console.log("Insert userFolder", result);
+                });
+              });
+          });
+          }
           navigate("/MyMeeting");
       } catch (error) {
-          console.log(meetStartTime )
+          console.log(meetStartTime)
           alert(error.message);
           
       }
   }
-
-
-
-
-
 
   return (
     <div className='App'>
@@ -171,10 +270,14 @@ function EditMeeting(props) {
         <header>
         <Navbar props={user}/>
         </header>
+
+
        <div style={{margin:"20px"}}>
              <h1 style={{color: "#EE5D20", marginTop: '2%', marginLeft:"20px"}}>Edit Meeting</h1>
              <Grid style={{margin:"20px", backgroundColor: '#FDEFE9',padding:"20px"}}>
               <Grid.Col span={6}>
+
+                {/* Meeting Name */}
                 <TextInput
                     placeholder={state.meeting.meetName}
                     defaultValue={state.meeting.meetName}
@@ -184,13 +287,15 @@ function EditMeeting(props) {
                       input: {
                         color:'#EE5D20',
                         borderColor:'#EE5D20',
-                        backgroundColor:'#FDEFE9',
+                        // backgroundColor:'#FDEFE9',
                         width: rem(300),
                         marginRight: rem(-2),
+                        
                       },
                     }}
                 />
 
+                {/* Meeting Type */}
                 <div style={{width: "300px"}}>
                   <NativeSelect
                     mt="md"
@@ -203,7 +308,7 @@ function EditMeeting(props) {
                       input: {
                         color:'#EE5D20',
                         borderColor:'#EE5D20',
-                        backgroundColor:'#FDEFE9',
+                        // backgroundColor:'#FDEFE9',
                         fontWeight: 500,
                         borderTopLeftRadius: 0,
                         borderBottomLeftRadius: 0,
@@ -212,30 +317,7 @@ function EditMeeting(props) {
                       },
                     }}
                   />
-                </div>
-               
-
-                  <div style={{marginTop:"15px"}}>
-                  {/* <DatePickerInput
-                    placeholder={state.meeting.meetDes}
-                    label="Meeting Description"
-                    onChange={(event) => setMeetDes(event.currentTarget.value)}
-                    styles={{
-                      input: {
-                        borderBottom: rem(5),
-                        width: rem(300),
-                        marginRight: rem(-2),  
-                      },
-                    }}
-                  /> */}
-
-                  {/* <DatePickerInput
-                    label="Pick date"
-                    placeholder="Pick date"
-                    value={state.meeting.meetStartDate}
-                    onChange={setMeetStartDate}
-                  /> */}
-                  </div>
+                </div>             
 
                   <div style={{marginTop:"15px"}}>
                 <form>
@@ -286,7 +368,7 @@ function EditMeeting(props) {
                       input: {
                         color:'#EE5D20',
                         borderColor:'#EE5D20',
-                        backgroundColor:'#FDEFE9',
+                        // backgroundColor:'#FDEFE9',
                         width: "85%",
                         height: rem(150),
                         marginRight: rem(-2),  
@@ -304,73 +386,177 @@ function EditMeeting(props) {
                     }}>
 
                 {/* Folder */}
-                <div style={{width: "300px",}}>
-                  <NativeSelect
-                    mt="md"
-                    // comboboxProps={{ withinPortal: true }}
-                    data={folderId}
-                    placeholder="Select Folder"
-                    label="Folder"
-                    onChange={(event) => setMeetTagId(event.currentTarget.value)}
-                    styles={{
-                      input: {
-                        color:'#EE5D20',
-                        borderColor:'#EE5D20',
-                        backgroundColor:'#FDEFE9',
-                        fontWeight: 500,
-                        borderTopLeftRadius: 0,
-                        borderBottomLeftRadius: 0,
-                        // width: rem(300),
-                        marginRight: rem(-2),
-                      },
-                    }}
-                  />
+                <div style={{width: "300px",}}>              
+                    <NativeSelect
+                      mt="md"
+                      // comboboxProps={{ withinPortal: true }}
+                      // data={folderId}
+                      // placeholder={meetFolder}
+                      label="Folder"
+                      onChange={(e) => {
+                        const c = userFolder?.find((x) => x.folders.folderId == e.target.value);
+                        setSelectedFolder(e.target.value);
+                        console.log(e.target.value);
+                      }}
+                      styles={{
+                        input: {
+                          color:'#EE5D20',
+                          borderColor:'#EE5D20',
+                          // backgroundColor:'#FDEFE9',
+                          fontWeight: 500,
+                          borderTopLeftRadius: 0,
+                          borderBottomLeftRadius: 0,
+                          // width: rem(300),
+                          marginRight: rem(-2),
+                        },
+                      }}
+                    >
+                      {/* <option>{meetFolder}</option> */}
+
+                    {userFolder.map( folders => {
+                      return(
+                          <option key={folders.folders.folderId} value={folders.folders.folderId}>{folders.folders.folderName}</option>
+                        )})}
+                    </NativeSelect>
                 </div>
 
               {/* Objective */}
               <div style={{marginTop:"15px"}}>
-              <TagsInput
-                label="Meeting Objective"
+         
+{/*     
+              {newObj.map((listNewObj) => (
+          <div>
+            {listNewObj}
+            <button value={listNewObj}>
+              x
+            </button>
+          </div>
+        ))}
+          {meetObjData.map((meetObjData) => (
+          <div key={meetObjData.objId}>
+            {meetObjData.objDes}<button onClick={() => deleteObj(meetObjData)}>x</button>
+          </div>
+        ))} */}
+        {/* </Box> */}
+
+        <InputBase
+        label="Meeting Objective"
+        placeholder='No Objective'
+        component="div" multiline
+        classNames={classes}
+        style={{
+          width: "90%",
+          minHeight: rem(100),
+          marginRight: rem(-2),
+          marginBottom: rem(30),
+          color:'#EE5D20',
+          borderColor:'#EE5D20',
+          backgroundColor:'#FDEFE9',
+        }}
+        >
+          <div style={{ height: rem(10) }}></div>
+          <Pill.Group>
+
+          {meetObjData.map((meetObjData) => ( 
+            <Pill 
+            key={meetObjData.objId}
+            classNames={{root:classes.root}}
+            // onClick={()=>console.log(meetObjData)}
+            onRemove={()=>deleteObj(meetObjData)}
+            withRemoveButton 
+            clearable
+            >
+            {meetObjData.objDes}
+            {/* <button onClick={() => deleteObj(meetObjData)}>x</button> */}
+          </Pill>
+        ))}
+          </Pill.Group>
+          
+          <div style={{ height: rem(20) }}></div>
+          
+          <TagsInput
+          label="Add New Objective"
                 placeholder="Press Enter to submit Objective"
-                defaultValue={meetObjData}
-                clearable
-                // value={newObj} 
-                onChange={(event) => setNewObj(event.currentTarget.value)}
-              //   onKeyDown={(event) => {
-              //     if (event.key === 'Enter') {
-              //         addObj(event);
-              //     }
-              // }}
+                classNames={{pill:classes.pill}}
+                // defaultValue={newObjList}
+                value={meetObj}
+                onChange={(e) => addObj(e)}
+                omRemove={deleteObj}
+                clearable 
                 styles={{
                   input: {
                     color:'#EE5D20',
                     borderColor:'#EE5D20',
-                    backgroundColor:'#FDEFE9',
-                    width: "90%",
-                    height: rem(100),
-                    marginRight: rem(-2),
+                    // backgroundColor:'#FDEFE9',
+                    // marginTop:"1rem"
                   },
                 }}
               />
+          </InputBase>
+              
+              {/* {newObj} */}      
               </div>
 
               <div style={{marginTop:"15px"}}>
+              {/* {meetParti.map((listNewObj) => (
+          <div>
+            {listNewObj}
+            <button value={listNewObj}>
+              x
+            </button>
+          </div>
+        ))}
+        {meetAtten.map((listAtten) => (
+          <div key={listAtten.members}>
+            {listAtten.members.full_name}<button onClick={() => deleteAtt(listAtten)}>x</button>
+          </div>
+        ))} */}
+              {/* <div style={{marginTop:"15px"}}> */}
+        <InputBase
+        label="Meeting Attendee"
+        placeholder='No Objective'
+        component="div" multiline
+        classNames={classes}
+        style={{
+          width: "90%",
+          minHeight: rem(100),
+          marginRight: rem(-2),
+          marginBottom: rem(30),
+          color:'#EE5D20',
+          borderColor:'#EE5D20',
+          backgroundColor:'#FDEFE9',
+        }}
+        ><div style={{ height: rem(10) }}></div>
+        <Pill.Group>       
+        {meetAtten.map((listAtten) => (
+          <Pill 
+          classNames={{root:classes.root}}
+          // onClick={()=>console.log(meetObjData)}
+          onRemove={()=>deleteAtt(listAtten)}
+          withRemoveButton 
+          clearable 
+          key={listAtten.members}>
+            {listAtten.members.full_name}
+            {/* <button onClick={() => deleteAtt(listAtten)}>x</button> */}
+          </Pill>
+        ))}
+        </Pill.Group>
+        <div style={{ height: rem(20) }}></div>
               <TagsInput
-                label="Participant"
-                placeholder="Press Enter to submit Participant"
-                defaultValue={meetParti}
+              classNames={{pill:classes.pill}}
+              label='Add New Attendee'
+                placeholder="Press Enter to submit attendee"
+                onChange={setMeetParti}
                 clearable
                 styles={{
                   input: {
                     color:'#EE5D20',
                     borderColor:'#EE5D20',
-                    backgroundColor:'#FDEFE9',
-                    width: "90%",
-                    height: rem(100),
-                    marginRight: rem(-2),
+                    // backgroundColor:'#FDEFE9',
+                    // marginTop:"1rem"
                   },
                 }}
-              />
+              /></InputBase>
               </div>
               {/* <div style={{width: "90%",marginTop:"30px", justifyItems:'end'}}> */}
               <Group justify="flex-end" mt="md" style={{ marginRight:'10%' , marginTop:"30%" }}>
@@ -397,5 +583,3 @@ function EditMeeting(props) {
 }
 
 export default EditMeeting
-
- 
