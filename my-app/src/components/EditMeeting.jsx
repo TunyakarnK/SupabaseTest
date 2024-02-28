@@ -1,5 +1,5 @@
 import React from 'react'
-import { Select, NativeSelect, rem, TextInput,Input, TagsInput, Grid,Textarea,Button, Group,InputBase, Pill} from '@mantine/core';
+import { Text, NativeSelect, rem, TextInput, TagsInput, Grid,Textarea,Button, Group,InputBase, Pill} from '@mantine/core';
 import { useEffect, useState } from "react";
 import { supabase } from '../supabaseClient.js';
 import Navbar from './Navbar/Navbar.jsx'
@@ -273,7 +273,10 @@ function EditMeeting(props) {
 
 
        <div style={{margin:"20px"}}>
-             <h1 style={{color: "#EE5D20", marginTop: '2%', marginLeft:"20px"}}>Edit Meeting</h1>
+       <Grid align='center' style={{ marginLeft:rem(50), marginTop:rem(30) }}>
+      <Grid.Col span={0.8}><Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto'}}>Back</Button></Grid.Col>
+      <Grid.Col span={8}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'10px'}}>Edit Meeting</Text></Grid.Col>
+      </Grid>
              <Grid style={{margin:"20px", backgroundColor: '#FDEFE9',padding:"20px"}}>
               <Grid.Col span={6}>
 
