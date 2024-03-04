@@ -19,7 +19,7 @@ function MyMeeting() {
   const [newMeeting, setNewMeeting] = useState([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [newMeetName, setNewMeetName] = useState([]);
-  
+
     useEffect(() =>{
       async function getUserData() {
         await supabase.auth.getUser().then((value) =>{
@@ -35,6 +35,11 @@ function MyMeeting() {
       fetchNewMeeting();
       console.log('meet'+newMeeting)
     }, [])
+
+    async function signOut() {
+      await supabase.auth.signOut();
+      navigate("/");
+    }
 
     async function fetchNewMeeting() {
       try {
@@ -70,7 +75,7 @@ function MyMeeting() {
         const { data, error } = await supabase
           .from("folders")
           .insert({
-            folderName: folderName
+            folderName: folderName,
           })
           .single()
           
@@ -114,7 +119,6 @@ function MyMeeting() {
         </Grid>
         <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
         <Grid.Col span={5}><Text c="#4f5b5f" style={{marginLeft:'10px'}}>Meeting Name</Text></Grid.Col>
-        <Grid.Col span={5.5} ><Text c="#4f5b5f">Meeting Date</Text></Grid.Col>
         </Grid>
         <div >
             {newMeeting.map((newMeeting) => (
@@ -143,9 +147,9 @@ function MyMeeting() {
           </div>
         </div>
           
-        <Modal opened={opened} onClose={close} title="Delete" centered>
-       <TextInput label="Rename Folder" defaultValue={folder.folderName} size="xs" onChange={(event) => setFolderName(event.currentTarget.value)} />
-              <Button color='#EE5D20' onClick={close} style={{marginTop:'10px',marginRight:'10px',marginLeft:'90px'}}>Cancle</Button>
+        <Modal opened={opened} onClose={close} title="New Folder" centered>
+       <TextInput label="Create Folder"  size="xs" onChange={(event) => setFolderName(event.currentTarget.value)} />
+              <Button color='#EE5D20' onClick={close} style={{marginTop:'10px',marginRight:rem(10),marginLeft:rem(240)}}>Cancle</Button>
               <Button variant='outline' color='#EE5D20' style={{marginTop:'10px'}} onClick={() => createNewFolder()}>Create</Button>
       </Modal>   
             </div>
@@ -154,7 +158,10 @@ function MyMeeting() {
            <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div> 
     </>
        :
-       <></>
+       <>
+       {signOut}
+       {navigate('/')}
+       </>
        }
       </div>
     );
