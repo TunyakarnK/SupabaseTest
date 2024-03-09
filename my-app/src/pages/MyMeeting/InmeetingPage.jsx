@@ -31,32 +31,50 @@ function InmeetingPage() {
         console.log(data[0]);
       }
     };
-    fetchMeeting();
-    console.log(session);
+    // fetchMeeting();
+    // fetchObj();
     fetchObj();
   }, []);
   console.log("1",meetData[0]?.folderId);
-  console.log("meetData",meetData);
 
   const fetchObj = async () => {
+    await supabase
+    .from("meeting")
+    .select()
+    .eq("meetId", id)
+    .then((result) => {
+      console.log("fetchO", result.data[0]);
+      setMeetData(result.data[0]);
+        supabase
+        .from("meetObj")
+        .select("objId, objDes, objStatus")
+        .eq("meetId", id)
+        .eq("folderId", result.data[0].folderId)
+        .eq("objStatus", false)
+        .then((result) => {
+          console.log("fetchObjjjjjjjjjjjjjjj", result.data);
+          setMeetObjData(result.data);
+        })
+    })
+  }
+  const fetchO = async () => {
     const { data, error } = await supabase
       .from("meetObj")
       .select("objId, objDes, objStatus")
       .lte("meetId", id)
       .eq("folderId", meetData.folderId)
-      .eq("objStatus", false);
+      .eq("objStatus", false)
     if (data) {
-      console.log("fetchObj", data);
+      console.log("fetchObjgfdsgfs", data);
       setMeetObjData(data);
     }
   };
-
   function addObj(e) {
     e.preventDefault();
     supabase
       .from("meetObj")
       .insert({
-        folderId: meetData[0]?.folderId,
+        folderId: meetData?.folderId,
         meetId: id,
         objDes: newObj,
       })
@@ -131,7 +149,7 @@ function InmeetingPage() {
       </Grid.Col>
       <Grid.Col span={1.5} />
       <Grid.Col span={1} >
-        <Link to={"/Conclusion/"+id}><Button radius='xl' color="#EE5D20" onClick={addNote} style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>Conclusion</Button></Link> 
+        <Link to={"/Conclusion/"+id}><Button radius='xl' color="#EE5D20" onClick={addNote} style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>Conclude</Button></Link> 
       </Grid.Col>
       </Grid>
       
