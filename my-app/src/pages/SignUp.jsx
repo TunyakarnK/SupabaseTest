@@ -1,5 +1,5 @@
 // import { React, useEffect, useState } from "react";
-// import { supabase } from '../main'
+// import { supabase } from "src/supabaseClient";
 
 export function Signup ({ session }){
 //   const [loading, setLoading] = useState(true)
@@ -93,5 +93,5 @@ export function Signup ({ session }){
 //       </div>
 //     </form>
 //   )
-}
+ }
 export default Signup;

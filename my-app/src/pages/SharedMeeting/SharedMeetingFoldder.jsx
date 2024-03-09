@@ -1,12 +1,12 @@
 // import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { supabase } from '../../supabaseClient.js';
+import { supabase } from "src/supabaseClient.js";
 import Navbar from '../../components/Navbar/Navbar.jsx'
 import React from 'react';
 import '../../components/MeetingCard.css'
 import { useNavigate, Link } from "react-router-dom";
 import MeetingCard from 'src/components/NewMeetingCard';
-import FolderCard from 'src/components/FolderCard';
+import ShareMeetingFolderCard from "./ShareMeetingFolderCard.jsx";
 import { Grid, ScrollArea, TextInput,Text,rem, Button,Modal ,Radio,Group} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
@@ -85,12 +85,12 @@ function SharedMeeting() {
         <div>
           <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
           <Grid.Col span={5}><Text c="#4f5b5f" style={{marginLeft:'10px'}}>Folder Name</Text></Grid.Col>
-          <Grid.Col span={5.5} ><Text c="#4f5b5f">Owner</Text></Grid.Col>
+          {/* <Grid.Col span={5.5} ><Text c="#4f5b5f">Owner</Text></Grid.Col> */}
           </Grid>
 
           <div>
             {folder.map((folder) => (
-              <FolderCard folder = {folder} user = {user} key={folder.folderId} />
+              <ShareMeetingFolderCard folder = {folder} user = {user} key={folder.folderId} />
             ))}
             
           </div>

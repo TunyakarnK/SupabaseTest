@@ -255,7 +255,7 @@ function EditMeeting(props) {
               });
           });
           }
-          navigate("/MyMeeting");
+          navigate(-1);
       } catch (error) {
           console.log(meetStartTime)
           alert(error.message);

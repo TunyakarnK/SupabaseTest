@@ -8,11 +8,12 @@ import MeetingCard from 'src/components/NewMeetingCard';
 import FolderCard from 'src/components/FolderCard';
 import { Grid, ScrollArea, TextInput,Text,rem, Button,Modal ,Radio,Group} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useSession } from '@supabase/auth-helpers-react';
 
 function MyMeeting() {
   const navigate = useNavigate();
-  
-  const [user, setUser] = useState({});
+  const session = useSession()
+  const [user, setUser] = useState([]);
   const [createFolder, setCreateFolder] = useState(false);
   const [folder, setFolder] = useState([]);
   const [folderName, setFolderName] = useState([]);
@@ -20,21 +21,24 @@ function MyMeeting() {
   const [opened, { open, close }] = useDisclosure(false);
   const [newMeetName, setNewMeetName] = useState([]);
 
-    useEffect(() =>{
-      async function getUserData() {
-        await supabase.auth.getUser().then((value) =>{
-          // value.data.user
-          if(value.data?.user){
-            console.log(value.data.user)
-            setUser(value.data.user)
-          }
-        })
+  useEffect(() =>{
+    getUserData();
+    fetchFolder();
+    fetchNewMeeting();
+    console.log('meet'+newMeeting)   
+  }, [session])
+
+  async function getUserData() {
+    await supabase.auth.getUser().then((value) =>{
+      // value.data.user
+      if(value.data?.user){
+        setUser(value.data.user);
+        console.log(user);
+        
       }
-      getUserData();
-      fetchFolder();
-      fetchNewMeeting();
-      console.log('meet'+newMeeting)
-    }, [])
+    })
+  }
+
 
     async function signOut() {
       await supabase.auth.signOut();
@@ -46,32 +50,42 @@ function MyMeeting() {
         const { data, error } = await supabase
           .from("meeting")
           .select('*')
-          .is('folderId', null);
-        if (error) throw error;
+          .is('folderId', null)
+          .eq("creatorId", session.user.id);
+        // if (error) throw error;
         if (data != null) {
           setNewMeeting(data); 
         }
       } catch (error) {
-        alert(error.message);
+        // alert(error.message);
       }
     }
 
     async function fetchFolder() {
       try {
         const { data, error } = await supabase
-          .from("folders")
-          .select("*")
-        if (error) throw error;
+          .from("userFolder")
+          .select(
+            `
+            userId,
+            folders(folderName, folderId)
+            `
+          )
+          .eq("checkOwner", true)
+          .eq("userId", session.user.id)
+        // if (error) throw error;
         if (data != null) {
+          console.log("fetch folder", data);
           setFolder(data); 
         }
       } catch (error) {
-        alert(error.message);
+        // alert(error.message);
       }
     }
   
     async function createNewFolder() {
-      try {
+      if(folderName !== ''){
+       try {
         const { data, error } = await supabase
           .from("folders")
           .insert({
@@ -79,10 +93,11 @@ function MyMeeting() {
           })
           .single()
           
-        if (error) throw error;
+        // if (error) throw error;
         window.location.reload();
       } catch (error) {
-        alert(error.message);
+        // alert(error.message);
+      } 
       }
     }
   
@@ -94,15 +109,20 @@ function MyMeeting() {
           .from("meeting")
           .insert({
             meetName: 'Untitled Meeting',
+            creatorId: session.user.id,
+            meetCreate: new Date()
           })
           .single()
           
-        if (error) throw error;
+        // if (error) throw error;
+        getUserData();
         window.location.reload();
       } catch (error) {
-        alert(error.message);
+        // alert(error.message);
       }
     }
+
+    
 
     return (
       <div className="App">
@@ -148,7 +168,7 @@ function MyMeeting() {
         </div>
           
         <Modal opened={opened} onClose={close} title="New Folder" centered>
-       <TextInput label="Create Folder"  size="xs" onChange={(event) => setFolderName(event.currentTarget.value)} />
+       <TextInput withAsterisk label="Create Folder"  size="xs" onChange={(event) => setFolderName(event.currentTarget.value)} />
               <Button color='#EE5D20' onClick={close} style={{marginTop:'10px',marginRight:rem(10),marginLeft:rem(240)}}>Cancle</Button>
               <Button variant='outline' color='#EE5D20' style={{marginTop:'10px'}} onClick={() => createNewFolder()}>Create</Button>
       </Modal>   
@@ -159,8 +179,9 @@ function MyMeeting() {
     </>
        :
        <>
-       {signOut}
-       {navigate('/')}
+       {/* {signOut}
+       {navigate('/')} */}
+       loading
        </>
        }
       </div>

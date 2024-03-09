@@ -7,11 +7,14 @@ import { useEffect } from 'react';
 import { Card, Table, Grid,Text,Button, ActionIcon,  Modal} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconTrash } from '@tabler/icons-react';
+import { useSession } from '@supabase/auth-helpers-react';
 
 function MeetingCard(props) {
   
   const meeting = props.meeting;
-  const user = props.user;
+  // const user = props.user;
+  const session = useSession();
+  const user = session.user;
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
@@ -34,19 +37,19 @@ function MeetingCard(props) {
     }
     
     getUserData();
-  }, []);
+  }, [session]);
 
     async function deleteMeeting() {
         try {
             const { data, error } = await supabase
                 .from("meeting")
                 .delete()
-                .eq("meetName", meeting.meetName)
+                .eq("meetId", meeting.meetId)
             
-            if (error) throw error;
+            // if (error) throw error;
             window.location.reload();
         } catch (error) {
-            alert(error.message);
+            // alert(error.message);
         }
     }
     function EditMeeting (){
@@ -68,9 +71,9 @@ function MeetingCard(props) {
       
         <Grid align="center" >
         <Grid.Col span={5} onClick={handleButtonClick} ><Text >{meeting.meetName}</Text></Grid.Col>
-        <Grid.Col span={5.5} onClick={handleButtonClick} >{meeting.meetStartDate}</Grid.Col>
-        <Grid.Col span={1} ><Button variant='outline' color='#EE5D20' onClick={EditMeeting}>Edit Meeting</Button></Grid.Col>
-        {/* <Grid.Col span={0.5} ><ActionIcon onClick={open} variant="subtle" color="#EE5D20"><IconTrash/></ActionIcon></Grid.Col>     */}
+        <Grid.Col span={4.5} onClick={handleButtonClick} >{meeting.meetStartDate}</Grid.Col>
+        <Grid.Col span={1.5} ><Button variant='outline' color='#EE5D20' onClick={EditMeeting}>Edit Meeting</Button></Grid.Col>
+        <Grid.Col span={0.5} ><ActionIcon onClick={open} variant="subtle" color="#EE5D20"><IconTrash/></ActionIcon></Grid.Col>    
         </Grid>            
         <Modal opened={opened} onClose={close} title="Delete" centered>
         <div style={{padding:'10px'}}>Do you want to delete {meeting.meetName} ?</div>

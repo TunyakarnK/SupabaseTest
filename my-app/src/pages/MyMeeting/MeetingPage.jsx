@@ -51,7 +51,7 @@ useEffect(() =>{
   fetchMeeting();
   // console.log(data);
   console.log(meetData);
-}, [])
+}, [session])
 
 function updateToggle(id) {
   setToggle(id)
@@ -124,9 +124,12 @@ const handleButtonClick = () => {
 
 
   return (
-<><div style={{
+
+    <div style={{
   // backgroundColor:'#FDEFE9' 
   }}>
+    {Object.keys(user).length !== 0 ?
+    <>
 <Navbar props={session.user} />
 <div style={{ margin:"40px", padding:'20px'}}>
   
@@ -205,9 +208,17 @@ const handleButtonClick = () => {
       <h1>กำลังประชุม</h1>
       <InmeetingPage />
     </div> */}
-    </div></div>
+    </div>
     <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div>
 </>
+       :
+       <>
+       {/* {signOut}
+       {navigate('/')} */}
+       loading
+       </>
+       }
+       </div>
   )
 }
 

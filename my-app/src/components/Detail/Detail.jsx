@@ -9,28 +9,7 @@ function Detail() {
   const [meetData, setMeetData] = useState([]);
   const [userData, setUserData] = useState([]);
   const [meetObjData, setMeetObjData] = useState([]);
-
-
-  // const fetchMeeting = async () => {
-  //   // try{
-  //     const { data, error } = await supabase
-  //     .from("meeting")
-  //     .select()
-  //     .eq("meetId", id);
-  //     // .then(data => {
-  //     //   console.log(data);
-  //     //   setMeetData(data);
-  //     //   fetchObj();
-  //     // });
-  //   if (data) {
-  //     console.log(data);
-  //     setMeetData(data);
-  //     fetchObj();
-  //   }
-  //   // }catch(error){
-  //   //   return;
-  //   // }
-  // };
+  const [ meetAtten , setMeetAtten ] = useState([]);
 
   const fetchMeeting = async () => {
     try {
@@ -39,93 +18,94 @@ function Detail() {
         .select()
         .eq("meetId", id);
       if (data) {
-        console.log(data);
+        console.log("fetch Meeting", data);
         setMeetData(data);
-        fetchObj()
+        fetchObj();
       }
     } catch (error) {
       console.error("Error fetching meeting:", error);
     }
   };
-  
-  const fetchOwner = async () => {
+
+  const fetchCreator = async () => {
     const { data, error } = await supabase
       .from("meeting")
       .select(
         `
         folderId,
-        ownerId,
+        creatorId,
         meetId,
-        users(
-          userId,
-          firstName,
-          lastName
+        user(
+          id,
+          full_name
         )
       `
       )
       .eq("meetId", id);
     if (data) {
-      console.log(data);
+      console.log("fetch Creator", data);
       setUserData(data);
       // console.log(data);
     }
   };
-
-  // const fetchObj = async () => {
-  //   // var a = meetData[0].folderId
-  //   const { data, error } = await supabase
-  //     .from("meetObj")
-  //     .select("objDes")
-  //     // .lte("meetId", id)
-  //     .eq("folderId", userData[0].folderId)
-  //     .eq("objStatus", false);
-  //   if (data) {
-  //     console.log(data);
-  //     setMeetObjData(data);
-  //   }
-  // };
+  
   const fetchObj = async () => {
     try {
-        const { data, error } = await supabase
-          .from("meetObj")
-          .select("objDes")
-          .lte("meetId", id)
-          .eq("folderId", userData[0].folderId)
-          .eq("objStatus", false);
-        if (data) {
-          console.log(data);
-          setMeetObjData(data);
-        }
+      const { data, error } = await supabase
+        .from("meetObj")
+        .select("objDes")
+        .eq("meetId", id)
+        .eq("folderId", meetData[0].folderId)
+      if (data) {
+        console.log("fetching meetObj:", data);
+        setMeetObjData(data);
+      }
     } catch (error) {
       console.error("Error fetching meetObj:", error);
     }
   };
 
+
+  const fetchAttendee = async () => {
+    try {
+      const { data, error } = await supabase
+      .from("meeting")
+      .select(
+        `
+        attendee(
+          userId,
+          members:user(full_name)
+          )
+        `
+      )
+      .eq("meetId", id)
+      .single();
+      if (data) {
+        console.log("fetching attendee", data.attendee);
+        setMeetAtten(data.attendee)
+      }if (error) {
+        console.error("Error fetching attendee:", error);
+      }
+    } catch (error) {
+      console.error("Error fetching attendee:", error);
+    }
+  }
+
   useEffect(() => {
-    fetchMeeting()
+    fetchMeeting();
+    fetchAttendee();
+    fetchCreator();
+  }, []);
 
-    fetchOwner();
-  }, [])
 
   useEffect(() => {
-
-    // fetchMeeting();
-
-    // fetchOwner();
-    
     fetchObj();
-    
-    // const fetchData = async () => {
-    //   await fetchMeeting();
-    //   fetchOwner();
-    //   fetchObj();
-    // };
-    // fetchData();
-    
   }, [meetData]);
 
-  console.log(userData);
-  return (
+  // useEffect(() => {
+    
+  // }, [meetAtten]);
+return (
     <><div 
     // style={{ backgroundColor:'#FDEFE9' }}
     >
@@ -135,15 +115,18 @@ function Detail() {
           <p>
             {" "}
             Owner:{" "}
-            {userData.users &&
-            userData.users.firstName &&
-            userData.users.lastName
-              ? `${userData.users.firstName} ${userData.users.lastName}`
+            {userData.user &&
+            userData.user.full_name 
+              ? `${userData.user.full_name}`
               : "Have no data"}
           </p>
         </div>
       ))}
-      
+
+<p> Attendee:</p>
+      {meetAtten.map((listAtten) => (
+        <div key={listAtten.members}>{listAtten.members.full_name}</div>
+      ))}
       {meetData.map((meetData, index) => (
         <div key={index}>
           <p> Meeting Name: {meetData?.meetName || "ยังไม่มีงับ"}</p>

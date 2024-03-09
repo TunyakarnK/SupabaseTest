@@ -26,11 +26,11 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/Profile" element={<Profile />} />
       <Route path="/MyMeeting" element={<MyMeeting />} />
-      <Route path="/Folder/:folderid" element={<MeetingList/>} />
+      <Route path="MyMeeting/Folder/:id" element={<MeetingList/>} />
       <Route path="/Folder/:folderid/statistic" element={<FolderStatisticPage />} />
       <Route path="/MeetingPage/:id" element={<MeetingPage />} />
       <Route path="/SharedMeeting" element={<SharedMeeting />} />
-      <Route path="/SharedMeeting/:folderid" element={<SharedMeetingList />} />
+      <Route path="/SharedMeeting/:sharedfolderid" element={<SharedMeetingList />} />
       <Route path="/EditMeeting" element={<EditMeeting />} />
       <Route path="/Inmeeting/:id" element={<InmeetingPage />} />
       <Route path="/Conclusion/:id" element={<Conclusion />} />
