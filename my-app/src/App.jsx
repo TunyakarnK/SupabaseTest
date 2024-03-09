@@ -31,12 +31,11 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/Profile" element={<Profile />} />
 
-      <Route path="/MyMeeting" element={<MyMeeting />} >
-      <Route path="/MyMeeting/:folderId"  element={<MeetingList />} />
-      </Route>
+      <Route path="/MyMeeting" element={<MyMeeting />} />
+      <Route path="/MyMeeting/Folder/:id"  element={<Folder />} />
 
       <Route path="/SharedMeeting" element={<SharedMeeting />} />
-      <Route path="/SharedMeeting/Folder/:id" element={<SharedMeetingFoldder />} />
+      <Route path="/SharedMeeting/Folder/:id" element={< SharedMeetingList/>} />
       <Route path="/EditMeeting" element={<EditMeeting />} />
       <Route path="/Inmeeting/:id" element={<InmeetingPage />} />
       <Route path="/Conclusion/:id" element={<Conclusion />} />
@@ -48,7 +47,7 @@ function App() {
       {/* <Route path="/Detail_Conclusion/:id" element={<Detail_Conclusion />} /> */}
       <Route path="/Inmeeting/:id" element={<InmeetingPage />} />
       <Route path="/Conclusion/:id" element={<Conclusion />} />
-      <Route path="/Folder/:id" element={<Folder />}/>
+      {/* <Route path="/Folder/:id" element={<Folder />}/> */}
       {/* <Route path="/MyMeeting/:folder" render={(props) => <MeetingDetails {...props} items={[]} />}
         /> */}
       
