@@ -7,23 +7,25 @@ import Navbar from "../Navbar/Navbar";
 // import "survey-core/defaultV2.min.css";
 // import Popup from 'reactjs-popup';
 // import 'reactjs-popup/dist/index.css';
-import { useState } from "react";
+import { useStatem, useEffect, useState } from "react";
 import { useSession } from '@supabase/auth-helpers-react';
 
 
 const dataComment = [
-  { value: 'None', label: '---' },
   { value: 'Good', label: 'Good' },
-  { value: 'Natural', label: 'Natural' },
+  { value: 'Neutral', label: 'Neutral' },
   { value: 'Bad', label: 'Bad' },
 ];
 
 function Feedback() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [comment, setComment] = useState([]);
-  const [emote, setEmote] = useState([]);
+  const [comment, setComment] = useState();
+  const [ commentDatabase, setCommentDatabase ] = useState([]);
+  const [emote, setEmote] = useState("Neutral");
   const [commentCard, setCommentCard] = useState([]);
+  const [ checkAns, setCheckAns ] = useState(false);
+  const [ checkEnded, setCheckEnded ] = useState(false);
   const session = useSession();
   // const [user, setUser] = useState({});
   const [selectedOption1, setSelectedOption1] = useState("Male")
@@ -83,6 +85,7 @@ function Feedback() {
     setSelectedOption4(event.target.value)
 }
 
+console.log(session.user.id);
   // Function to handle the form submission
   function submit(event) {
     // Preventing the default form submission behaviour
@@ -91,7 +94,7 @@ function Feedback() {
     // Logging the selected option
     console.log(selectedOption1)
     
-    test 
+    
     const data = [{
       qId: 1,
       answer: selectedOption1, 
@@ -110,35 +113,45 @@ function Feedback() {
    },
 
   ];
-  supabase.from("answers").insert([
+  supabase.from("answer").insert([
     {
     questId: data[0].qId,
     answer: data[0].answer,
     meetId: id,
-    userId: 1
+    userId: session.user.id
   },
   {
     questId: data[1].qId,
     answer: data[1].answer, 
     meetId: id,
-    userId: 1
+    userId: session.user.id
   },
   {
     questId: data[2].qId,
     answer: data[2].answer, 
     meetId: id,
-    userId: 1
+    userId: session.user.id
   },
   {
     questId: data[3].qId,
     answer: data[3].answer, 
     meetId: id,
-    userId: 1
+    userId: session.user.id
   }
 ]
   )
   .then(result => {
     console.log(result);
+    supabase
+    .from("attendee")
+    .update({checkFb: true})
+    .eq("meetId", id)
+    .eq("userId", session.user.id)
+    .select("checkFb")
+    .then((result) => {
+      console.log(result);
+      checkAnswer();
+    })
   });
    console.log(data);   
    console.log(data[1].qId);
@@ -160,6 +173,68 @@ function Feedback() {
         <Radio color="#EE5D20" value="10" label="10" />
       </Group>
   )
+  useEffect(() => {
+    fetchComment();
+    checkAnswer();
+    checkEndedMeeting();
+  }, []);
+
+  const checkEndedMeeting = async () => {
+    const { data, error } = await supabase
+    .from("meeting")
+    .select("meetStatus")
+    .eq("meetId", id)
+    if ( data) {
+      console.log("Check Meeting Status", data[0].meetStatus);
+      setCheckEnded(data[0].meetStatus);
+    }
+  }
+  const checkAnswer = async () => {
+    const { data, error } = await supabase
+    .from("attendee")
+    .select("checkFb")
+    .eq("meetId", id)
+    .eq("userId", session.user.id)
+    if ( data ){
+      console.log("check answer", data[0].checkFb);
+      setCheckAns(data[0].checkFb);
+    }
+  }
+
+  const fetchComment = async () => {
+    const { data, error } = await supabase
+    .from("comment")
+    .select("comId, comment, senId")
+    .eq("meetId", id)
+    if ( data ){
+      console.log("comment", data);
+      setCommentDatabase(data);
+    }
+  }
+
+  const insertComment = async () => {
+    supabase
+    .from("comment")
+    .insert({
+      comment: comment,
+      meetId: id,
+      senId: emote
+    })
+    .then((result) => {
+      console.log("comment insert", result);
+      fetchComment();
+    })
+  }
+  const deleteComment = async () => {
+    await supabase
+    .from("comment")
+    .delete()
+    .eq("conId", commentDatabase)
+    .then((result) => {
+      console.log("delete comment", result);
+    })
+  }
+ 
 
   return (
      <div className="App">
@@ -179,10 +254,10 @@ function Feedback() {
         </Grid>
     <div>
       <Grid grow style={{height:"auto"}}><Grid.Col span='auto' >
-        
+    { (checkAns === false && checkEnded === true) && ( <div>
     <Radio.Group
       name="Q1"
-      label="ท่านได้รับข้อมูลชุดใหม่ที่มีความสำคัญกับท่านมากน้อยแค่ไหน"
+      label="ฉันได้รับข้อมูลชุดใหม่ที่มีความสำคัญกับฉัน"
       size="lg"
       style={{margin:'20px'}}
       onClick={(event)=>setSelectedOption1(event.target.value)}
@@ -190,10 +265,10 @@ function Feedback() {
     >
       {radioGroup}
     </Radio.Group>
-
+  
     <Radio.Group
       name="Q2"
-      label="การประชุมในครั้งนี้ช่วยให้เกิดการพัฒนาในส่วนของการทำงานร่วมกันเป็นทีมได้หรือไม่"
+      label="การประชุมในครั้งนี้ช่วยให้เกิดการพัฒนาในส่วนของการทำงานร่วมกันเป็นทีม"
       size="lg"
       style={{margin:'20px'}}
       onClick={(event)=>setSelectedOption2(event.target.value)}
@@ -204,7 +279,7 @@ function Feedback() {
 
     <Radio.Group
       name="Q3"
-      label="ท่านรู้สึกพึงพอใจแค่ไหนกับความสัมพันธ์ของเวลาในการเตรียมการ, การประชุม, และผลลัพธ์ที่ได้รับ"
+      label="ฉันรู้สึกว่าการประชุมมีประสิทธิภาพ"
       size="lg"
       style={{margin:'20px'}}
       onClick={(event)=>setSelectedOption3(event.target.value)}
@@ -215,25 +290,26 @@ function Feedback() {
 
     <Radio.Group
       name="Q4"
-      label="ท่านรู้สึกพึงพอใจกับการประชุมครั้งนี้มากน้อยแค่ไหน"
+      label="ฉันรู้สึกพึงพอใจกับการประชุมครั้งนี้"
       size="lg"
       style={{margin:'20px'}}
       onClick={(event)=>setSelectedOption4(event.target.value)}
       withAsterisk
     >
       {radioGroup}
-    </Radio.Group>
-    <Button style={{margin:'20px'}} color="#EE5D20" onClick={submit} type="submit">Submit</Button>
+    </Radio.Group> 
+    <Button style={{margin:'20px'}} color="#EE5D20" onClick={submit} type="submit">Submit</Button> </div>
+    )}
       </Grid.Col>
       <Grid.Col span='auto' style={{backgroundColor: "#EE5D20",borderRadius:'5px',}}>
         <ScrollArea h={430}>
         <div >
-            {commentCard.map((commentCards) => (
+            {commentDatabase.map((commentCards) => (
               
             <div key={commentCards.id} style={{width:'auto', backgroundColor:'#FDEFE9', borderRadius:'5px', margin:'10px',padding:'10px'}}>
               <Grid align="center">
                 <Grid.Col span={9.5} >{commentCards.comment}</Grid.Col>
-                <Grid.Col span={1} >{commentCards.emote}</Grid.Col>
+                <Grid.Col span={1} >{commentCards.senId}</Grid.Col>
               </Grid></div>
           ))}
         </div>
@@ -248,12 +324,11 @@ function Feedback() {
           rightSection={select}
           rightSectionWidth={92}
           /></Grid.Col>
-        <Grid.Col span={2.5}><Button color="#EE5D20" fullWidth onClick={()=>combinedcommentCardOnClick()}>Send</Button></Grid.Col>
+        <Grid.Col span={2.5}><Button color="#EE5D20" fullWidth onClick={()=>insertComment()}>Send</Button></Grid.Col>
         </Grid>
         
         </Grid.Col>
       </Grid>
-
       </div></div>
       <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div>
       </>
