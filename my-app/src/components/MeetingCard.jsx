@@ -2,15 +2,17 @@ import React from 'react'
 import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import "src/components/MeetingCard.css"
-import { Link,NavLink,useNavigate } from 'react-router-dom';
+import { Link,NavLink,useNavigate, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Card, Table, Grid,Text,Button, ActionIcon,  Modal} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconTrash } from '@tabler/icons-react';
+import { useSession } from '@supabase/auth-helpers-react';
 
 function MeetingCard(props) {
-  
+  const { id } = useParams();
   const meeting = props.meeting;
+  const session = useSession;
   const user = props.user;
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
@@ -21,6 +23,8 @@ function MeetingCard(props) {
   const [ meetName, setMeetName ] = useState ([]);
   // const [ ownerId, setOwnerId]= useState ([]);
   const [ meetStartDate, setMeetStartDate] = useState ([]);
+  const [ creatorName, setcreatorName ] = useState();
+  const [ checkCreator, setCheckCreator ] = useState();
   
   //fetch status ของ meeting
 
@@ -32,8 +36,8 @@ function MeetingCard(props) {
           // console.log(value)
         }
       });
-    }
-    
+    }checkCreatorMeeting();
+    console.log("test", meeting.meetStatus);
     getUserData();
   }, []);
 
@@ -43,11 +47,12 @@ function MeetingCard(props) {
                 .from("meeting")
                 .delete()
                 .eq("meetId", meeting.meetId)
-            
-            if (error) throw error;
-            window.location.reload();
+                // window.location.reload();
+          getUserData()
+          fetchFolder();
+          fetchNewMeeting();
         } catch (error) {
-            alert(error.message);
+            // alert(error.message);
         }
     }
     function EditMeeting (){
@@ -58,9 +63,56 @@ function MeetingCard(props) {
         navigate('/MeetingPage/' + meeting.meetId, { state: { user } });    
     }
 
+    const checkCreatorMeeting = async () => {
+      await supabase
+      .from("meeting")
+      .select("meetStatus, creatorId")
+      .eq("folderId", id)
+      .then((result) => {
+        console.log("who create this meeting", result);
+        setCheckCreator(result.data[0].creatorId)
+        supabase
+        .from("user")
+        .select("full_name")
+        .eq("id", result.data[0].creatorId)
+        .then((result) => {
+          console.log("Name", result);
+          setcreatorName(result.data[0].full_name);
+        })
+      })
+    }
 
   return (
+    <>
+    {meeting.creatorId == user.id ? (
     <div className='meetCard' 
+    // onClick={() => handleButtonClick()} 
+    onMouseEnter={() => setIsHovered(true)}
+    onMouseLeave={() => setIsHovered(false)}
+    style={{ padding: '10px',borderBottom: '1px solid #202F34',backgroundColor: isHovered ? '#eddecf' : 'transparent', transition: 'background-color 0.3s ease',cursor: 'pointer' }}
+    >       
+      
+        <Grid align="center" >
+        <Grid.Col span={4} onClick={handleButtonClick} ><Text >{meeting.meetName}</Text></Grid.Col>
+        <Grid.Col span={1}><Text c="#4f5b5f" >{meeting.meetStatus}</Text></Grid.Col>
+        <Grid.Col span={1} onClick={handleButtonClick} >{meeting.meetStatus === false ?(<Text>Incoming</Text>):(<Text>Ended</Text>)}</Grid.Col>
+        <Grid.Col span={1} onClick={handleButtonClick} >{creatorName}</Grid.Col>
+        <Grid.Col span={2} onClick={ handleButtonClick} >{meeting.meetStartDate}</Grid.Col>
+        { meeting.meetStatus == false && (<Grid.Col span={1.5} ><Button variant='outline' color='#EE5D20' onClick={EditMeeting}>Edit Meeting</Button></Grid.Col>)}
+        
+        <Grid.Col span={0.5} ><ActionIcon onClick={open} variant="subtle" color="#EE5D20"><IconTrash/></ActionIcon></Grid.Col>    
+        </Grid>            
+        <Modal opened={opened} onClose={close} title="Delete" centered>
+        <div style={{padding:'10px'}}>Do you want to delete {meeting.meetName} ?</div>
+       <div>
+        <Button color='#EE5D20' onClick={close} style={{margin:'10px'}}>Cancel</Button>
+        <Button variant='outline' color='#EE5D20' onClick={deleteMeeting}>Delete</Button>
+       </div>
+       
+      </Modal>   
+        </div>)
+        :     
+        <div className='meetCard' 
     // onClick={() => handleButtonClick()} 
     onMouseEnter={() => setIsHovered(true)}
     onMouseLeave={() => setIsHovered(false)}
@@ -70,21 +122,13 @@ function MeetingCard(props) {
         <Grid align="center" >
         <Grid.Col span={4} onClick={handleButtonClick} ><Text >{meeting.meetName}</Text></Grid.Col>
         <Grid.Col span={2}><Text c="#4f5b5f" >status</Text></Grid.Col>
-        <Grid.Col span={2} onClick={handleButtonClick} ><Text>{user.user_metadata.full_name}</Text></Grid.Col>
+        <Grid.Col span={2} onClick={handleButtonClick} ><Text>{creatorName}</Text></Grid.Col>
         <Grid.Col span={2} onClick={ handleButtonClick} >{meeting.meetStartDate}</Grid.Col>
 
-        <Grid.Col span={1.5} ><Button variant='outline' color='#EE5D20' onClick={EditMeeting}>Edit Meeting</Button></Grid.Col>
-        <Grid.Col span={0.5} ><ActionIcon onClick={open} variant="subtle" color="#EE5D20"><IconTrash/></ActionIcon></Grid.Col>    
-        </Grid>            
-        <Modal opened={opened} onClose={close} title="Delete" centered>
-        <div style={{padding:'10px'}}>Do you want to delete {meeting.meetName} ?</div>
-       <div>
-        <Button color='#EE5D20' onClick={close} style={{margin:'10px'}}>Cancle</Button>
-        <Button variant='outline' color='#EE5D20' onClick={deleteMeeting}>Delete</Button>
-       </div>
-       
-      </Modal>   
-        </div>
+        </Grid>             
+        </div>}
+        
+        </>
   )
 }
 
