@@ -1,5 +1,5 @@
 import React from 'react'
-import MeetingCard from 'src/components/MeetingCard';
+// import MeetingCard from 'src/components/MeetingCard';
 import { useParams } from 'react-router-dom'
 import { useSession } from '@supabase/auth-helpers-react';
 import { useState, useEffect } from 'react';
@@ -7,9 +7,11 @@ import Navbar from 'src/components/Navbar/Navbar';
 import { supabase } from 'src/supabaseClient';
 import { Grid, ScrollArea, TextInput,Text,rem, Button,Modal } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
+import SharedMeetingCard from './SharedMeetingCard';
 
 function SharedMeetingList(props) { 
   const { folderid } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [meeting, setMeeting] = useState([]);
   const [folder, setFolder] = useState([]);
@@ -31,7 +33,7 @@ function SharedMeetingList(props) {
             console.log('data='+data)
           }
         } catch (error) {
-          alert(error.message);
+          // alert(error.message);
         }
       }
 
@@ -46,13 +48,14 @@ function SharedMeetingList(props) {
       const { data, error } = await supabase
           .from("meeting")
           .select("*")
+          .eq("folderId", id)
             //จริงๆๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
           if (error) throw error;
           if (data != null) {
           setMeeting(data); 
           }
         } catch (error) {
-          alert(error.message);
+          // alert(error.message);
         }
       }
 
@@ -89,7 +92,7 @@ function SharedMeetingList(props) {
 
         <div>
             {meeting.map((meeting) => (
-            <MeetingCard meeting = {meeting} user={session.user} key={meeting.MeetId}/>
+            <SharedMeetingCard meeting = {meeting} user={session.user} key={meeting.meetId}/>
           ))}
             </div>
         </div>

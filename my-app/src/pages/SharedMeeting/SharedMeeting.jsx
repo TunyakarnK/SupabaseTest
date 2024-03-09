@@ -6,6 +6,7 @@ import { useSession } from '@supabase/auth-helpers-react';
 import MeetingCard from 'src/components/MeetingCard';
 import '../../components/MeetingCard.css'
 import { useNavigate, Link } from "react-router-dom";
+// import SharedMeetingFoldderCard from "src/pages/SharedMeeting/ShareMeetingFolderCard.jsx"
 import FolderCard from 'src/components/FolderCard';
 import { Grid, ScrollArea, TextInput,Text,rem, Button,Modal ,Radio,Group} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
