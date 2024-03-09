@@ -61,6 +61,7 @@ function EditMeeting(props) {
           setMeetData(data);
           console.log(data[0]);
         }
+        
       };
       fetchMeeting();
       getUserData();
@@ -80,6 +81,7 @@ function EditMeeting(props) {
         .from("meetObj")
         .select("objId, objDes, objStatus")
         .eq("meetId", state.meeting.meetId)
+        .eq("folderId", state.meeting.folderId)
         .eq("objStatus", false);
       if (data) {
         console.log("fetchObj", data);
@@ -89,7 +91,7 @@ function EditMeeting(props) {
 
     
   // delete Objective
-    async function deleteObj(ob) {
+    async function deleteObj(obj) {
       supabase
         .from("meetObj")
         .delete()
@@ -106,7 +108,7 @@ function EditMeeting(props) {
         .from("user")
         .select(
          `
-         userFolder(
+          userFolder(checkOwner,
           folders(
             folderId,
             folderName
@@ -115,9 +117,16 @@ function EditMeeting(props) {
          `
         )
         .eq("id", session.user.id)
+        // .eq("userFolder.checkOwner", true)
       if ( data ){
         console.log("fetch user folder", data[0].userFolder);
-        setUserFolder(data[0].userFolder)
+        console.log(data);
+        // setUserFolder(data[0].userFolder);
+        const check = data[0].userFolder.filter(checks => checks.checkOwner == true);
+        console.log(check);
+        setUserFolder(check)
+      }if ( error ){
+        console.log(error);
       }
     }
         
@@ -137,7 +146,6 @@ function EditMeeting(props) {
             userId, attId,
             members:user(full_name)
             )
-
           `
         )
         .eq("meetId", state.meeting.meetId)
@@ -158,9 +166,18 @@ function EditMeeting(props) {
         .from("attendee")
         .delete()
         .eq('attId', att.attId)
+        .select()
         .then((result) => {
           console.log("Deleted attendee", result);
           fetchAttendee();
+          supabase
+          .from("userFolder")
+          .delete()
+          .eq('userId', result.data[0].userId)
+          .eq('folderId', state.meeting.folderId)
+          .then((result) => {
+            console.log("Deleted attendee userFolder", result);
+          })
         });
     }
 
@@ -205,9 +222,10 @@ function EditMeeting(props) {
                   folderId: selectedFolder
               })
               .eq("meetId", state.meeting.meetId)
-          if (error) throw error;
+              .select()
+          // if (error) throw error;
           // window.location.reload();
-          for (var i = 0; i <= newObj.length + 1; i++) {
+          for (var i = 0; i <= newObj.length; i++) {
             console.log(newObj[i]);
             supabase
             .from("meetObj")
@@ -217,7 +235,7 @@ function EditMeeting(props) {
               objDes: newObj[i],
             })
             .then((result) => {
-              console.log(result);
+              console.log("add new obj in edit page", result);
             });
           }
           // Insert attendee select id from where email
@@ -338,40 +356,40 @@ function EditMeeting(props) {
                   <div style={{marginTop:"15px"}}>
                 <form>
                 <label  >Meeting Start-Date
-                  <input type="date" 
+                  <input type="datetime-local" 
                       defaultValue={state.meeting.meetStartDate}
                       onChange={(e) => setMeetStartDate(e.target.value)} 
                       style={{margin:"15px"}}
                   />
                 </label>
 
-                <label>Meeting Start-Time
+                {/* <label>Meeting Start-Time
                   <input type="time" 
                       defaultValue={state.meeting.meetStartTime}
                       onChange={(e) => setMeetStartTime(e.target.value)} 
                       style={{margin:"15px"}}
                     />
-                </label>
+                </label> */}
                 </form>
                 </div>
 
                 <form>
-                <label>Meeting End-Date&nbsp;
+                <label>Meeting End-Time&nbsp;
                   
-                  <input type="date" 
+                  <input type="time" 
                       defaultValue={state.meeting.meetEndDate}
                       onChange={(e) => setMeetEndDate(e.target.value)} 
                       style={{margin:"15px"}}
                     />
                 </label>                 
 
-                <label>Meeting End-Time&nbsp;
+                {/* <label>Meeting End-Time&nbsp;
                   <input type="time" 
                       defaultValue={state.meeting.meetEndTime}
                       onChange={(e) => setMeetEndTime(e.target.value)} 
                       style={{margin:"15px" ,}}
                     />
-                </label> 
+                </label>  */}
                 </form>
                 
                 <div style={{marginTop:"15px"}}>
@@ -429,7 +447,8 @@ function EditMeeting(props) {
                     }}
                   >
                     {/* <option>{meetFolder}</option> */}
-
+                    {/* <option >default: {userFolder.folders.folderName}</option> */}
+                    <option>Choose Your Folder</option>
                   {userFolder.map( folders => {
                     return(
                         <option key={folders.folders.folderId} value={folders.folders.folderId}>{folders.folders.folderName}</option>
