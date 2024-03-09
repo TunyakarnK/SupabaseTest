@@ -1,7 +1,7 @@
 // import { React, useEffect, useState } from "react";
-// import { supabase } from '../main'
+// import { supabase } from '../supabaseClient';
 
-export function Signup ({ session }){
+// export function Signup ({ session }){
 //   const [loading, setLoading] = useState(true)
 //   const [username, setUsername] = useState(null)
 //   const [avatar_url, setAvatarUrl] = useState(null)
@@ -93,5 +93,5 @@ export function Signup ({ session }){
 //       </div>
 //     </form>
 //   )
-}
-export default Signup;
+// }
+// export default Signup;
