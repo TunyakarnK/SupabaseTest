@@ -54,9 +54,8 @@ function Detail() {
       const { data, error } = await supabase
         .from("meetObj")
         .select("objDes")
-        .lte("meetId", id)
-        .eq("folderId", userData[0].folderId)
-        .eq("objStatus", false);
+        .eq("meetId", id)
+        .eq("folderId", meetData[0].folderId)
       if (data) {
         console.log("fetching meetObj:", data);
         setMeetObjData(data);
@@ -65,6 +64,7 @@ function Detail() {
       console.error("Error fetching meetObj:", error);
     }
   };
+
 
   const fetchAttendee = async () => {
     try {
