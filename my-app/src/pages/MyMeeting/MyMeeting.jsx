@@ -4,16 +4,16 @@ import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from '../../supabaseClient.js';
 import Navbar from '../../components/Navbar/Navbar.jsx'
-import NewMeetingCard from 'src/components/NewMeetingCard';
-import { useSession } from '@supabase/auth-helpers-react';
+import MeetingCard from 'src/components/NewMeetingCard';
 import FolderCard from 'src/components/FolderCard';
 import { Grid, ScrollArea, TextInput,Text,rem, Button,Modal ,Radio,Group} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useSession } from '@supabase/auth-helpers-react';
 
 function MyMeeting() {
   const navigate = useNavigate();
-  const session = useSession();
-  const [user, setUser] = useState({});
+  const session = useSession()
+  const [user, setUser] = useState([]);
   const [createFolder, setCreateFolder] = useState(false);
   const [folder, setFolder] = useState([]);
   const [folderName, setFolderName] = useState([]);
@@ -21,39 +21,43 @@ function MyMeeting() {
   const [opened, { open, close }] = useDisclosure(false);
   const [newMeetName, setNewMeetName] = useState([]);
   const [ folderOwner, setFolderOwner ] = useState(null);
-  
-    useEffect(() =>{
-      async function getUserData() {
-        await supabase.auth.getUser().then((value) =>{
-          // value.data.user
-          if(value.data?.user){
-            console.log(value.data.user)
-            setUser(value.data.user)
-          }
-        })
+
+  useEffect(() =>{
+    getUserData();
+    fetchFolder();
+    fetchNewMeeting();
+    console.log('meet'+newMeeting)   
+  }, [session])
+
+  async function getUserData() {
+    await supabase.auth.getUser().then((value) =>{
+      // value.data.user
+      if(value.data?.user){
+        setUser(value.data.user);
+        console.log(user);
       }
-      getUserData();
-      fetchFolder();
-      fetchNewMeeting();
-      console.log('meet'+newMeeting)
-    }, [])
+    })
+  }
+
+
+    async function signOut() {
+      await supabase.auth.signOut();
+      navigate("/");
+    }
 
     async function fetchNewMeeting() {
       try {
         const { data, error } = await supabase
           .from("meeting")
-          .select("*")
-          // .filter("folderId", 'is', null)
-          .eq("creatorId", session.user.id)
-          //จริงๆๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
-        if (error) throw error;
+          .select('*')
+          .is('folderId', null)
+          .eq("creatorId", session.user.id);
+        // if (error) throw error;
         if (data != null) {
-          console.log("getNewMeeting",data);
           setNewMeeting(data); 
         }
       } catch (error) {
         // alert(error.message);
-        console.log("getNewMeeting",error);
       }
     }
 
@@ -64,20 +68,21 @@ function MyMeeting() {
           .select(
             `
             userId,
-            folders(folderName,folderId)
+            folders(folderName, folderId)
             `
           )
           .eq("checkOwner", true)
           .eq("userId", session.user.id)
-        if (error) throw error;
+        // if (error) throw error;
         if (data != null) {
-          console.log("getFolder", data);
+          console.log("fetch folder", data);
           setFolder(data); 
         }
       } catch (error) {
         // alert(error.message);
       }
     }
+  
     async function createNewFolder() {
       try {
         const { data, error } = await supabase
@@ -92,14 +97,14 @@ function MyMeeting() {
             supabase
             .from("userFolder")
             .insert({
-              userId: session.user.id,
+              userId: user.id,
               folderId: result.data.folderId,
               checkOwner: true
             })
             .then((result) => {
               console.log("user Folder", result);
               setFolderOwner(result);
-              // window.location.reload();
+              window.location.reload(); 
             });
           });
         if (result){
@@ -109,9 +114,8 @@ function MyMeeting() {
         // alert(error.message);
       }
     }
-    console.log(new Date());
+  
     console.log(folder);
-    console.log(folderOwner);
 
     async function createNewMeeting(){
       try {
@@ -122,14 +126,31 @@ function MyMeeting() {
             creatorId: session.user.id,
             meetCreate: new Date()
           })
+          .select()
           .single()
-          
-        if (error) throw error;
-        window.location.reload();
+          .then((result) => {
+            console.log("create new meeting", result);
+            supabase
+            .from("attendee")
+            .insert({
+              meetId: result.data.meetId,
+              email: session.user.email,
+              userId: session.user.id
+            })
+            .then((result) => {
+              console.log("insert Attendee", result);
+              window.location.reload(); 
+            })
+            // fetchNewMeeting();
+          })
+        // if (error) throw error;
+
       } catch (error) {
-        alert(error.message);
+        // alert(error.message);
       }
     }
+
+    
 
     return (
       <div className="App">
@@ -146,11 +167,10 @@ function MyMeeting() {
         </Grid>
         <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
         <Grid.Col span={5}><Text c="#4f5b5f" style={{marginLeft:'10px'}}>Meeting Name</Text></Grid.Col>
-        <Grid.Col span={5.5} ><Text c="#4f5b5f">Meeting Date</Text></Grid.Col>
         </Grid>
         <div >
             {newMeeting.map((newMeeting) => (
-            <NewMeetingCard meeting = {newMeeting} user = {user} key={newMeeting.MeetId}/>
+            <MeetingCard meeting = {newMeeting} user = {user} key={newMeeting.MeetId}/>
           ))}
             </div>
        <div>
@@ -171,12 +191,13 @@ function MyMeeting() {
             {folder.map((folder) => (
               <FolderCard folder = {folder} user = {user} key={folder.folderId} />
             ))}
+            
           </div>
         </div>
           
-        <Modal opened={opened} onClose={close} title="Delete" centered>
-       <TextInput label="Rename Folder" defaultValue={folder.folderName} size="xs" onChange={(event) => setFolderName(event.currentTarget.value)} />
-              <Button color='#EE5D20' onClick={close} style={{marginTop:'10px',marginRight:'10px',marginLeft:'90px'}}>Cancle</Button>
+        <Modal opened={opened} onClose={close} title="New Folder" centered>
+       <TextInput withAsterisk label="Create Folder"  size="xs" onChange={(event) => setFolderName(event.currentTarget.value)} />
+              <Button color='#EE5D20' onClick={close} style={{marginTop:'10px',marginRight:rem(10),marginLeft:rem(235)}}>Cancle</Button>
               <Button variant='outline' color='#EE5D20' style={{marginTop:'10px'}} onClick={() => createNewFolder()}>Create</Button>
       </Modal>   
             </div>
@@ -185,7 +206,11 @@ function MyMeeting() {
            <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div> 
     </>
        :
-       <></>
+       <>
+       {/* {signOut}
+       {navigate('/')} */}
+       loading
+       </>
        }
       </div>
     );
