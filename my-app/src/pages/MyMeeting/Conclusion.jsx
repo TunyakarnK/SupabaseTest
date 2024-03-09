@@ -20,37 +20,59 @@ function Conclusion() {
   const [ nextMeet, setNextMeet ] = useState(null);
 
   useEffect(() => {
-    const fetchMeeting = async () => {
-      const { data, error } = await supabase
-        .from("meeting")
-        .select()
-        .eq("meetId", id);
-      if (data) {
-        console.log("lllll", data);
-        setMeetData(data);
-        console.log(data[0]);
-      }
-    };
+    // const fetchMeeting = async () => {
+    //   const { data, error } = await supabase
+    //     .from("meeting")
+    //     .select()
+    //     .eq("meetId", id);
+    //   if (data) {
+    //     console.log("lllll", data);
+    //     setMeetData(data);
+    //     console.log(data[0]);
+    //   }
+    // };
     
-    const fetchObj = async () => {
-      const { data, error } = await supabase
-        .from("meetObj")
-        .select("folderId, objDes")
-        .eq("meetId", id);
-      if (data) {
-        console.log(data);
-        setMeetObjData(data);
-      }
-    };
-    fetchMeeting();
     fetchObj();
+    // fetchObj();
     // fetchNextMeeting();
   }, [nextMeet]);
+
+  // const fetchObj = async () => {
+  //   const { data, error } = await supabase
+  //     .from("meetObj")
+  //     .select("folderId, objDes, objStatus")
+  //     .eq("meetId", id)
+  //     .eq("folderId", meetData[0]?.folderId)
+  //     // .eq("objStatus", true);
+  //   if (data) {
+  //     console.log(data);
+  //     setMeetObjData(data);
+  //   }
+  // };
+
+  const fetchObj = async () => {
+    await supabase
+    .from("meeting")
+    .select()
+    .eq("meetId", id)
+    .then((result) => {
+      console.log("fetchO", result.data[0]);
+      setMeetData(result.data[0])
+        supabase
+        .from("meetObj")
+        .select("objId, objDes, objStatus")
+        .eq("meetId", id)
+        .eq("folderId", result.data[0].folderId) // .eq("objStatus", false)
+        .then((result) => {
+          console.log("fetchObjjjjjjjjjjjjjjj", result.data);
+          setMeetObjData(result.data);
+        })
+    });
+  }
 
   function addFol(fol) {
     setArrFol((current) => [...current, fol]);
     console.log(arrFol.length);
-    console.log(setArrFol);
     setFol("")
   }
   //
@@ -70,28 +92,69 @@ function Conclusion() {
         console.log(result);
       });
     }
-
     // end time
     supabase
     .from("meeting")
     .update({
-      meetEndTime: meetEndTime.toLocaleTimeString()
+      meetEndTime: meetEndTime.toLocaleTimeString(),
+      meetStatus: true
     })
     .eq('meetId', id)
     .then(result => {
       console.log(result);
     });
-
     // create next meeting
     supabase
     .from("meeting")
     .insert({
-      folderId: meetData[0]?.folderId,
-      creatorId: session.user.id
+      folderId: meetData.folderId,
+      creatorId: session.user.id,
+      meetName: 'Untitled Meeting',
+      meetCreate: new Date()
     })
-    .then(result => {
-      console.log("Test Create new meeting",result);
-      fetchNextMeeting();
+    .select()
+    .then((result) => {
+      console.log("Create new meeting", result);
+      supabase
+      .from("attendee")
+      .insert({
+        meetId: result.data.meetId,
+        email: session.user.email,
+        userId: session.user.id
+      })
+      .then((result) => {
+        console.log("insert Attendee", result);
+        // window.location.reload(); 
+      })
+  // send objective not yet
+      for (var i = 0; i <= meetObjData.length-1; i++){
+        if (meetObjData[i]?.objStatus === false) {
+        supabase
+        .from("meetObj")
+        .insert({ 
+          folderId: result.data[0].folderId,
+          objDes: meetObjData[i]?.objDes,
+          meetId: result.data[0].meetId
+        })
+        .then((result) => {
+          console.log("insert meet objective not yet", result);
+        });
+        }
+      }
+// send follow up
+      for (var i = 0; i <= arrFol.length; i++) {
+        console.log(arrFol[i]);
+        supabase
+        .from("meetObj")
+        .insert({
+          folderId: result.data[0].folderId,
+          meetId: result.data[0].meetId,
+          objDes: arrFol[i],
+        })
+        .then((result) => {
+          console.log("send follow up", result);
+        });
+      }
     });
   }
 
@@ -121,18 +184,23 @@ function Conclusion() {
       // alert(data[0].meetId)
       console.log(data[0].meetId);
       setNextMeet(data[0].meetId);
+      for (var i = 0; i <= meetObjData.length-1; i++){
+      if (meetObjData[i]?.objStatus === false) {
       supabase
       .from("meetObj")
-      .update({ 
+      .insert({ 
+        folderId: meetObjData[0]?.folderId,
+        objDes: meetObjData[i]?.objDes,
         meetId: data[0].meetId
       })
-      .eq("meetId", meetData[0].meetId)
       .then((result) => {
-        console.log("change meetId", result);
-      })
+        console.log("insert meet objective", result);
+      });
+      }
+    }
       
     // send follow up
-      for (var i = 0; i <= arrFol.length + 1; i++) {
+      for (var i = 0; i <= arrFol.length; i++) {
         console.log(arrFol[i]);
         supabase
         .from("meetObj")
@@ -148,7 +216,12 @@ function Conclusion() {
     }
   }
 
-  // const addfol = () => {
+
+  for (var i = 0; i <= meetObjData.length-1; i++){
+    if (meetObjData[i]?.objStatus === false) {
+    console.log("1", meetObjData[i]?.objDes); }
+  }
+  // const addfol = () => 
 
   // }
   return (
@@ -179,7 +252,9 @@ function Conclusion() {
       </Grid.Col>
       <Grid.Col span={2.5} />
       <Grid.Col span={1} >
-      <Link to={'/MeetingPage/'+id}><Button radius='xl' color="#EE5D20" onClick={() => sendData() } style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>End meeting</Button></Link>
+      {/* <Link to={'/MeetingPage/'+id}></Link> */}
+      <Button radius='xl' color="#EE5D20" onClick={ () => sendData() } style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>End meeting</Button>
+        
       </Grid.Col>
       </Grid>
 
