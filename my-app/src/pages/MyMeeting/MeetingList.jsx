@@ -86,6 +86,12 @@ return (
           <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'25px'}}>My Meeting ❯ {id}</Text></Grid.Col>
           {/* <Grid.Col span={1.3}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px'}}>Statistic</Button></Grid.Col> */}
         </Grid>
+        <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
+        <Grid.Col span={4}><Text c="#4f5b5f" style={{marginLeft:'10px'}}>Meeting Name</Text></Grid.Col>
+        <Grid.Col span={2} ><Text c="#4f5b5f">Status</Text></Grid.Col>
+        <Grid.Col span={2} ><Text c="#4f5b5f">Owner</Text></Grid.Col>
+        <Grid.Col span={2} ><Text c="#4f5b5f">Meeting Date</Text></Grid.Col>
+        </Grid>
 
         {/* <div className=''>
             {newMeeting.map((newMeeting) => (
