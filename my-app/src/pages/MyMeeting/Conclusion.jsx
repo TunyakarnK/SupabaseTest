@@ -118,12 +118,12 @@ function Conclusion() {
       supabase
       .from("attendee")
       .insert({
-        meetId: result.data.meetId,
+        meetId: result.data[0].meetId,
         email: session.user.email,
         userId: session.user.id
       })
       .then((result) => {
-        console.log("insert Attendee", result);
+        console.log("insert Attendee******", result);
         // window.location.reload(); 
       })
   // send objective not yet
@@ -252,9 +252,9 @@ function Conclusion() {
       </Grid.Col>
       <Grid.Col span={2.5} />
       <Grid.Col span={1} >
-      {/* <Link to={'/MeetingPage/'+id}></Link> */}
-      <Button radius='xl' color="#EE5D20" onClick={ () => sendData() } style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>End meeting</Button>
-        
+      <Link to={'/MeetingPage/'+id}><Button radius='xl' color="#EE5D20" onClick={ () => sendData() } style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>End meeting</Button>
+        </Link>
+      
       </Grid.Col>
       </Grid>
 
