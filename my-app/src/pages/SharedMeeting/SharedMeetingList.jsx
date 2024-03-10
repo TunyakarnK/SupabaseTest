@@ -1,6 +1,6 @@
 import React from 'react'
 // import MeetingCard from 'src/components/MeetingCard';
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useSession } from '@supabase/auth-helpers-react';
 import { useState, useEffect } from 'react';
 import Navbar from 'src/components/Navbar/Navbar';
@@ -26,7 +26,7 @@ function SharedMeetingList(props) {
       const { data, error } = await supabase
           .from("folders")
           .select()
-          .eq("folderId",folderid)
+          .eq("folderId", id)
           if (error) throw error;
           if (data != null) {
             setFolder(data);
@@ -38,11 +38,32 @@ function SharedMeetingList(props) {
       }
 
     fetchFolder();
-    fetchMeeting();
+    // fetchMeeting();
+    fetchM()
     console.log(folder)
     // console.log(folder[0].folderName)
   }, [])
 
+  async function fetchM() {
+    try {
+      const { data, error } = await supabase
+        .from("attendee")
+        .select(`
+         meeting(*)
+        `)
+        .eq("userId", session.user.id)
+        .eq("meeting.folderId", id)
+        if ( data ){
+          console.log("meeting list share", data);
+          // 
+          const check = data.filter(checks => checks.meeting != null);
+          console.log("60", check);
+          setMeeting(check);
+        }
+    } catch (error) {
+
+    }
+  }
   async function fetchMeeting() {
     try {
       const { data, error } = await supabase
@@ -60,7 +81,7 @@ function SharedMeetingList(props) {
       }
 
       function statisticButton(){
-        navigate('/Folder/'+folder.folderid+'/statistic', { state: { folder } } );    
+        navigate('Folder/'+ folder.folders.folderId, { state: { folder } } );    
       }
   
   
@@ -77,10 +98,10 @@ function SharedMeetingList(props) {
      
         
         <Grid align="center">
-          <Grid.Col span={0.8}><Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto'}}>Back</Button></Grid.Col>
+          <Link to = {"/SharedMeeting"}><Grid.Col span={0.8}><Button variant='outline' color='#EE5D20' radius="xl"  style={{width:'auto'}}>Back</Button></Grid.Col></Link>
+          
         {/* <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folder[0].folderName}</Text></Grid.Col> */}
           <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folderid}</Text></Grid.Col>
-          <Grid.Col span={1.3}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px'}}>Statistic</Button></Grid.Col>
         </Grid>
       
         <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
