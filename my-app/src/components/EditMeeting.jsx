@@ -1,11 +1,13 @@
 import React from 'react'
-import { Select, NativeSelect, rem, TextInput, TagsInput, Grid,Textarea,Button, Group } from '@mantine/core';
+import { Text, NativeSelect, rem, TextInput, TagsInput, Grid,Textarea,Button, Group,InputBase, Pill} from '@mantine/core';
 import { useEffect, useState } from "react";
 import { supabase } from '../supabaseClient.js';
 import Navbar from './Navbar/Navbar.jsx'
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useSession } from '@supabase/auth-helpers-react';
+import classes from '../components/Edit.module.css'
+
 
 function EditMeeting(props) {
   const { state } = useLocation();
@@ -56,13 +58,14 @@ function EditMeeting(props) {
           .select()
           .eq("meetId", state.meeting.meetId);
   
-        if (data) {
-          console.log( data);
+        if (data) {         
           setMeetData(data);
           console.log(data[0]);
         }
         
       };
+
+      
       fetchMeeting();
       getUserData();
       getMeeting();
@@ -240,13 +243,13 @@ function EditMeeting(props) {
           }
           // Insert attendee select id from where email
           for (var i = 0; i <= meetParti.length; i++) {
-            console.log(meetParti[i]);
+            console.log("ผู้เข้าร่วม", meetParti[i]);
             supabase
             .from("user")
             .select("id, email")
             .eq("email", meetParti[i])
             .then((result) => {
-              console.log("Fetch user id where email", result.data[0].id)
+              console.log("Fetch user id where email", result.data)
               const user_id = result.data[0].id
               // insert attendee
               supabase
@@ -260,17 +263,28 @@ function EditMeeting(props) {
                 console.log("Insert attendee", result);
                 supabase
                 .from("userFolder")
-                .insert({
-                  userId: user_id,
-                  folderId: state.meeting.folderId
-                })
+                .select("userId, folderId")
+                .eq("userId", user_id)
+                .eq("folderId", state.meeting.folderId)
                 .then((result) => {
-                  console.log("Insert userFolder", result);
+                  console.log("Check exist userFolder", result.data[0])
+                    if (result.data[0] == null){
+                    supabase
+                    .from("userFolder")
+                    .insert({
+                      userId: user_id,
+                      folderId: state.meeting.folderId,
+                      checkOwner: false
+                    })
+                    .then((result) => {
+                      console.log("Insert userFolder", result);
+                    });
+                  } 
                 });
               });
           });
           }
-          navigate("/MyMeeting");
+          navigate(-1);
       } catch (error) {
           console.log(meetStartTime)
           alert(error.message);
@@ -288,9 +302,14 @@ function EditMeeting(props) {
 
           
        <div style={{margin:"20px"}}>
-             <h1 style={{color: "#EE5D20", marginTop: '2%', marginLeft:"20px"}}>Edit Meeting</h1>
+       <Grid align='center' style={{ marginLeft:rem(50), marginTop:rem(30) }}>
+      <Grid.Col span={0.8}><Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto'}}>Back</Button></Grid.Col>
+      <Grid.Col span={8}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'10px'}}>Edit Meeting</Text></Grid.Col>
+      </Grid>
              <Grid style={{margin:"20px", backgroundColor: '#FDEFE9',padding:"20px"}}>
               <Grid.Col span={6}>
+
+                {/* Meeting Name */}
                 <TextInput
                     placeholder={state.meeting.meetName}
                     defaultValue={state.meeting.meetName}
@@ -300,13 +319,15 @@ function EditMeeting(props) {
                       input: {
                         color:'#EE5D20',
                         borderColor:'#EE5D20',
-                        backgroundColor:'#FDEFE9',
+                        // backgroundColor:'#FDEFE9',
                         width: rem(300),
                         marginRight: rem(-2),
+                        
                       },
                     }}
                 />
 
+                {/* Meeting Type */}
                 <div style={{width: "300px"}}>
                   <NativeSelect
                     mt="md"
@@ -319,7 +340,7 @@ function EditMeeting(props) {
                       input: {
                         color:'#EE5D20',
                         borderColor:'#EE5D20',
-                        backgroundColor:'#FDEFE9',
+                        // backgroundColor:'#FDEFE9',
                         fontWeight: 500,
                         borderTopLeftRadius: 0,
                         borderBottomLeftRadius: 0,
@@ -328,30 +349,7 @@ function EditMeeting(props) {
                       },
                     }}
                   />
-                </div>
-               
-
-                  <div style={{marginTop:"15px"}}>
-                  {/* <DatePickerInput
-                    placeholder={state.meeting.meetDes}
-                    label="Meeting Description"
-                    onChange={(event) => setMeetDes(event.currentTarget.value)}
-                    styles={{
-                      input: {
-                        borderBottom: rem(5),
-                        width: rem(300),
-                        marginRight: rem(-2),  
-                      },
-                    }}
-                  /> */}
-
-                  {/* <DatePickerInput
-                    label="Pick date"
-                    placeholder="Pick date"
-                    value={state.meeting.meetStartDate}
-                    onChange={setMeetStartDate}
-                  /> */}
-                  </div>
+                </div>             
 
                   <div style={{marginTop:"15px"}}>
                 <form>
@@ -402,7 +400,7 @@ function EditMeeting(props) {
                       input: {
                         color:'#EE5D20',
                         borderColor:'#EE5D20',
-                        backgroundColor:'#FDEFE9',
+                        // backgroundColor:'#FDEFE9',
                         width: "85%",
                         height: rem(150),
                         marginRight: rem(-2),  
@@ -458,6 +456,8 @@ function EditMeeting(props) {
 
               {/* Objective */}
               <div style={{marginTop:"15px"}}>
+         
+{/*     
               {newObj.map((listNewObj) => (
           <div>
             {listNewObj}
@@ -470,37 +470,69 @@ function EditMeeting(props) {
           <div key={meetObjData.objId}>
             {meetObjData.objDes}<button onClick={() => deleteObj(meetObjData)}>x</button>
           </div>
+        ))} */}
+        {/* </Box> */}
+
+        <InputBase
+        label="Meeting Objective"
+        placeholder='No Objective'
+        component="div" multiline
+        classNames={classes}
+        style={{
+          width: "90%",
+          minHeight: rem(100),
+          marginRight: rem(-2),
+          marginBottom: rem(30),
+          color:'#EE5D20',
+          borderColor:'#EE5D20',
+          backgroundColor:'#FDEFE9',
+        }}
+        >
+          <div style={{ height: rem(10) }}></div>
+          <Pill.Group>
+
+          {meetObjData.map((meetObjData) => ( 
+            <Pill 
+            key={meetObjData.objId}
+            classNames={{root:classes.root}}
+            // onClick={()=>console.log(meetObjData)}
+            onRemove={()=>deleteObj(meetObjData)}
+            withRemoveButton 
+            clearable
+            >
+            {meetObjData.objDes}
+            {/* <button onClick={() => deleteObj(meetObjData)}>x</button> */}
+          </Pill>
         ))}
-              <TagsInput
-                label="Meeting Objective"
+          </Pill.Group>
+          
+          <div style={{ height: rem(20) }}></div>
+          
+          <TagsInput
+          label="Add New Objective"
                 placeholder="Press Enter to submit Objective"
-                // defaultValue={meetObj}
+                classNames={{pill:classes.pill}}
+                // defaultValue={newObjList}
                 value={newObj}
                 onChange={setNewObj}
-                clearable
-                // value={newObj} 
-              //   onKeyDown={(event) => {
-              //     if (event.key === 'Enter') {
-              //         addObj(event);
-              //     }
-              // }}
+                // omRemove={deleteObj}
+                clearable 
                 styles={{
                   input: {
                     color:'#EE5D20',
                     borderColor:'#EE5D20',
-                    backgroundColor:'#FDEFE9',
-                    width: "90%",
-                    height: rem(100),
-                    marginRight: rem(-2),
+                    // backgroundColor:'#FDEFE9',
+                    // marginTop:"1rem"
                   },
                 }}
               />
-              {newObj}
+          </InputBase>
               
+              {/* {newObj} */}      
               </div>
 
               <div style={{marginTop:"15px"}}>
-              {meetParti.map((listNewObj) => (
+              {/* {meetParti.map((listNewObj) => (
           <div>
             {listNewObj}
             <button value={listNewObj}>
@@ -512,11 +544,42 @@ function EditMeeting(props) {
           <div key={listAtten.members}>
             {listAtten.members.full_name}<button onClick={() => deleteAtt(listAtten)}>x</button>
           </div>
+        ))} */}
+              {/* <div style={{marginTop:"15px"}}> */}
+        <InputBase
+        label="Meeting Attendee"
+        placeholder='No Objective'
+        component="div" multiline
+        classNames={classes}
+        style={{
+          width: "90%",
+          minHeight: rem(100),
+          marginRight: rem(-2),
+          marginBottom: rem(30),
+          color:'#EE5D20',
+          borderColor:'#EE5D20',
+          backgroundColor:'#FDEFE9',
+        }}
+        ><div style={{ height: rem(10) }}></div>
+        <Pill.Group>       
+        {meetAtten.map((listAtten) => (
+          <Pill 
+          classNames={{root:classes.root}}
+          // onClick={()=>console.log(meetObjData)}
+          onRemove={()=>deleteAtt(listAtten)}
+          withRemoveButton 
+          clearable 
+          key={listAtten.members}>
+            {listAtten.members.full_name}
+            {/* <button onClick={() => deleteAtt(listAtten)}>x</button> */}
+          </Pill>
         ))}
+        </Pill.Group>
+        <div style={{ height: rem(20) }}></div>
               <TagsInput
-                label="Participant"
-                placeholder="Press Enter to submit Participant"
-                // defaultValue={meetParti}
+              classNames={{pill:classes.pill}}
+              label='Add New Attendee'
+                placeholder="Press Enter to submit attendee"
                 value={meetParti}
                 onChange={setMeetParti}
                 clearable
@@ -524,13 +587,11 @@ function EditMeeting(props) {
                   input: {
                     color:'#EE5D20',
                     borderColor:'#EE5D20',
-                    backgroundColor:'#FDEFE9',
-                    width: "90%",
-                    height: rem(100),
-                    marginRight: rem(-2),
+                    // backgroundColor:'#FDEFE9',
+                    // marginTop:"1rem"
                   },
                 }}
-              />
+              /></InputBase>
               </div>
               {/* <div style={{width: "90%",marginTop:"30px", justifyItems:'end'}}> */}
               <Group justify="flex-end" mt="md" style={{ marginRight:'10%' , marginTop:"30%" }}>
@@ -557,5 +618,3 @@ function EditMeeting(props) {
 }
 
 export default EditMeeting
-
- 
