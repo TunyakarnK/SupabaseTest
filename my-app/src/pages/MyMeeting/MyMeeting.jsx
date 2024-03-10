@@ -39,7 +39,6 @@ function MyMeeting() {
     })
   }
 
-
     async function signOut() {
       await supabase.auth.signOut();
       navigate("/");
@@ -88,7 +87,7 @@ function MyMeeting() {
         const { data, error } = await supabase
           .from("folders")
           .insert({
-            folderName: folderName
+            folderName: folderName,
           })
           .select("folderId")
           .single()
@@ -197,7 +196,7 @@ function MyMeeting() {
           
         <Modal opened={opened} onClose={close} title="New Folder" centered>
        <TextInput withAsterisk label="Create Folder"  size="xs" onChange={(event) => setFolderName(event.currentTarget.value)} />
-              <Button color='#EE5D20' onClick={close} style={{marginTop:'10px',marginRight:rem(10),marginLeft:rem(235)}}>Cancle</Button>
+              <Button color='#EE5D20' onClick={close} style={{marginTop:'10px',marginRight:rem(10),marginLeft:rem(235)}}>Cancel</Button>
               <Button variant='outline' color='#EE5D20' style={{marginTop:'10px'}} onClick={() => createNewFolder()}>Create</Button>
       </Modal>   
             </div>
