@@ -62,15 +62,19 @@ function FolderCard(props) {
 
 async function updateFolderName(){
   try {
-            const { data, error } = await supabase
+        const { data, error } = await supabase
                 .from("folders")
                 .update({
                   folderName: folderName,
                 })
-                .eq("folderId", folder.folderId) 
+                .eq("folderId", folder.folders.folderId) 
+                if (data) {
+                  console.log("update folder name", data);
+                }
             // if (error) throw error;
             window.location.reload();
         } catch (error) {
+          console.log("error update name", error);
             // alert(error.message);
         }
 }
