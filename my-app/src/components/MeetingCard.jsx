@@ -2,7 +2,7 @@ import React from 'react'
 import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import "src/components/MeetingCard.css"
-import { Link,NavLink,useNavigate } from 'react-router-dom';
+import { Link,NavLink,useNavigate, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Card, Table, Grid,Text,Button, ActionIcon,  Modal} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -10,41 +10,57 @@ import { IconTrash } from '@tabler/icons-react';
 import { useSession } from '@supabase/auth-helpers-react';
 
 function MeetingCard(props) {
-  const session = useSession();
+  const { id } = useParams();
   const meeting = props.meeting;
+  const session = useSession;
+  const user = props.user;
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
-  
-  //fetch status ของ meeting
+  const [thisUser, setThisUser] = useState({});
+  const [ editing, setEditing ] = useState(false);
+  const [ meetId, setMeetId ]= useState ([]);
+  const [ meetName, setMeetName ] = useState ([]);
+  // const [ ownerId, setOwnerId]= useState ([]);
+  const [ meetStartDate, setMeetStartDate] = useState ([]);
+  const [ creatorName, setcreatorName ] = useState();
+  const [ checkCreator, setCheckCreator ] = useState();
 
-  const [user, setUser] = useState(null);
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (session.user) {
-        const { data, error } = await supabase.auth.getUser();
-        if (error) throw error;
-        setUser(data?.user);
-      }
-    };
+    async function getUserData() {
+      await supabase.auth.getUser().then((value) => {
+        if (value.data?.user) {
+          setThisUser(value.data.user);
+          // console.log(value)
+        }
+      });
+    }checkCreatorMeeting();
+    console.log("test", meeting.meetStatus);
+    getUserData();
+  }, []);
 
-    fetchUserData();
-  }, [session]);
-
-  async function deleteMeeting() {
-    try {
-      const { data, error } = await supabase
-        .from("meeting")
-        .delete()
-        .eq("meetName", meeting.meetName);
-
-      if (error) throw error;
-      window.location.reload(); // Simpler approach for now
-    } catch (error) {
-      // Handle errors appropriately (e.g., display error message)
-      console.error(error);
+    async function deleteMeeting() {
+        try {
+            const { data, error } = await supabase
+                .from("meeting")
+                .delete()
+                .eq("meetId", meeting.meetId)
+                // window.location.reload();
+          getUserData()
+          fetchFolder();
+          fetchNewMeeting();
+        } catch (error) {
+            // alert(error.message);
+        }
     }
-  }
+    function EditMeeting (){
+      navigate('/EditMeeting', { state: { meeting } });
+    } 
+
+    function handleButtonClick (){
+        navigate('/MeetingPage/' + meeting.meetId, { state: { user } });    
+    }
+  
 
   function EditMeeting() {
     navigate('/EditMeeting', { state: { meeting } });
@@ -54,6 +70,24 @@ function MeetingCard(props) {
     navigate(`/MeetingPage/${meeting.meetId}`, { state: { user } });
   }
 
+    const checkCreatorMeeting = async () => {
+      await supabase
+      .from("meeting")
+      .select("meetStatus, creatorId")
+      .eq("folderId", id)
+      .then((result) => {
+        console.log("who create this meeting", result);
+        setCheckCreator(result.data[0].creatorId)
+        supabase
+        .from("user")
+        .select("full_name")
+        .eq("id", result.data[0].creatorId)
+        .then((result) => {
+          console.log("Name", result);
+          setcreatorName(result.data[0].full_name);
+        })
+      })
+    }
 
   return (
     <div
@@ -98,19 +132,17 @@ function MeetingCard(props) {
         <Modal opened={opened} onClose={close} title="Delete">
           <div style={{ padding: '10px' }}>Do you want to delete {meeting.meetName} ?</div>
        <div>
-        <Button color='#EE5D20' onClick={close} style={{margin:'10px'}}>Cancle</Button>
+        <Button color='#EE5D20' onClick={close} style={{margin:'10px'}}>Cancel</Button>
         <Button variant='outline' color='#EE5D20' onClick={deleteMeeting}>Delete</Button>
        </div>
        
-      </Modal> 
-      
+      </Modal>       
+
       </>
     )}
       </div>
-        
   )
-}
+
+    }
 
 export default MeetingCard
-
-

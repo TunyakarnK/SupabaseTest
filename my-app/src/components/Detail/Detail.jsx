@@ -48,7 +48,6 @@ function Detail() {
       // console.log(data);
     }
   };
-  
   const fetchObj = async () => {
     try {
       const { data, error } = await supabase
@@ -89,7 +88,7 @@ function Detail() {
     } catch (error) {
       console.error("Error fetching attendee:", error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchMeeting();
@@ -105,7 +104,8 @@ function Detail() {
   // useEffect(() => {
     
   // }, [meetAtten]);
-return (
+
+  return (
     <><div 
     // style={{ backgroundColor:'#FDEFE9' }}
     >
@@ -122,8 +122,7 @@ return (
           </p>
         </div>
       ))}
-
-<p> Attendee:</p>
+      <p> Attendee:</p>
       {meetAtten.map((listAtten) => (
         <div key={listAtten.members}>{listAtten.members.full_name}</div>
       ))}

@@ -19,8 +19,8 @@ function Login() {
       // getUserData();
       // handleSignInWithGoogle(user);
       // signed in, go to Profile
-      // navigate("/Profile");
       navigate("/MyMeeting");
+      // navigate("/MyMeeting");
   }else{
     // not signed in, go to Login
     navigate("/");

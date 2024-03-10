@@ -35,10 +35,10 @@ function MeetingPage(props) {
 const [thisUser, setThisUser] = useState({});  
 const navigate = useNavigate();
 const { id } = useParams();
-// const {user} = useParams();
+const {user} = useParams();
 const [ meetData, setMeetData ] = useState ([]);
 const [ isRunning, setIsRunning ] = useState(false);
-const [ meetStartTime, setMeetStartTime ] = useState('');
+// const [ meetStartTime, setMeetStartTime ] = useState('');
 const [ meetStopTime, setMeetEndTime ] = useState('');
 const [ toggle, setToggle ] = useState(1)
 const [isEnded, setIsEnded ] = useState(false);
@@ -56,52 +56,40 @@ useEffect(() =>{
 function updateToggle(id) {
   setToggle(id)
 }
-const meetEndTime1 = new Date();
-const meetStartTime1 = new Date();
 
-const fetchMeeting = async () => {
+const fetchCreator = async () => {
   try {
     const { data, error } = await supabase
       .from("meeting")
-      .select()
-      .eq("meetId", id);
+      .select("creatorId, meetStatus, folderId")
+      .eq("meetId", id)
     if (data) {
-      console.log(data);
-      setMeetData(data);
+      console.log(",,,", data[0].creatorId);
+      console.log(",,,", data[0].meetStatus);
+      console.log(",,,", data[0].folderId);
+      setMeetData(data[0]);
     }
   } catch (error) {
-    console.error("Error fetching meeting:", error);
+    console.error("creatorId not equal current user!", error);
   }
 };
 
-const handleButtonClick = () => {
-    if (isRunning) {
-      setMeetEndTime(new Date());
-      
-      console.log(meetEndTime1.toLocaleTimeString("th-TH"));
+useEffect(() => {
+  fetchCreator()
+  console.log(meetData);
+}, []);
 
-      supabase.from("meeting").update({
-        meetEndTime: meetEndTime1.toLocaleTimeString(),
-      })
-      .eq('meetId', id)
-      .then(result => {
-        console.log(result);
-      });
-    } else {
-      setMeetStartTime(new Date());
-      console.log(meetStartTime1.toLocaleTimeString("th-TH"));
-      supabase.from("meeting").update({
-        meetStartTime: meetStartTime1.toLocaleTimeString(),
-      })
-      .eq('meetId', id)
-      .then(result => {
-        console.log(result);
-      });
-    }
-    setIsRunning(!isRunning);
-    if (isRunning) {
-      setIsEnded(true);
-    }
+const meetStartTime = new Date();
+const handleButtonClick = () => {
+  supabase
+  .from("meeting")
+  .update({
+    meetStartTime: meetStartTime.toLocaleTimeString()
+  })
+  .eq('meetId', id)
+  .then(result => {
+    console.log(result);
+  });
   };
 
   const links = tabs[section].map((item) => (  
@@ -119,7 +107,7 @@ const handleButtonClick = () => {
     </text>
   ));
   function feedBack(){
-    navigate('/Feedback', { state: { id } });
+    navigate('/MeetingPage/feedback/' + id, { state: { id } });
   }
 
 
@@ -134,11 +122,23 @@ const handleButtonClick = () => {
 <div style={{ margin:"40px", padding:'20px'}}>
   
 <Grid align="center">
-<Grid.Col span={1}><Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto',marginBottom:'10px'}}>Back</Button></Grid.Col>
+<Grid.Col span={1}>
+  { meetData.creatorId === session.user.id ? 
+  (<Link to={"/MyMeeting/Folder/" + meetData.folderId }><Button variant='outline' color='#EE5D20' radius="xl" style={{width:'auto',marginBottom:'10px'}}>Back</Button></Link>)
+  :
+  (<Link to={"/SharedMeeting/Folder/" + meetData.folderId }><Button variant='outline' color='#EE5D20' radius="xl" style={{width:'auto',marginBottom:'10px'}}>Back</Button></Link>)  }
+  
+  
+  </Grid.Col>
   <Grid.Col span={8}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'30px'}}>My Meeting ❯ </Text></Grid.Col>
   {/* <Grid.Col span={2}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px'}}>Statistic</Button></Grid.Col> */}
   <Grid.Col span={1.5}><Button color='#EE5D20' radius="xl" onClick={()=>feedBack()}>Feedback</Button></Grid.Col>
-  <Grid.Col span={1}><Link to={"/Inmeeting/"+id} style={{}}><Button color='#EE5D20' radius="xl">Start Meeting</Button></Link></Grid.Col>
+  <Grid.Col span={1}>
+  {( meetData.creatorId === session.user.id && meetData.meetStatus === false) && (
+        <Link to={"/Inmeeting/"+id}><button className="btn-con" onClick={() => handleButtonClick()}>Start Meeting</button></Link>  
+  )}
+    
+    </Grid.Col>
   <Grid.Col span={1}></Grid.Col>
 </Grid>
 

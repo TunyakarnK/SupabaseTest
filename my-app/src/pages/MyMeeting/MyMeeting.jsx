@@ -20,6 +20,7 @@ function MyMeeting() {
   const [newMeeting, setNewMeeting] = useState([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [newMeetName, setNewMeetName] = useState([]);
+  const [ folderOwner, setFolderOwner ] = useState(null);
 
   useEffect(() =>{
     getUserData();
@@ -34,7 +35,6 @@ function MyMeeting() {
       if(value.data?.user){
         setUser(value.data.user);
         console.log(user);
-        
       }
     })
   }
@@ -91,15 +91,31 @@ function MyMeeting() {
           .insert({
             folderName: folderName,
           })
+          .select("folderId")
           .single()
-          
-        // if (error) throw error;
-        window.location.reload();
+          .then((result) => {
+            console.log("create New Folder", result);
+            supabase
+            .from("userFolder")
+            .insert({
+              userId: user.id,
+              folderId: result.data.folderId,
+              checkOwner: true
+            })
+            .then((result) => {
+              console.log("user Folder", result);
+              setFolderOwner(result);
+              window.location.reload(); 
+            });
+          });
+        if (result){
+          console.log("create New Folder", result);
+        }
       } catch (error) {
         // alert(error.message);
-      } 
       }
     }
+  }
   
     console.log(folder);
 
@@ -112,11 +128,25 @@ function MyMeeting() {
             creatorId: session.user.id,
             meetCreate: new Date()
           })
+          .select()
           .single()
-          
+          .then((result) => {
+            console.log("create new meeting", result);
+            supabase
+            .from("attendee")
+            .insert({
+              meetId: result.data.meetId,
+              email: session.user.email,
+              userId: session.user.id
+            })
+            .then((result) => {
+              console.log("insert Attendee", result);
+              window.location.reload(); 
+            })
+            // fetchNewMeeting();
+          })
         // if (error) throw error;
-        getUserData();
-        window.location.reload();
+
       } catch (error) {
         // alert(error.message);
       }
@@ -169,7 +199,7 @@ function MyMeeting() {
           
         <Modal opened={opened} onClose={close} title="New Folder" centered>
        <TextInput withAsterisk label="Create Folder"  size="xs" onChange={(event) => setFolderName(event.currentTarget.value)} />
-              <Button color='#EE5D20' onClick={close} style={{marginTop:'10px',marginRight:rem(10),marginLeft:rem(240)}}>Cancle</Button>
+              <Button color='#EE5D20' onClick={close} style={{marginTop:'10px',marginRight:rem(10),marginLeft:rem(235)}}>Cancle</Button>
               <Button variant='outline' color='#EE5D20' style={{marginTop:'10px'}} onClick={() => createNewFolder()}>Create</Button>
       </Modal>   
             </div>
@@ -188,4 +218,4 @@ function MyMeeting() {
     );
   }
   
-  export default MyMeeting;
+  export default MyMeeting

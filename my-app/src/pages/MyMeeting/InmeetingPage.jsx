@@ -25,38 +25,56 @@ function InmeetingPage() {
         .from("meeting")
         .select()
         .eq("meetId", id);
-
       if (data) {
         console.log("lllll", data);
-        setMeetData(data);
+        setMeetData(data[0]);
         console.log(data[0]);
       }
     };
-    fetchMeeting();
-    console.log(session);
+    // fetchMeeting();
+    // fetchObj();
     fetchObj();
   }, []);
   console.log("1",meetData[0]?.folderId);
-  console.log("meetData",meetData);
 
   const fetchObj = async () => {
+    await supabase
+    .from("meeting")
+    .select()
+    .eq("meetId", id)
+    .then((result) => {
+      console.log("fetchO", result.data[0]);
+      setMeetData(result.data[0]);
+        supabase
+        .from("meetObj")
+        .select("objId, objDes, objStatus")
+        .eq("meetId", id)
+        .eq("folderId", result.data[0].folderId)
+        .eq("objStatus", false)
+        .then((result) => {
+          console.log("fetchObjjjjjjjjjjjjjjj", result.data);
+          setMeetObjData(result.data);
+        })
+    })
+  }
+  const fetchO = async () => {
     const { data, error } = await supabase
       .from("meetObj")
       .select("objId, objDes, objStatus")
-      .eq("meetId", id)
-      .eq("objStatus", false);
+      .lte("meetId", id)
+      .eq("folderId", meetData.folderId)
+      .eq("objStatus", false)
     if (data) {
-      console.log(data);
+      console.log("fetchObjgfdsgfs", data);
       setMeetObjData(data);
     }
   };
-
   function addObj(e) {
     e.preventDefault();
     supabase
       .from("meetObj")
       .insert({
-        folderId: meetData[0]?.folderId,
+        folderId: meetData?.folderId,
         meetId: id,
         objDes: newObj,
       })
@@ -91,15 +109,19 @@ function InmeetingPage() {
       });
   }
 
-  function addNote(event){
+  function addNote(){
     // set Note value
-    setNewNote(event.target.value)
+    // setNewNote(event.target.value)
+    supabase
+    .from("notes")
+    .insert({
+      meetId: id,
+      noteDes: newNote
+    })
+    .then((result) => {
+      console.log(result);
+    })
 }
-function addNote() {
-//add note to database when click conclusion
-}
-
-
 
   return (
     <div>
@@ -127,7 +149,7 @@ function addNote() {
       </Grid.Col>
       <Grid.Col span={1.5} />
       <Grid.Col span={1} >
-        <Link to={"/Conclusion/"+id}><Button radius='xl' color="#EE5D20" onClick={addNote} style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>Conclusion</Button></Link> 
+        <Link to={"/Conclusion/"+id}><Button radius='xl' color="#EE5D20" onClick={addNote} style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>Conclude</Button></Link> 
       </Grid.Col>
       </Grid>
       
@@ -184,6 +206,7 @@ function addNote() {
         </ActionIcon>
       }
     />
+    
             {/* <form onSubmit={addObj}>
               <input
                 class="form-control"
@@ -207,9 +230,10 @@ function addNote() {
         minRows={18}
         maxRows={20}
       placeholder="Write your note here..."
+      value={newNote}
       style={{marginTop:'20px',
       height:rem(300)}}
-      onChange={addNote}
+      onChange={(e) => setNewNote(e.target.value)}
     /></div>
       </Grid.Col>
       </Grid>

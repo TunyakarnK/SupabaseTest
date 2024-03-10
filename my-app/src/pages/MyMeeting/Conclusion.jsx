@@ -12,70 +12,218 @@ import "./conclusion.css";
 function Conclusion() {
   const { id } = useParams();
   const session = useSession();
-  const [meetData, setMeetData] = useState([]);
-  const [con, setCon] = useState("");
-  const [fol, setFol] = useState("");
-  const [arrFol, setArrFol] = useState([]);
-  const [meetObjData, setMeetObjData] = useState([]);
+  const [ meetData, setMeetData ] = useState([]);
+  const [ con, setCon ] = useState("");
+  const [ fol, setFol ] = useState("");
+  const [ arrFol, setArrFol ] = useState([]);
+  const [ meetObjData, setMeetObjData ] = useState([]);
+  const [ nextMeet, setNextMeet ] = useState(null);
 
   useEffect(() => {
-    const fetchMeeting = async () => {
-      const { data, error } = await supabase
-        .from("meeting")
-        .select()
-        .eq("meetId", id);
-
-      if (data) {
-        console.log("lllll", data);
-        setMeetData(data);
-        console.log(data[0]);
-      }
-    };
+    // const fetchMeeting = async () => {
+    //   const { data, error } = await supabase
+    //     .from("meeting")
+    //     .select()
+    //     .eq("meetId", id);
+    //   if (data) {
+    //     console.log("lllll", data);
+    //     setMeetData(data);
+    //     console.log(data[0]);
+    //   }
+    // };
     
-    const fetchObj = async () => {
-      const { data, error } = await supabase
-        .from("meetObj")
-        .select("folderId, objDes")
-        .eq("meetId", id);
-      if (data) {
-        console.log(data);
-        setMeetObjData(data);
-      }
-    };
-    fetchMeeting();
     fetchObj();
-  }, []);
+    // fetchObj();
+    // fetchNextMeeting();
+  }, [nextMeet]);
+
+  // const fetchObj = async () => {
+  //   const { data, error } = await supabase
+  //     .from("meetObj")
+  //     .select("folderId, objDes, objStatus")
+  //     .eq("meetId", id)
+  //     .eq("folderId", meetData[0]?.folderId)
+  //     // .eq("objStatus", true);
+  //   if (data) {
+  //     console.log(data);
+  //     setMeetObjData(data);
+  //   }
+  // };
+
+  const fetchObj = async () => {
+    await supabase
+    .from("meeting")
+    .select()
+    .eq("meetId", id)
+    .then((result) => {
+      console.log("fetchO", result.data[0]);
+      setMeetData(result.data[0])
+        supabase
+        .from("meetObj")
+        .select("objId, objDes, objStatus")
+        .eq("meetId", id)
+        .eq("folderId", result.data[0].folderId) // .eq("objStatus", false)
+        .then((result) => {
+          console.log("fetchObjjjjjjjjjjjjjjj", result.data);
+          setMeetObjData(result.data);
+        })
+    });
+  }
 
   function addFol(fol) {
     setArrFol((current) => [...current, fol]);
     console.log(arrFol.length);
-    console.log(setArrFol);
+    setFol("")
   }
   //
+  const meetEndTime = new Date();
 
   function sendData() {
     console.log(arrFol);
-    // supabase.from("meet")
-    for (var i = 0; i <= arrFol.length + 1; i++) {
-      console.log(arrFol[i]);
+    // send conclusion
+    if (con != "") {
       supabase
-      .from("meetObj")
+      .from("conclusion")
       .insert({
-        folderId: meetObjData[0]?.folderId,
-        // meetId: id,
-        objDes: arrFol[i],
+        meetId: id,
+        con: con,
       })
       .then((result) => {
         console.log(result);
       });
     }
+    // end time
+    supabase
+    .from("meeting")
+    .update({
+      meetEndTime: meetEndTime.toLocaleTimeString(),
+      meetStatus: true
+    })
+    .eq('meetId', id)
+    .then(result => {
+      console.log(result);
+    });
+    // create next meeting
+    supabase
+    .from("meeting")
+    .insert({
+      folderId: meetData.folderId,
+      creatorId: session.user.id,
+      meetName: 'Untitled Meeting',
+      meetCreate: new Date()
+    })
+    .select()
+    .then((result) => {
+      console.log("Create new meeting", result);
+      supabase
+      .from("attendee")
+      .insert({
+        meetId: result.data.meetId,
+        email: session.user.email,
+        userId: session.user.id
+      })
+      .then((result) => {
+        console.log("insert Attendee", result);
+        // window.location.reload(); 
+      })
+  // send objective not yet
+      for (var i = 0; i <= meetObjData.length-1; i++){
+        if (meetObjData[i]?.objStatus === false) {
+        supabase
+        .from("meetObj")
+        .insert({ 
+          folderId: result.data[0].folderId,
+          objDes: meetObjData[i]?.objDes,
+          meetId: result.data[0].meetId
+        })
+        .then((result) => {
+          console.log("insert meet objective not yet", result);
+        });
+        }
+      }
+// send follow up
+      for (var i = 0; i <= arrFol.length; i++) {
+        console.log(arrFol[i]);
+        supabase
+        .from("meetObj")
+        .insert({
+          folderId: result.data[0].folderId,
+          meetId: result.data[0].meetId,
+          objDes: arrFol[i],
+        })
+        .then((result) => {
+          console.log("send follow up", result);
+        });
+      }
+    });
   }
 
+  // delete follo-up
   const deltefol = (e) => {
     const name = e.target.value;
     console.log("jjjj", name);
     setArrFol(arrFol.filter((items) => items !== name));
   };
+
+  const fetchNextMeeting = async () => {
+    const { data, error } = await supabase
+    .from("meeting")
+    .select(
+      `
+      meetId,
+      folders(
+        folderId
+      )
+      `
+    )
+    .eq("folderId", meetData[0]?.folderId)
+    .order("meetId", { ascending: false })
+    .limit(1);
+    if (data) {
+      console.log("fetch Next Meeting", data[0].meetId);
+      // alert(data[0].meetId)
+      console.log(data[0].meetId);
+      setNextMeet(data[0].meetId);
+      for (var i = 0; i <= meetObjData.length-1; i++){
+      if (meetObjData[i]?.objStatus === false) {
+      supabase
+      .from("meetObj")
+      .insert({ 
+        folderId: meetObjData[0]?.folderId,
+        objDes: meetObjData[i]?.objDes,
+        meetId: data[0].meetId
+      })
+      .then((result) => {
+        console.log("insert meet objective", result);
+      });
+      }
+    }
+      
+    // send follow up
+      for (var i = 0; i <= arrFol.length; i++) {
+        console.log(arrFol[i]);
+        supabase
+        .from("meetObj")
+        .insert({
+          folderId: meetData[0]?.folderId,
+          meetId: data[0].meetId,
+          objDes: arrFol[i],
+        })
+        .then((result) => {
+          console.log(result);
+        });
+      }
+    }
+  }
+
+
+  for (var i = 0; i <= meetObjData.length-1; i++){
+    if (meetObjData[i]?.objStatus === false) {
+    console.log("1", meetObjData[i]?.objDes); }
+  }
+  // const addfol = () => 
+
+  // }
   return (
     <div>
       <div className='Navbar'style={{height:"60px", boxShadow:'1px 1px 10px 5px #dfd9ca'}} >
@@ -104,7 +252,9 @@ function Conclusion() {
       </Grid.Col>
       <Grid.Col span={2.5} />
       <Grid.Col span={1} >
-      <Link to={'/MeetingPage/'+id}><Button radius='xl' color="#EE5D20" onClick={() => sendData() } style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>End meeting</Button></Link>
+      {/* <Link to={'/MeetingPage/'+id}></Link> */}
+      <Button radius='xl' color="#EE5D20" onClick={ () => sendData() } style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>End meeting</Button>
+        
       </Grid.Col>
       </Grid>
 
@@ -114,6 +264,9 @@ function Conclusion() {
       <div style={{marginLeft:'40px',}}><Text c="#EE5D20" size='xl' fw={500} style={{marginTop:'3%'}}>Objective</Text>
 
       {/* map obj */}
+      {meetObjData.map((listobj) => (
+        <div>{listobj.objDes}</div>
+        ))}
 
       <Center>
       
@@ -132,7 +285,8 @@ function Conclusion() {
       placeholder="Conclusion..."
       style={{marginTop:'20px',
        width:'90%'}}
-      // onChange={addConclusion}
+       value={con}
+       onChange={(e) => setCon(e.target.value)}
     />
       </div>
       <div style={{borderColor:'#EE5D20'}}><Text c="#EE5D20" size='xl' fw={500} style={{marginTop:'3%'}}>Follow-Up</Text>
@@ -175,7 +329,7 @@ function Conclusion() {
         <div>
         <p className="p">Conclusion</p>
         <textarea className="text-con" rows="5" cols="45"></textarea> */}
-        {/* <br />
+        /* <br />
         <p className="p">Follow-Up</p>
         {arrFol.map((listfol) => (
           <div>
@@ -194,7 +348,7 @@ function Conclusion() {
         ></input>
         <button class="btn btn-primary" onClick={() => addFol(fol)}>
           +
-        </button> */}
+        </button>
         {/* {fol} */}
         <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div>
         </div>

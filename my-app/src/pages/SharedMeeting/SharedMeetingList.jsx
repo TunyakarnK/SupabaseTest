@@ -8,8 +8,10 @@ import { supabase } from 'src/supabaseClient';
 import { Grid,Text, Button,Modal } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 
+
 function SharedMeetingList(props) { 
-  const { sharedfolderid } = useParams();
+  const { folderid } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [meeting, setMeeting] = useState([]);
   const [folder, setFolder] = useState([]);
@@ -31,7 +33,7 @@ function SharedMeetingList(props) {
             console.log('data='+data)
           }
         } catch (error) {
-          alert(error.message);
+          // alert(error.message);
         }
       }
 
@@ -45,13 +47,15 @@ function SharedMeetingList(props) {
     try {
       const { data, error } = await supabase
           .from("meeting")
-          .select().eq('folderId',sharedfolderid)
+          .select("*")
+          .eq("folderId", id)
+            //จริงๆๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
           if (error) throw error;
           if (data != null) {
           setMeeting(data); 
           }
         } catch (error) {
-          alert(error.message);
+          // alert(error.message);
         }
       }
 
@@ -66,7 +70,7 @@ function SharedMeetingList(props) {
         {Object.keys(session.user).length !== 0 ?
           <>
         <header>
-        <Navbar props={session.user} />
+        {/* <Navbar props={session.user} /> */}
         </header>
 
         <div style={{backgroundColor:'#FDEFE9', margin:"40px", padding:'20px'}}>
@@ -75,7 +79,7 @@ function SharedMeetingList(props) {
         <Grid align="center">
           <Grid.Col span={0.8}><Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto'}}>Back</Button></Grid.Col>
         {/* <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folder[0].folderName}</Text></Grid.Col> */}
-          <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>Shared with me ❯ {sharedfolderid}</Text></Grid.Col>
+          <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>Shared with me ❯ {folderid}</Text></Grid.Col>
           {/* <Grid.Col span={1.3}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px'}}>Statistic</Button></Grid.Col> */}
         </Grid>
       
@@ -88,7 +92,7 @@ function SharedMeetingList(props) {
 
         <div>
             {meeting.map((meeting) => (
-            <SharedMeetingCard meeting = {meeting} user={session.user} key={meeting.MeetId}/>
+            <SharedMeetingCard meeting = {meeting} user={session.user} key={meeting.meetId}/>
           ))}
           {/* <SharedMeetingCard /> */}
             </div>

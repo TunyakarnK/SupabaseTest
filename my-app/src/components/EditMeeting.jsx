@@ -63,6 +63,7 @@ function EditMeeting(props) {
           setMeetData(data);
           console.log(data[0]);
         }
+        
       };
 
       
@@ -72,12 +73,10 @@ function EditMeeting(props) {
       fetchFolder();
       fetchObj();
       fetchAttendee();
-      // getObj();  
-      
+      // getObj();
       console.log('from edit page')
-      console.log(state.meeting)
-      console.log("obj", meetObjData)
-     
+      console.log(state.meeting.meetId)
+      console.log("folderId", state.meeting.folderId)
     }, [])
 
     //ดึงข้อมูล Objective ของ meeting
@@ -86,6 +85,7 @@ function EditMeeting(props) {
         .from("meetObj")
         .select("objId, objDes, objStatus")
         .eq("meetId", state.meeting.meetId)
+        .eq("folderId", state.meeting.folderId)
         .eq("objStatus", false);
       if (data) {
         console.log("fetchObj", data);
@@ -94,20 +94,16 @@ function EditMeeting(props) {
     };
 
     
-    // delete Objective
-    async function deleteObj() {
+  // delete Objective
+    async function deleteObj(obj) {
       supabase
         .from("meetObj")
         .delete()
-        .eq('objId', meetObjData.objId)
+        .eq('objId', obj.objId)
         .then(() => {
           console.log("Deleted Objective");
           fetchObj();
         });
-    }
-
-    function addObj(e){
-      setNewObj(e);
     }
 
     //ดึงข้อมูล Folder ของ meeting
@@ -116,7 +112,7 @@ function EditMeeting(props) {
         .from("user")
         .select(
          `
-         userFolder(
+          userFolder(checkOwner,
           folders(
             folderId,
             folderName
@@ -125,11 +121,23 @@ function EditMeeting(props) {
          `
         )
         .eq("id", session.user.id)
+        // .eq("userFolder.checkOwner", true)
       if ( data ){
         console.log("fetch user folder", data[0].userFolder);
-        setUserFolder(data[0].userFolder)
+        console.log(data);
+        // setUserFolder(data[0].userFolder);
+        const check = data[0].userFolder.filter(checks => checks.checkOwner == true);
+        console.log(check);
+        setUserFolder(check)
+      }if ( error ){
+        console.log(error);
       }
     }
+        
+    //   } catch (error) {
+    //     alert(error.message);
+    //   }
+    // }
 
     //ดึงข้อมูล Participant ของ meeting
     const fetchAttendee = async () => {
@@ -162,9 +170,18 @@ function EditMeeting(props) {
         .from("attendee")
         .delete()
         .eq('attId', att.attId)
+        .select()
         .then((result) => {
           console.log("Deleted attendee", result);
           fetchAttendee();
+          supabase
+          .from("userFolder")
+          .delete()
+          .eq('userId', result.data[0].userId)
+          .eq('folderId', state.meeting.folderId)
+          .then((result) => {
+            console.log("Deleted attendee userFolder", result);
+          })
         });
     }
 
@@ -208,9 +225,10 @@ function EditMeeting(props) {
                   folderId: selectedFolder
               })
               .eq("meetId", state.meeting.meetId)
-          if (error) throw error;
+              .select()
+          // if (error) throw error;
           // window.location.reload();
-          for (var i = 0; i <= newObj.length + 1; i++) {
+          for (var i = 0; i <= newObj.length; i++) {
             console.log(newObj[i]);
             supabase
             .from("meetObj")
@@ -220,7 +238,7 @@ function EditMeeting(props) {
               objDes: newObj[i],
             })
             .then((result) => {
-              console.log(result);
+              console.log("add new obj in edit page", result);
             });
           }
           // Insert attendee select id from where email
@@ -270,7 +288,6 @@ function EditMeeting(props) {
         <header>
         <Navbar props={user}/>
         </header>
-
 
        <div style={{margin:"20px"}}>
        <Grid align='center' style={{ marginLeft:rem(50), marginTop:rem(30) }}>
@@ -325,40 +342,40 @@ function EditMeeting(props) {
                   <div style={{marginTop:"15px"}}>
                 <form>
                 <label  >Meeting Start-Date
-                  <input type="date" 
+                  <input type="datetime-local" 
                       defaultValue={state.meeting.meetStartDate}
                       onChange={(e) => setMeetStartDate(e.target.value)} 
                       style={{margin:"15px"}}
                   />
                 </label>
 
-                <label>Meeting Start-Time
+                {/* <label>Meeting Start-Time
                   <input type="time" 
                       defaultValue={state.meeting.meetStartTime}
                       onChange={(e) => setMeetStartTime(e.target.value)} 
                       style={{margin:"15px"}}
                     />
-                </label>
+                </label> */}
                 </form>
                 </div>
 
                 <form>
-                <label>Meeting End-Date&nbsp;
+                <label>Meeting End-Time&nbsp;
                   
-                  <input type="date" 
+                  <input type="time" 
                       defaultValue={state.meeting.meetEndDate}
                       onChange={(e) => setMeetEndDate(e.target.value)} 
                       style={{margin:"15px"}}
                     />
                 </label>                 
 
-                <label>Meeting End-Time&nbsp;
+                {/* <label>Meeting End-Time&nbsp;
                   <input type="time" 
                       defaultValue={state.meeting.meetEndTime}
                       onChange={(e) => setMeetEndTime(e.target.value)} 
                       style={{margin:"15px" ,}}
                     />
-                </label> 
+                </label>  */}
                 </form>
                 
                 <div style={{marginTop:"15px"}}>

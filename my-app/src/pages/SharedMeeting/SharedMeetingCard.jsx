@@ -21,6 +21,7 @@ function SharedMeetingCard(props) {
   const [ meetName, setMeetName ] = useState ([]);
   // const [ ownerId, setOwnerId]= useState ([]);
   const [ meetStartDate, setMeetStartDate] = useState ([]);
+  const [ meetOwner, setMeetOwner ] = useState();
   
   useEffect(() => {
     async function getUserData() {
@@ -32,8 +33,24 @@ function SharedMeetingCard(props) {
       });
     }
     getUserData();
+    fetchMeetCreator();
   }, []);
 
+  const fetchMeetCreator = async () => {
+    const { data, error } = await supabase
+      .from("meeting")
+      .select(
+        `
+        creatorId,
+        user(full_name)
+        `
+      )
+      .eq("meetId", meeting.meetId)
+      if( data ){
+        console.log("meet creator", data[0].user.full_name);
+        setMeetOwner(data[0].user.full_name);
+      }
+  }
 
     function handleButtonClick (){
         navigate('/MeetingPage/${meeting.meetId}', { state: { user } });    
@@ -47,8 +64,8 @@ function SharedMeetingCard(props) {
     >                
         <Grid align="center" >
         <Grid.Col span={4} onClick={handleButtonClick} ><Text >{meeting.meetName}</Text></Grid.Col>
-        <Grid.Col span={2}><Text c="#4f5b5f" >Status</Text></Grid.Col>
-        <Grid.Col span={2} onClick={handleButtonClick} ><Text>{user.user_metadata.full_name}</Text></Grid.Col>
+        <Grid.Col span={2}><Text c="#4f5b5f" >{meeting.meetStatus === false ?(<Text>Incoming</Text>):(<Text>Ended</Text>)}</Text></Grid.Col>
+        <Grid.Col span={2} onClick={handleButtonClick} ><Text>{meetOwner}</Text></Grid.Col>
         <Grid.Col span={2} onClick={ handleButtonClick} >{meeting.meetStartDate}</Grid.Col>  
         </Grid>            
        

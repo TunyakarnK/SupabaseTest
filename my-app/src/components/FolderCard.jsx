@@ -3,7 +3,7 @@ import "./MeetingCard.css"
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import "src/components/MeetingCard.css"
-import { useNavigate } from 'react-router-dom';
+import { Link,NavLink,useNavigate } from 'react-router-dom';
 import { rem, TextInput, Grid, Text, Button, ActionIcon, Modal, Popover} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconTrash,IconEdit } from '@tabler/icons-react';

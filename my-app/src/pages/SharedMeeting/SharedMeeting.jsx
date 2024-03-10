@@ -1,28 +1,26 @@
-import React from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+// import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { supabase } from '../../supabaseClient.js';
 import Navbar from '../../components/Navbar/Navbar.jsx'
+import { useSession } from '@supabase/auth-helpers-react';
+import MeetingCard from 'src/components/MeetingCard';
 import '../../components/MeetingCard.css'
-// import MeetingCard from 'src/components/NewMeetingCard';
-import ShareMeetingFolderCard from "./ShareMeetingFolderCard.jsx";
+import { useNavigate, Link } from "react-router-dom";
+// import SharedMeetingFoldderCard from "src/pages/SharedMeeting/ShareMeetingFolderCard.jsx"
+import FolderCard from 'src/components/FolderCard';
 import { Grid, ScrollArea, TextInput,Text,rem, Button,Modal ,Radio,Group} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useEffect, useState } from "react";
-import MeetingCard from 'src/components/MeetingCard';
-import { useSession } from '@supabase/auth-helpers-react';
 
-function SharedMeetingFoldder() {
-const { id } = useParams();
-  const navigate = useNavigate();
-  
+
+function SharedMeeting() {
+  // const navigate = useNavigate();
+  const session = useSession();
   const [user, setUser] = useState({});
   const [createFolder, setCreateFolder] = useState(false);
   const [folder, setFolder] = useState([]);
   const [folderName, setFolderName] = useState([]);
   const [newMeeting, setNewMeeting] = useState([]);
-  const [opened, { open, close }] = useDisclosure(false);
-  const [newMeetName, setNewMeetName] = useState([]);
-  
+
     useEffect(() =>{
       async function getUserData() {
         await supabase.auth.getUser().then((value) =>{
@@ -34,42 +32,54 @@ const { id } = useParams();
         })
       }
       getUserData();
-      fetchFolder();
-      fetchNewMeeting();
-      console.log('meet'+newMeeting)
+      getFolder();
+      getNewMeeting();
     }, [])
-
-    async function fetchNewMeeting() {
+      
+    async function getNewMeeting() {
       try {
         const { data, error } = await supabase
-          .from("meeting")
-          .select("*")
+          .from("attendee")
+          .select(`
+            meeting(*
+            )
+          `)
+          // .filter("folderId", 'is', null)
+          .eq("email", session.user.email)
           //จริงๆๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
         if (error) throw error;
         if (data != null) {
+          console.log("get New Meeting",data);
           setNewMeeting(data); 
         }
       } catch (error) {
-        alert(error.message);
+        // alert(error.message);
+        console.log("error get New Meeting",error);
       }
     }
 
-    async function fetchFolder() {
+    async function getFolder() {
       try {
         const { data, error } = await supabase
-          .from("folders")
-          .select("*")
-        if (error) throw error;
+          .from("userFolder")
+          .select(
+            `
+            userId,
+            folders(folderName,folderId)
+            `
+          )
+          .eq("checkOwner", false)
+          .eq("userId", session.user.id)
+        if (error) {console.log(error);}
         if (data != null) {
+          console.log("getFolder", data);
           setFolder(data); 
         }
       } catch (error) {
-        alert(error.message);
+        // alert(error.message);
       }
     }
-  
-    console.log(folder);
-      
+
     return (
       <div className="App">
         {Object.keys(user).length !== 0 ?
@@ -86,12 +96,12 @@ const { id } = useParams();
         <div>
           <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
           <Grid.Col span={5}><Text c="#4f5b5f" style={{marginLeft:'10px'}}>Folder Name</Text></Grid.Col>
-          {/* <Grid.Col span={5.5} ><Text c="#4f5b5f">Owner</Text></Grid.Col> */}
+          <Grid.Col span={5.5} ><Text c="#4f5b5f">Owner</Text></Grid.Col>
           </Grid>
 
           <div>
             {folder.map((folder) => (
-              <ShareMeetingFolderCard folder = {folder} user = {user} key={folder.folderId} />
+              <FolderCard folder = {folder} user = {user} key={folder.folderId} />
             ))}
             
           </div>
@@ -108,20 +118,5 @@ const { id } = useParams();
       </div>
     );
   }
-
-  // return (
-    
-  //   <div>
-  //       <Link to="/SharedMeeting" ><Button color='#EE5D20' radius="xl">Back</Button></Link>
-  //       <br />
-  //       Folder
-  //       <div className=''>
-  //           {newMeeting.map((newMeeting) => (
-  //           <MeetingCard meeting = {newMeeting} user = {user} />
-  //         ))}
-  //           </div>
-  //   </div>
-  // )
-
-
-export default SharedMeetingFoldder;
+  
+  export default SharedMeeting;
