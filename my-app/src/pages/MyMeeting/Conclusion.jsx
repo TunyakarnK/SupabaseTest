@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSession } from '@supabase/auth-helpers-react';
 import { NavLink } from "react-router-dom";
-import { Grid, Button,Text, Center,Container, Textarea, ActionIcon,rem, Checkbox,TextInput,SimpleGrid, Skeleton } from "@mantine/core";
-import { IconCirclePlus } from '@tabler/icons-react';
+import { Grid, Button,Text, Center,Container, Textarea, ActionIcon,rem, Checkbox,TextInput,SimpleGrid } from "@mantine/core";
+import { IconCirclePlus, IconCircleX } from '@tabler/icons-react';
 import "./inmeetingpage.css"
 import "./conclusion.css";
 
@@ -118,12 +118,12 @@ function Conclusion() {
       supabase
       .from("attendee")
       .insert({
-        meetId: result.data.meetId,
+        meetId: result.data[0].meetId,
         email: session.user.email,
         userId: session.user.id
       })
       .then((result) => {
-        console.log("insert Attendee", result);
+        console.log("insert Attendee******", result);
         // window.location.reload(); 
       })
   // send objective not yet
@@ -252,9 +252,9 @@ function Conclusion() {
       </Grid.Col>
       <Grid.Col span={2.5} />
       <Grid.Col span={1} >
-      {/* <Link to={'/MeetingPage/'+id}></Link> */}
-      <Button radius='xl' color="#EE5D20" onClick={ () => sendData() } style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>End meeting</Button>
-        
+      <Link to={'/MeetingPage/'+id}><Button radius='xl' color="#EE5D20" onClick={ () => sendData() } style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>End meeting</Button>
+        </Link>
+      
       </Grid.Col>
       </Grid>
 
@@ -291,12 +291,21 @@ function Conclusion() {
       </div>
       <div style={{borderColor:'#EE5D20'}}><Text c="#EE5D20" size='xl' fw={500} style={{marginTop:'3%'}}>Follow-Up</Text>
       {arrFol.map((listfol) => (
-          <div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            padding: rem(10),
+            borderBottom: '1px solid #202F34',
+            width: '90%',
+            justifyContent: 'space-between'
+          }}>
             {listfol}
-            <button value={listfol} onClick={deltefol}>
-              x
-            </button>
+            
+            <ActionIcon variant="transparent" aria-label="x" color="#EE5D20" value={listfol} onClick={deltefol}>
+              <IconCircleX style={{ width: '70%', height: '70%' }} stroke={1.5} />
+            </ActionIcon>
           </div>
+          
         ))}
         
       <TextInput
@@ -305,7 +314,7 @@ function Conclusion() {
       radius="sm"
       size="md"
       placeholder="Add Follow-up"
-      style={{width:'90%'}}
+      style={{width:'90%', marginTop:rem(10)}}
       rightSectionWidth={42}
       rightSection={
         <ActionIcon variant="transparent" aria-label="x" color="#EE5D20"  onClick={() => addFol(fol)}>
@@ -329,7 +338,7 @@ function Conclusion() {
         <div>
         <p className="p">Conclusion</p>
         <textarea className="text-con" rows="5" cols="45"></textarea> */}
-        /* <br />
+        {/* /* <br />
         <p className="p">Follow-Up</p>
         {arrFol.map((listfol) => (
           <div>
@@ -348,7 +357,7 @@ function Conclusion() {
         ></input>
         <button class="btn btn-primary" onClick={() => addFol(fol)}>
           +
-        </button>
+        </button> */}
         {/* {fol} */}
         <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div>
         </div>
