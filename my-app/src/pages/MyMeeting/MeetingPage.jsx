@@ -11,7 +11,7 @@ import Detail_Conclusion from 'src/components/Detail_Conclusion';
 import Navbar from 'src/components/Navbar/Navbar';
 import InmeetingPage from './InmeetingPage';
 import { useNavigate } from "react-router-dom";
-import { Grid, GridCol, SegmentedControl, Text, rem, Button,Radio,Group } from '@mantine/core';
+import { Grid, GridCol, SegmentedControl, Text, rem, Button,Radio,Group,Tabs,Badge  } from '@mantine/core';
 import classes from 'src/components/Detail/NavbarSegmented.module.css';
 import { useSession } from '@supabase/auth-helpers-react';
 
@@ -48,8 +48,10 @@ const session = useSession();
 
 
 useEffect(() =>{
-  fetchMeeting();
+  // fetchMeeting();
   // console.log(data);
+  console.log(meetData);
+  fetchCreator()
   console.log(meetData);
 }, [session])
 
@@ -69,15 +71,15 @@ const fetchCreator = async () => {
       console.log(",,,", data[0].folderId);
       setMeetData(data[0]);
     }
-  } catch (error) {
+  } 
+  catch (error) {
     console.error("creatorId not equal current user!", error);
   }
 };
 
-useEffect(() => {
-  fetchCreator()
-  console.log(meetData);
-}, []);
+// useEffect(() => {
+  
+// }, []);
 
 const meetStartTime = new Date();
 const handleButtonClick = () => {
@@ -92,20 +94,20 @@ const handleButtonClick = () => {
   });
   };
 
-  const links = tabs[section].map((item) => (  
-    <text
-      // className={classes.link}
-      data-active={item.label === active || undefined}
-      // href={item.link}
-      key={item.label}
-      onClick={(event) => {
-        event.preventDefault();
-        setActive(item.label);
-      }}
-    >
-      <span>{item.value}</span>
-    </text>
-  ));
+  // const links = tabs[section].map((item) => (  
+  //   <text
+  //     // className={classes.link}
+  //     data-active={item.label === active || undefined}
+  //     // href={item.link}
+  //     key={item.label}
+  //     onClick={(event) => {
+  //       event.preventDefault();
+  //       setActive(item.label);
+  //     }}
+  //   >
+  //     <span>{item.value}</span>
+  //   </text>
+  // ));
   function feedBack(){
     navigate('/MeetingPage/feedback/' + id, { state: { id } });
   }
@@ -116,7 +118,7 @@ const handleButtonClick = () => {
     <div style={{
   // backgroundColor:'#FDEFE9' 
   }}>
-    {Object.keys(user).length !== 0 ?
+    {Object.keys(session.user).length !== 0 ?
     <>
 <Navbar props={session.user} />
 <div style={{ margin:"40px", padding:'20px'}}>
@@ -130,13 +132,15 @@ const handleButtonClick = () => {
   
   
   </Grid.Col>
-  <Grid.Col span={8}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'30px'}}>My Meeting ❯ </Text></Grid.Col>
-  {/* <Grid.Col span={2}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px'}}>Statistic</Button></Grid.Col> */}
-  <Grid.Col span={1.5}><Button color='#EE5D20' radius="xl" onClick={()=>feedBack()}>Feedback</Button></Grid.Col>
+  <Grid.Col span={7.5}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'30px'}}>My Meeting ❯ </Text></Grid.Col>
+  <Grid.Col span={1.3}><Badge variant="outline" color="#EE5D20" size="xl">{meetData.meetStatus ? "Ended" : "Incoming"}</Badge></Grid.Col>
+  <Grid.Col span={1}><Button color='#EE5D20' radius="xl" onClick={()=>feedBack()}>Feedback</Button></Grid.Col>
   <Grid.Col span={1}>
   {( meetData.creatorId === session.user.id && meetData.meetStatus === false) && (
-        <Link to={"/Inmeeting/"+id}><button className="btn-con" onClick={() => handleButtonClick()}>Start Meeting</button></Link>  
+        <Link to={"/Inmeeting/"+id}><Button color='#EE5D20' radius="xl" onClick={() => handleButtonClick()}>Start Meeting</Button></Link>  
   )}
+  {/* :{
+  (<Button color='' disabled style={{marginLeft:'20px',marginBottom:'30px', borderColor: '#EE5D20',  backgroundColor: "white"}} radius="xl" onClick={() => handleButtonClick()}>Start Meeting</Button>)} */}
     
     </Grid.Col>
   <Grid.Col span={1}></Grid.Col>
@@ -150,8 +154,8 @@ const handleButtonClick = () => {
 
     {/* <div>user:{state.user.user_metadata.full_name}</div> */}
     {/* <nav className={classes.navbar}> */}
-    <div style={{ backgroundColor:'#FDEFE9', borderStyle:'solid',borderWidth:'1px',borderColor:'#EE5D20',padding:'10px',borderRadius: '10px' }}>      
-        <SegmentedControl
+    <div style={{ backgroundColor:'white', borderStyle:'solid',borderWidth:'1px',borderColor:'#EE5D20',padding:'10px',borderRadius: '10px' }}>      
+        {/* <SegmentedControl
         classNames='classes'
           fullWidth withItemsBorders={false} 
           size='lg'
@@ -169,11 +173,30 @@ const handleButtonClick = () => {
             { label: 'Conclusion', value: 'Conclusion' },
             // { label: 'Feedback', value: 'Feedback' },
           ]}
-        />
+        /> */}
+      <Tabs color="orange" defaultValue="Detail" >
+      <Tabs.List >
+        <Tabs.Tab value="Detail">Detail</Tabs.Tab>
+        <Tabs.Tab value="Note">Meeting Note</Tabs.Tab>
+        <Tabs.Tab value="Conclusion">Conclusion</Tabs.Tab>
+      </Tabs.List>
 
-      <div style={{ padding:'20px',minHeight: '30vw', height:'auto'}}>
+      <Tabs.Panel value="Detail">
+      <Detail />
+      </Tabs.Panel>
+
+      <Tabs.Panel value="Note">
+      <Note />
+      </Tabs.Panel>
+
+      <Tabs.Panel value="Conclusion">
+      <Detail_Conclusion />
+      </Tabs.Panel>
+    </Tabs>
+
+      {/* <div style={{ padding:'20px',minHeight: '30vw', height:'auto'}}>
         {links}
-      </div>
+      </div> */}
         
       </div>
 

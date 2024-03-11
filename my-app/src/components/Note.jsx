@@ -24,9 +24,11 @@ function Note() {
       }, [])
 
   return (
+    <div style={{ padding:'20px',minHeight: '30vw', height:'auto'}}>
     <Text size="xl">
       {meetNote[0]?.noteDes || "ยังไม่มีงับ"}
     </Text>
+    </div>
   )
 }
 

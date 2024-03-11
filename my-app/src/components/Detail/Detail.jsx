@@ -142,12 +142,20 @@ function Detail() {
     fetchObj();
   }, [meetData]);
 
-  // useEffect(() => {
-    
-  // }, [meetAtten]);
+  function meetType(type){
+    if (type=='1'){
+      return 'Decision-Making'
+    }else if(type=='2'){
+      return 'Problem-Solving'
+    }else if(type=='2'){
+      return 'Info/Opinion-Sharing'
+    }else{
+      return 'No Data'
+    }
+  }
 
   return (
-    <><div 
+    <><div style={{ padding:'20px',minHeight: '30vw', height:'auto'}}
     // style={{ backgroundColor:'#FDEFE9' }}
     >
     <Grid>
@@ -156,7 +164,7 @@ function Detail() {
         <div key={index}>
           <Text size="xl">Meeting Name</Text>
           <Text size="md"> {meetData?.meetName || "No Data"}</Text>
-          <div style={{height:rem(10)}}></div>
+          <div style={{height:rem(20)}}></div>
           <Text size="xl">Meeting Schedule</Text>
           {/* <Text size="md"> {meetData?.meetStartDate || "No Data"}</Text> */}
           <Text size="md"> {formatDateToText(meetData?.meetStartDate) || "No Data"} - {extractTimeFromDateTime(meetData?.meetEndDate)}</Text>
@@ -186,7 +194,7 @@ function Detail() {
       {meetData.map((meetData, index) => (
         <div key={index}>
           <Text size="xl">Meeting Type</Text>
-          <Text size="md"> {meetData?.meetTagId || "No Data"}</Text>
+          <Text size="md"> {meetType(meetData?.meetTagId)}</Text>
           <div style={{height:rem(10)}}></div>
           <Text size="xl">Description</Text>
           <Text size="md"> {meetData?.meetDes || "No Data"}</Text>
@@ -198,10 +206,11 @@ function Detail() {
         {meetObjData.map(({ objDes }, index) => (
           <div key={index}>
             <ul>
-              <li><Text size="md">{objDes !== null ? objDes : "No objective"}</Text></li>
+              <li><Text size="md">{objDes !== null ? objDes : "Have no objective"}</Text></li>
             </ul>
           </div>
         ))}
+      
       </div>
       </Grid.Col>
     </Grid>    

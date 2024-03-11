@@ -24,10 +24,12 @@ function Detail_Conclusion() {
       }, [])
 
   return (
+  <div style={{ padding:'20px',minHeight: '30vw', height:'auto'}}>
     <Text size="xl">
     {/* Meeting Name */}
     {meetCon[0]?.con || "ยังไม่มีงับ"}
     </Text>
+  </div>
   )
 }
 
