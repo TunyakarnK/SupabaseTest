@@ -40,9 +40,8 @@ function EditMeeting(props) {
     const [ meetObjData, setMeetObjData ] = useState([]);
     const [ newObj, setNewObj ] = useState([]);
     const [ meetAtten , setMeetAtten ] = useState([]);
-  // console.log("meeting tag", data[1].value);
+    // console.log("meeting tag", data[1].value);
     console.log("meeting tag", meetTagId);
-
     useEffect(() =>{
       async function getUserData() {
         await supabase.auth.getUser().then((value) =>{
@@ -202,7 +201,8 @@ function EditMeeting(props) {
               setMeetFolder(result.data[0].folderName);
             });
           });
-         
+          //ต้องๆต้องเอาแค่ meeting ที่พึ่งสร้างใหม่
+        // if (error) throw error;
       } catch (error) {
         console.log("174", error.message);
       }
@@ -210,6 +210,7 @@ function EditMeeting(props) {
 
     async function updateMeeting() {
       try {
+        console.log(meetTagId)
           const { data, error } = await supabase
               .from("meeting")
               .update({
@@ -243,13 +244,13 @@ function EditMeeting(props) {
           }
           // Insert attendee select id from where email
           for (var i = 0; i <= meetParti.length; i++) {
-            console.log(meetParti[i]);
+            console.log("ผู้เข้าร่วม", meetParti[i]);
             supabase
             .from("user")
             .select("id, email")
             .eq("email", meetParti[i])
             .then((result) => {
-              console.log("Fetch user id where email", result.data[0].id)
+              console.log("Fetch user id where email", result.data)
               const user_id = result.data[0].id
               // insert attendee
               supabase
@@ -263,12 +264,23 @@ function EditMeeting(props) {
                 console.log("Insert attendee", result);
                 supabase
                 .from("userFolder")
-                .insert({
-                  userId: user_id,
-                  folderId: state.meeting.folderId
-                })
+                .select("userId, folderId")
+                .eq("userId", user_id)
+                .eq("folderId", state.meeting.folderId)
                 .then((result) => {
-                  console.log("Insert userFolder", result);
+                  console.log("Check exist userFolder", result.data[0])
+                    if (result.data[0] == null){
+                    supabase
+                    .from("userFolder")
+                    .insert({
+                      userId: user_id,
+                      folderId: state.meeting.folderId,
+                      checkOwner: false
+                    })
+                    .then((result) => {
+                      console.log("Insert userFolder", result);
+                    });
+                  } 
                 });
               });
           });
@@ -289,6 +301,7 @@ function EditMeeting(props) {
         <Navbar props={user}/>
         </header>
 
+          
        <div style={{margin:"20px"}}>
        <Grid align='center' style={{ marginLeft:rem(50), marginTop:rem(30) }}>
       <Grid.Col span={0.8}><Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto'}}>Back</Button></Grid.Col>
@@ -406,38 +419,40 @@ function EditMeeting(props) {
                     }}>
 
                 {/* Folder */}
-                <div style={{width: "300px",}}>              
-                    <NativeSelect
-                      mt="md"
-                      // comboboxProps={{ withinPortal: true }}
-                      // data={folderId}
-                      // placeholder={meetFolder}
-                      label="Folder"
-                      onChange={(e) => {
-                        const c = userFolder?.find((x) => x.folders.folderId == e.target.value);
-                        setSelectedFolder(e.target.value);
-                        console.log(e.target.value);
-                      }}
-                      styles={{
-                        input: {
-                          color:'#EE5D20',
-                          borderColor:'#EE5D20',
-                          // backgroundColor:'#FDEFE9',
-                          fontWeight: 500,
-                          borderTopLeftRadius: 0,
-                          borderBottomLeftRadius: 0,
-                          // width: rem(300),
-                          marginRight: rem(-2),
-                        },
-                      }}
-                    >
-                      {/* <option>{meetFolder}</option> */}
-
-                    {userFolder.map( folders => {
-                      return(
-                          <option key={folders.folders.folderId} value={folders.folders.folderId}>{folders.folders.folderName}</option>
-                        )})}
-                    </NativeSelect>
+                <div style={{width: "300px",}}>
+                  <NativeSelect
+                    mt="md"
+                    // comboboxProps={{ withinPortal: true }}
+                    // data={folderId}
+                    
+                    // placeholder={meetFolder}
+                    label="Folder"
+                    onChange={(e) => {
+                      const c = userFolder?.find((x) => x.folders.folderId == e.target.value);
+                      setSelectedFolder(e.target.value);
+                      console.log(e.target.value);
+                    }}
+                    styles={{
+                      input: {
+                        color:'#EE5D20',
+                        borderColor:'#EE5D20',
+                        backgroundColor:'#FDEFE9',
+                        fontWeight: 500,
+                        borderTopLeftRadius: 0,
+                        borderBottomLeftRadius: 0,
+                        // width: rem(300),
+                        marginRight: rem(-2),
+                      },
+                    }}
+                  >
+                    {/* <option>{meetFolder}</option> */}
+                    {/* <option >default: {userFolder.folders.folderName}</option> */}
+                    <option>Choose Your Folder</option>
+                  {userFolder.map( folders => {
+                    return(
+                        <option key={folders.folders.folderId} value={folders.folders.folderId}>{folders.folders.folderName}</option>
+                      )})}
+                  </NativeSelect>
                 </div>
 
               {/* Objective */}
@@ -499,9 +514,9 @@ function EditMeeting(props) {
                 placeholder="Press Enter to submit Objective"
                 classNames={{pill:classes.pill}}
                 // defaultValue={newObjList}
-                value={meetObj}
-                onChange={(e) => addObj(e)}
-                omRemove={deleteObj}
+                value={newObj}
+                onChange={setNewObj}
+                // omRemove={deleteObj}
                 clearable 
                 styles={{
                   input: {
@@ -566,6 +581,7 @@ function EditMeeting(props) {
               classNames={{pill:classes.pill}}
               label='Add New Attendee'
                 placeholder="Press Enter to submit attendee"
+                value={meetParti}
                 onChange={setMeetParti}
                 clearable
                 styles={{

@@ -49,6 +49,8 @@ function Folder() {
       console.log(error.message);
       // alert(error.message);
     }
+
+
   }
 
   const fetchUserFolder = async () => {
@@ -56,8 +58,7 @@ function Folder() {
       .from("userFolder")
       .select("checkOwner")
       .eq("folderId", id)
-      .eq("userId", session.user.id)
-      setFolder(data)
+      .eq("userId", session.user.id)   
       .then((result) => {
         console.log("check owner folder", result.data[0].checkOwner);
         setCheckOwnerFolder(result.data[0].checkOwner)
@@ -77,7 +78,7 @@ return (
         <div style={{backgroundColor:'#FDEFE9', margin:"40px", padding:'20px'}}>
 
         <Grid align="center">
-        <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folder[0].folderName}</Text></Grid.Col> /}
+        {/* <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folder}</Text></Grid.Col>  */}
           <Grid.Col span={0.8}>
           { checkOwnerFolder === true ? 
   (<Link to={"/MyMeeting"}><Button variant='outline' color='#EE5D20' radius="xl" style={{width:'auto',marginBottom:'10px'}}>Back</Button></Link>)
