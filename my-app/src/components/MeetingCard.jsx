@@ -89,6 +89,32 @@ function MeetingCard(props) {
       })
     }
 
+    function formatDateToText(textDate) {
+      try {
+        const dateObject = new Date(textDate);
+        if (isNaN(dateObject.getTime())) {
+          throw new Error("Invalid date-time text provided");
+        }
+    
+        // Adjust the date object to UTC+7 timezone
+        const localDateObject = new Date(dateObject.getTime() - (7 * 60 * 60 * 1000));
+    
+        // Extract day, month (0-indexed), year, hours, and minutes in local time
+        const day = localDateObject.toLocaleDateString("en-US", { day: '2-digit' });
+        const month = localDateObject.toLocaleDateString("en-US", { month: 'long' }); 
+        const year = localDateObject.getFullYear();
+        const hours = String(localDateObject.getHours()).padStart(2, '0');
+        const minutes = String(localDateObject.getMinutes()).padStart(2, '0'); 
+        const formattedDate = `${day} ${month} ${year} ${hours}:${minutes}`;
+    
+        return formattedDate;
+      } catch (error) {
+        console.warn("Error parsing date:", error.message);
+        return null; 
+      }
+    }
+    
+
   return (
     <div
     className='meetCard'
@@ -107,26 +133,13 @@ function MeetingCard(props) {
     {user && (
       <>
         <Grid align="center">
-          <Grid.Col span={4} onClick={handleButtonClick}>
-            <Text>{meeting.meetName}</Text>
-          </Grid.Col>
-          <Grid.Col span={2}><Text c="#4f5b5f">status</Text></Grid.Col>
-          <Grid.Col span={2} onClick={handleButtonClick}>
-            <Text>{user.user_metadata.full_name}</Text>
-          </Grid.Col>
-          <Grid.Col span={2} onClick={handleButtonClick}>
-            {meeting.meetStartDate}
-          </Grid.Col>
-          <Grid.Col span={1.5}>
-            <Button variant='outline' color='#EE5D20' onClick={EditMeeting}>
-              Edit Meeting
-            </Button>
-          </Grid.Col>
-          <Grid.Col span={0.5}>
-            <ActionIcon onClick={open} variant="subtle" color="#EE5D20">
-              <IconTrash />
-            </ActionIcon>
-          </Grid.Col>
+          <Grid.Col span={4} onClick={handleButtonClick}><Text>{meeting.meetName}</Text></Grid.Col>
+          <Grid.Col span={2}><Text c="#4f5b5f">{meeting.meetStatus === false ?(<Text>Incoming</Text>):(<Text>Ended</Text>)}</Text></Grid.Col>
+          <Grid.Col span={2} onClick={handleButtonClick}><Text>{user.user_metadata.full_name}</Text></Grid.Col>
+          <Grid.Col span={2} onClick={handleButtonClick}>{formatDateToText(meeting.meetStartDate)}</Grid.Col> 
+          <Grid.Col span={1.5}>{/* <Button variant='outline' color='#EE5D20' onClick={EditMeeting}>Edit Meeting</Button></Grid.Col><Grid.Col span={0.5}> */}
+            { meeting.meetStatus == false && (<Button variant='outline' color='#EE5D20' onClick={EditMeeting}>Edit Meeting</Button>)}</Grid.Col>
+          <Grid.Col span={0.5}><ActionIcon onClick={open} variant="subtle" color="#EE5D20"><IconTrash /></ActionIcon></Grid.Col>
         </Grid>
 
         <Modal opened={opened} onClose={close} title="Delete">
