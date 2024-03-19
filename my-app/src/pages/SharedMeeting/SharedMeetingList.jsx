@@ -15,7 +15,7 @@ function SharedMeetingList(props) {
   const navigate = useNavigate();
   const [meeting, setMeeting] = useState([]);
   const [folder, setFolder] = useState([]);
-  const [folderName, setFolderName] = useState([]);
+  const [folderName, setFolderName] = useState();
   const session = useSession();
 
 
@@ -30,7 +30,9 @@ function SharedMeetingList(props) {
           if (error) throw error;
           if (data != null) {
             setFolder(data);
-            console.log('data='+data)
+            console.log('data=', data)
+            setFolderName(data[0].folderName)
+            console.log("folder name", data[0].folderName);
           }
         } catch (error) {
           // alert(error.message);
@@ -101,7 +103,7 @@ function SharedMeetingList(props) {
           <Link to = {"/SharedMeeting"}><Grid.Col span={0.8}><Button variant='outline' color='#EE5D20' radius="xl"  style={{width:'auto'}}>Back</Button></Grid.Col></Link>
           
         {/* <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folder[0].folderName}</Text></Grid.Col> */}
-          <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folderid}</Text></Grid.Col>
+          <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>Shared with me ❯ {folderName}</Text></Grid.Col>
         </Grid>
       
         <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
