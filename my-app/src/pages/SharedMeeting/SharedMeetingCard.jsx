@@ -56,6 +56,33 @@ function SharedMeetingCard(props) {
         navigate('/MeetingPage/' + meeting.meeting.meetId, { state: { user } });    
     }
 
+    function formatDateToText(textDate) {
+      try {
+        const dateObject = new Date(textDate);
+        if (isNaN(dateObject.getTime())) {
+          throw new Error("Invalid date-time text provided");
+        }
+    
+        // Adjust the date object to UTC+7 timezone
+        const localDateObject = new Date(dateObject.getTime() - (7 * 60 * 60 * 1000));
+    
+        // Extract day, month (0-indexed), year, hours, and minutes in local time
+        const day = localDateObject.toLocaleDateString("en-US", { day: '2-digit' });
+        const month = localDateObject.toLocaleDateString("en-US", { month: 'long' }); 
+        const year = localDateObject.getFullYear();
+        const hours = String(localDateObject.getHours()).padStart(2, '0');
+        const minutes = String(localDateObject.getMinutes()).padStart(2, '0'); 
+        const formattedDate = `${day} ${month} ${year} ${hours}:${minutes}`;
+        if(formattedDate == '01 January 1970 00:00'){
+          return null;
+        }
+        return formattedDate;
+      } catch (error) {
+        console.warn("Error parsing date:", error.message);
+        return null; 
+      }
+    }
+
   return (
     <div className='meetCard' 
     onMouseEnter={() => setIsHovered(true)}
@@ -66,7 +93,7 @@ function SharedMeetingCard(props) {
         <Grid.Col span={4} onClick={handleButtonClick} ><Text >{meeting.meeting.meetName}</Text></Grid.Col>
         <Grid.Col span={2}><Text c="#4f5b5f" >{meeting.meeting.meetStatus === false ?(<Text>Incoming</Text>):(<Text>Ended</Text>)}</Text></Grid.Col>
         <Grid.Col span={2} onClick={handleButtonClick} ><Text>{meetOwner}</Text></Grid.Col>
-        <Grid.Col span={2} onClick={ handleButtonClick} >{meeting.meeting.meetStartDate}</Grid.Col>  
+        <Grid.Col span={2} onClick={ handleButtonClick} >{formatDateToText(meeting.meeting.meetStartDate)}</Grid.Col>  
         </Grid>            
        
     </div>
