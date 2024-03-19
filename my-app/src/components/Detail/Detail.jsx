@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "src/supabaseClient";
-import { Text } from "@mantine/core";
+import { Text,Grid,rem } from "@mantine/core";
 
 function Detail() {
   const { id } = useParams();
@@ -10,6 +10,7 @@ function Detail() {
   const [userData, setUserData] = useState([]);
   const [meetObjData, setMeetObjData] = useState([]);
   const [ meetAtten , setMeetAtten ] = useState([]);
+  const [ meetTag, setMeetTage ] = useState();
 
   const fetchMeeting = async () => {
     try {
@@ -21,6 +22,15 @@ function Detail() {
         console.log("fetch Meeting", data);
         setMeetData(data);
         fetchObj();
+        if ( data[0].meetTagId == 1 ) {
+          setMeetTage('Decision-Making')
+        } else if ( data[0].meetTagId == 2 ){
+          setMeetTage('Problem-Solving')
+        } else if ( data[0].meetTagId == 3 ) {
+          setMeetTage('Info/Opinion-Sharing')
+        } else {
+          setMeetTage('No meeting type')
+        }
       }
     } catch (error) {
       console.error("Error fetching meeting:", error);
@@ -48,7 +58,6 @@ function Detail() {
       // console.log(data);
     }
   };
-
   const fetchObj = async () => {
     try {
       const { data, error } = await supabase
@@ -91,10 +100,50 @@ function Detail() {
     }
   };
 
+      function formatDateToText(textDate) {
+        try {
+          const dateObject = new Date(textDate);
+          if (isNaN(dateObject.getTime())) {
+            throw new Error("Invalid date-time text provided");
+          }
+      
+          // Adjust the date object to UTC+7 timezone
+          const localDateObject = new Date(dateObject.getTime() - (7 * 60 * 60 * 1000));
+      
+          // Extract day, month (0-indexed), year, hours, and minutes in local time
+          const day = localDateObject.toLocaleDateString("en-US", { day: '2-digit' });
+          const month = localDateObject.toLocaleDateString("en-US", { month: 'long' }); 
+          const year = localDateObject.getFullYear();
+          const hours = String(localDateObject.getHours()).padStart(2, '0');
+          const minutes = String(localDateObject.getMinutes()).padStart(2, '0'); 
+          const formattedDate = `${day} ${month} ${year}, ${hours}:${minutes}`;
+      
+          return formattedDate;
+        } catch (error) {
+          console.warn("Error parsing date:", error.message);
+          return null; 
+        }
+      }
+      
+      function extractTimeFromDateTime(dateTimeText) {
+        try {
+          const timeParts = dateTimeText.split(":");
+          const hours = String(timeParts[0]).padStart(2, '0'); 
+          const minutes = String(timeParts[1]).padStart(2, '0'); 
+          const timeString = `${hours}:${minutes}`;
+      
+          return timeString;
+        } catch (error) {
+          console.warn("Error extracting time:", error.message);
+          return null; 
+        }
+      }
+      
   useEffect(() => {
     fetchMeeting();
     fetchAttendee();
     fetchCreator();
+    console.log('meetData ='+meetData);
   }, []);
 
 
@@ -110,40 +159,61 @@ function Detail() {
     <><div 
     // style={{ backgroundColor:'#FDEFE9' }}
     >
-    <Text size="xl">Details:</Text>
-      {userData.map((userData, index) => (
+    <Grid>
+      <Grid.Col span={6}>
+        {meetData.map((meetData, index) => (
         <div key={index}>
-          <p>
-            {" "}
-            Owner:{" "}
+          <Text size="xl">Meeting Name</Text>
+          <Text size="md"> {meetData?.meetName || "No Data"}</Text>
+          <div style={{height:rem(10)}}></div>
+          <Text size="xl">Meeting Schedule</Text>
+          {/* <Text size="md"> {meetData?.meetStartDate || "No Data"}</Text> */}
+          <Text size="md"> {formatDateToText(meetData?.meetStartDate) || "No Data"} - {extractTimeFromDateTime(meetData?.meetEndDate)}</Text>
+          <div style={{height:rem(20)}}></div>
+        </div>
+      ))}
+
+       {userData.map((userData, index) => (
+        <div key={index}>
+           <Text size="lg">Owner</Text>
+            <Text size="md">
             {userData.user &&
             userData.user.full_name 
               ? `${userData.user.full_name}`
               : "Have no data"}
-          </p>
+          </Text>
+          <div style={{height:rem(20)}}></div>
         </div>
       ))}
-      <p> Attendee:</p>
+
+      <Text size="lg"> Attendee</Text>
       {meetAtten.map((listAtten) => (
-        <div key={listAtten.members}>{listAtten.members.full_name}</div>
+        <div key={listAtten.members}><Text size="md">{listAtten.members.full_name}</Text></div>
       ))}
+      </Grid.Col>
+      <Grid.Col span={6}>
       {meetData.map((meetData, index) => (
         <div key={index}>
-          <p> Meeting Name: {meetData?.meetName || "ยังไม่มีงับ"}</p>
-          <p>Description:</p>
-          <p>{meetData?.meetDes || "ยังไม่มีงับ"}</p>
+          <Text size="xl">Meeting Type</Text>
+          <Text size="md"> {meetTag || "No Data"}</Text>
+          <div style={{height:rem(10)}}></div>
+          <Text size="xl">Description</Text>
+          <Text size="md"> {meetData?.meetDes || "No Data"}</Text>
+          <div style={{height:rem(10)}}></div>
         </div>
-      ))}
+      ))} 
       <div>
-        <p> Objective </p>
+        <Text size="xl"> Objective </Text>
         {meetObjData.map(({ objDes }, index) => (
           <div key={index}>
             <ul>
-              <li>{objDes !== null ? objDes : "Have no objective"}</li>
+              <li><Text size="md">{objDes !== null ? objDes : "No objective"}</Text></li>
             </ul>
           </div>
         ))}
       </div>
+      </Grid.Col>
+    </Grid>    
 
       {/* <div>
         {mapMeeting.ownerId}
