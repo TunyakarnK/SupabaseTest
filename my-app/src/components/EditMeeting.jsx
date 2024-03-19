@@ -226,6 +226,7 @@ function EditMeeting(props) {
               })
               .eq("meetId", state.meeting.meetId)
               .select()
+              console.log("update meeting", data);
           // if (error) throw error;
           // window.location.reload();
           for (var i = 0; i <= newObj.length; i++) {
@@ -578,7 +579,7 @@ function EditMeeting(props) {
         <div style={{ height: rem(20) }}></div>
               <TagsInput
               classNames={{pill:classes.pill}}
-              label='Add New Attendee'
+              label='Add New Attendee By Email'
                 placeholder="Press Enter to submit attendee"
                 value={meetParti}
                 onChange={setMeetParti}
