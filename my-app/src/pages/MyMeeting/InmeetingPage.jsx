@@ -20,22 +20,24 @@ function InmeetingPage() {
   const [isChecked, setChecked] = useState(false);
 
   useEffect(() => {
-    const fetchMeeting = async () => {
-      const { data, error } = await supabase
-        .from("meeting")
-        .select()
-        .eq("meetId", id);
-      if (data) {
-        console.log("lllll", data);
-        setMeetData(data[0]);
-        console.log(data[0]);
-      }
-    };
-    // fetchMeeting();
+
+    fetchMeeting();
     // fetchObj();
     fetchObj();
   }, []);
   console.log("1",meetData[0]?.folderId);
+
+  const fetchMeeting = async () => {
+    const { data, error } = await supabase
+      .from("meeting")
+      .select()
+      .eq("meetId", id);
+    if (data) {
+      console.log("lllll", data);
+      setMeetData(data[0]);
+      console.log(data[0]);
+    }
+  };
 
   const fetchObj = async () => {
     await supabase
@@ -145,7 +147,7 @@ function InmeetingPage() {
     <div style={{margin:"20px"}}>
       <Grid align='center' style={{ marginLeft:'70px' }}>
       <Grid.Col span={8}>
-      <Text size='30px' fw={'500'} style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>Meeting: {meetData[0]?.meetName}</Text>
+      <Text size='30px' fw={'500'} style={{marginTop:'20px',marginLeft:'20px',marginBottom:'10px'}}>Meeting: {meetData?.meetName}</Text>
       </Grid.Col>
       <Grid.Col span={1.5} />
       <Grid.Col span={1} >
