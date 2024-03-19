@@ -222,8 +222,9 @@ console.log(session.user.id);
     })
     .then((result) => {
       console.log("comment insert", result);
+      setComment("");
       fetchComment();
-    })
+    });
   }
   const deleteComment = async () => {
     await supabase
@@ -250,7 +251,6 @@ console.log(session.user.id);
           <Grid.Col span={1}></Grid.Col>
           <Grid.Col span={0.5}></Grid.Col>
           <Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto',marginBottom:'10px'}}>Back</Button>
-          <Grid.Col span={1}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px',marginBottom:'30px'}} >Statistic</Button></Grid.Col>
         </Grid>
     <div>
       <Grid grow style={{height:"auto"}}><Grid.Col span='auto' >
@@ -317,7 +317,7 @@ console.log(session.user.id);
         <Grid align="center" style={{backgroundColor: "#FDEFE9", borderRadius:'5px', padding:'5px'}}>
         <Grid.Col span={9.5}>
           <TextInput
-          defaultValue={comment}
+          value={comment}
           onChange={(event) => setComment(event.currentTarget.value)}
           type="text"
           placeholder="Write a Comment"
