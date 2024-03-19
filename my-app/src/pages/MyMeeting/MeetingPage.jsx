@@ -55,7 +55,7 @@ const fetchCreator = async () => {
   try {
     const { data, error } = await supabase
       .from("meeting")
-      .select("creatorId, meetStatus, folderId")
+      .select("creatorId, meetStatus, folderId, meetName")
       .eq("meetId", id)
     if (data) {
       console.log(",,,", data[0].creatorId);
@@ -121,7 +121,7 @@ const handleButtonClick = () => {
   
   
   </Grid.Col>
-  <Grid.Col span={8}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'30px'}}>My Meeting ❯ </Text></Grid.Col>
+  <Grid.Col span={8}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'30px'}}>{meetData.meetName}</Text></Grid.Col>
   {/* <Grid.Col span={2}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px'}}>Statistic</Button></Grid.Col> */}
   <Grid.Col span={1.5}><Button color='#EE5D20' radius="xl" onClick={()=>feedBack()}>Feedback</Button></Grid.Col>
   <Grid.Col span={1}>
