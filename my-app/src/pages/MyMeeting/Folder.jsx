@@ -13,11 +13,13 @@ function Folder() {
   const [user, setUser] = useState({});
   const [newMeeting, setNewMeeting] = useState([]);
   const [ checkOwnerFolder, setCheckOwnerFolder] = useState();
+  const [ folderName, SetFolderName ] = useState();
 
   useEffect(() =>{
     getUserData();
     getNewMeeting();
     fetchUserFolder();
+    getFolder();
   }, [session])
 
   async function getUserData() {
@@ -29,7 +31,21 @@ function Folder() {
       }
     })
   }
-  
+
+  async function getFolder(){
+    try {
+      const { data, error } = await supabase
+      .from("folders")
+      .select("folderName")
+      .eq("folderId", id)
+      if ( data != null ){
+        console.log("folderName", data);
+        SetFolderName(data[0].folderName)
+      }
+    } catch ( error ) {
+      console.log(error.message);
+    }
+  }
   async function getNewMeeting() {
     try {
       const { data, error } = await supabase
@@ -41,7 +57,7 @@ function Folder() {
       if (data != null) {
         console.log("get New Meeting", data);
         console.log();
-        setNewMeeting(data); 
+        setNewMeeting(data);
         // setCheckOwnerMeeting(data[0].creatorId)
       }
     } catch (error) {
@@ -75,14 +91,14 @@ return (
         <div style={{backgroundColor:'#FDEFE9', margin:"40px", padding:'20px'}}>
 
         <Grid align="center">
-        {/* <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folder[0].folderName}</Text></Grid.Col> /}
+        <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folderName}</Text></Grid.Col>
           <Grid.Col span={0.8}>
           { checkOwnerFolder === true ? 
   (<Link to={"/MyMeeting"}><Button variant='outline' color='#EE5D20' radius="xl" style={{width:'auto',marginBottom:'10px'}}>Back</Button></Link>)
   :
   (<Link to={"/SharedMeeting"}><Button variant='outline' color='#EE5D20' radius="xl" style={{width:'auto',marginBottom:'10px'}}>Back</Button></Link>)  }</Grid.Col>
-          <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'25px'}}>My Meeting ❯ {id}</Text></Grid.Col>
-          {/ <Grid.Col span={1.3}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px'}}>Statistic</Button></Grid.Col> */}
+          {/* <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'25px'}}>My Meeting ❯ {id}</Text></Grid.Col> */}
+          {/* { <Grid.Col span={1.3}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px'}}>Statistic</Button></Grid.Col> */}
         </Grid>
 
         <div className=''>
