@@ -210,7 +210,7 @@ function MyMeeting() {
           throw resp;
         }
         // document.getElementById('signout_button').style.visibility = 'visible';
-        document.getElementById('authorize_button').innerText = 'Refresh';
+        document.getElementById('authorize_button').innerText = 'Linked to Google Calendar';
         await listUpcomingEvents();
       };
   
@@ -316,9 +316,9 @@ function MyMeeting() {
        <div style={{backgroundColor:'#FDEFE9', margin:"50px", padding:'20px'}}>
         <Grid align="center">
         <Grid.Col span={10}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>New Meeting</Text></Grid.Col>
-        <Grid.Col span={0}><Button color='#EE5D20' radius={60} id="authorize_button" onClick={handleAuthClick} style={{ visibility: gapiInited && gisInited ? 'visible' : 'hidden' }}>Sync</Button></Grid.Col>
+        {/* <Grid.Col span={0}></Grid.Col> */}
         {/* <Grid.Col span={0.5}><Button id="signout_button" onClick={handleSignoutClick} style={{ visibility: 'hidden' }}>Sign Out</Button></Grid.Col> */}
-        <Grid.Col span={0.5}><Button color='#EE5D20' radius={60} onClick={()=>createNewMeeting()} style={{marginTop:'30px'}}> + New Meeting</Button></Grid.Col>
+        <Grid.Col span={0.1}><Button color='#EE5D20' radius={60} id="authorize_button" onClick={handleAuthClick} style={{ visibility: gapiInited && gisInited ? 'visible' : 'hidden' }}>Linked to Google Calendar</Button><Button color='#EE5D20' radius={60} onClick={()=>createNewMeeting()} style={{marginTop:'30px'}}> + New Meeting</Button></Grid.Col>
         </Grid>
         <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
         <Grid.Col span={5}><Text c="#4f5b5f" style={{marginLeft:'10px'}}>Meeting Name</Text></Grid.Col>
