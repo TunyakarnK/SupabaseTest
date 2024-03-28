@@ -70,24 +70,24 @@ function MeetingCard(props) {
     navigate(`/MeetingPage/${meeting.meetId}`, { state: { user } });
   }
 
-    const checkCreatorMeeting = async () => {
-      await supabase
-      .from("meeting")
-      .select("meetStatus, creatorId")
-      .eq("folderId", id)
+  const checkCreatorMeeting = async () => {
+    await supabase
+    .from("meeting")
+    .select("meetStatus, creatorId")
+    .eq("folderId", id)
+    .then((result) => {
+      console.log("who create this meeting", result);
+      setCheckCreator(result.data[0].creatorId)
+      supabase
+      .from("user")
+      .select("full_name")
+      .eq("id", result.data[0].creatorId)
       .then((result) => {
-        console.log("who create this meeting", result);
-        setCheckCreator(result.data[0].creatorId)
-        supabase
-        .from("user")
-        .select("full_name")
-        .eq("id", result.data[0].creatorId)
-        .then((result) => {
-          console.log("Name", result);
-          setcreatorName(result.data[0].full_name);
-        })
+        console.log("Name", result);
+        setcreatorName(result.data[0].full_name);
       })
-    }
+    })
+  }
 
     function formatDateToText(textDate) {
       try {

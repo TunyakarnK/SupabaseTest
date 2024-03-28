@@ -222,8 +222,9 @@ console.log(session.user.id);
     })
     .then((result) => {
       console.log("comment insert", result);
+      setComment("");
       fetchComment();
-    })
+    });
   }
   const deleteComment = async () => {
     await supabase
@@ -235,7 +236,6 @@ console.log(session.user.id);
     })
   }
  
-
   return (
      <div className="App">
         {Object.keys(session.user).length !== 0 ?

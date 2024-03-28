@@ -45,8 +45,6 @@ function App() {
       <Route path="/MeetingPage/feedback/:id" element={<Feedback />} />
       {/* <Route path="/Detail_Note/:id" element={<Note />} /> */}
       {/* <Route path="/Detail_Conclusion/:id" element={<Detail_Conclusion />} /> */}
-      <Route path="/Inmeeting/:id" element={<InmeetingPage />} />
-      <Route path="/Conclusion/:id" element={<Conclusion />} />
       {/* <Route path="/Folder/:id" element={<Folder />}/> */}
       {/* <Route path="/MyMeeting/:folder" render={(props) => <MeetingDetails {...props} items={[]} />}
         /> */}

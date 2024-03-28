@@ -70,7 +70,7 @@ function SharedMeetingList(props) {
         {Object.keys(session.user).length !== 0 ?
           <>
         <header>
-        {/* <Navbar props={session.user} /> */}
+        <Navbar props={session.user} />
         </header>
 
         <div style={{backgroundColor:'#FDEFE9', margin:"40px", padding:'20px'}}>

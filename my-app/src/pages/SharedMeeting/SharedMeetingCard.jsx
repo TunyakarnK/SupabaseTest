@@ -53,7 +53,7 @@ function SharedMeetingCard(props) {
   }
 
     function handleButtonClick (){
-        navigate('/MeetingPage/${meeting.meetId}', { state: { user } });    
+      navigate('/MeetingPage/' + meeting.meetId, { state: { user } });    
     }
     
     function formatDateToText(textDate) {

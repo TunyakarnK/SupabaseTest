@@ -10,6 +10,7 @@ function Detail() {
   const [userData, setUserData] = useState([]);
   const [meetObjData, setMeetObjData] = useState([]);
   const [ meetAtten , setMeetAtten ] = useState([]);
+  const [ meetTag, setMeetTage ] = useState();
 
   const fetchMeeting = async () => {
     try {
@@ -20,8 +21,16 @@ function Detail() {
       if (data) {
         console.log("fetch Meeting", data);
         setMeetData(data);
-        
         fetchObj();
+        if ( data[0].meetTagId == 1 ) {
+          setMeetTage('Decision-Making')
+        } else if ( data[0].meetTagId == 2 ){
+          setMeetTage('Problem-Solving')
+        } else if ( data[0].meetTagId == 3 ) {
+          setMeetTage('Info/Opinion-Sharing')
+        } else {
+          setMeetTage('No meeting type')
+        }
       }
     } catch (error) {
       console.error("Error fetching meeting:", error);
@@ -141,18 +150,6 @@ function Detail() {
   useEffect(() => {
     fetchObj();
   }, [meetData]);
-
-  function meetType(type){
-    if (type=='1'){
-      return 'Decision-Making'
-    }else if(type=='2'){
-      return 'Problem-Solving'
-    }else if(type=='2'){
-      return 'Info/Opinion-Sharing'
-    }else{
-      return 'No Data'
-    }
-  }
 
   return (
     <><div style={{ padding:'20px',minHeight: '30vw', height:'auto'}}
