@@ -49,7 +49,7 @@ function Navbar (props) {
       <nav className="navbar">
         <div className="container">
           <div className="logo">
-          <NavLink to="/Profile" className="title">
+          <NavLink to="/MyMeeting" className="title">
         Logo
       </NavLink>
           </div>
