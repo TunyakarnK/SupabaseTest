@@ -10,7 +10,7 @@ npm install @mantine/core @mantine/hooks @mantine/form @mantine/dates dayjs
 npm install react-icons --save
 npm install @tabler/icons-react
 ```
-Then merge from brach dev-nun
+### Then merge from brach dev-nun. accept all incomming code.
 
  [http://127.0.0.1:5173/](http://127.0.0.1:5173/ "http://127.0.0.1:5173/")
  
