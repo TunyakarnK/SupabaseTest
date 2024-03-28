@@ -191,7 +191,7 @@ function Detail() {
       {meetData.map((meetData, index) => (
         <div key={index}>
           <Text size="xl">Meeting Type</Text>
-          <Text size="md"> {meetType(meetData?.meetTagId)}</Text>
+          <Text size="md"> {(meetData?.meetTagId)}</Text>
           <div style={{height:rem(10)}}></div>
           <Text size="xl">Description</Text>
           <Text size="md"> {meetData?.meetDes || "No Data"}</Text>
