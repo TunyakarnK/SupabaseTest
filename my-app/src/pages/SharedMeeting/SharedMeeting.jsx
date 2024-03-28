@@ -70,7 +70,7 @@ function SharedMeeting() {
           )
           .eq("checkOwner", false)
           .eq("userId", session.user.id)
-        if (error) {console.log(error);}
+        // if (error) {console.log(error);}
         if (data != null) {
           console.log("getFolder", data);
           setFolder(data); 

@@ -1,13 +1,13 @@
 import React from 'react'
-import SharedMeetingCard from './SharedMeetingCard';
-import { useParams } from 'react-router-dom'
+// import MeetingCard from 'src/components/MeetingCard';
+import { useParams, Link } from 'react-router-dom'
 import { useSession } from '@supabase/auth-helpers-react';
 import { useState, useEffect } from 'react';
 import Navbar from 'src/components/Navbar/Navbar';
 import { supabase } from 'src/supabaseClient';
-import { Grid,Text, Button,Modal } from '@mantine/core';
+import { Grid, ScrollArea, TextInput,Text,rem, Button,Modal } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-
+import SharedMeetingCard from './SharedMeetingCard';
 
 function SharedMeetingList(props) { 
   const { folderid } = useParams();
@@ -15,7 +15,7 @@ function SharedMeetingList(props) {
   const navigate = useNavigate();
   const [meeting, setMeeting] = useState([]);
   const [folder, setFolder] = useState([]);
-  const [folderName, setFolderName] = useState([]);
+  const [folderName, setFolderName] = useState();
   const session = useSession();
 
 
@@ -26,11 +26,13 @@ function SharedMeetingList(props) {
       const { data, error } = await supabase
           .from("folders")
           .select()
-          .eq("folderId",sharedfolderid)
+          .eq("folderId", id)
           if (error) throw error;
           if (data != null) {
             setFolder(data);
-            console.log('data='+data)
+            console.log('data=', data)
+            setFolderName(data[0].folderName)
+            console.log("folder name", data[0].folderName);
           }
         } catch (error) {
           // alert(error.message);
@@ -38,11 +40,32 @@ function SharedMeetingList(props) {
       }
 
     fetchFolder();
-    fetchMeeting();
+    // fetchMeeting();
+    fetchM()
     console.log(folder)
     // console.log(folder[0].folderName)
   }, [])
 
+  async function fetchM() {
+    try {
+      const { data, error } = await supabase
+        .from("attendee")
+        .select(`
+         meeting(*)
+        `)
+        .eq("userId", session.user.id)
+        .eq("meeting.folderId", id)
+        if ( data ){
+          console.log("meeting list share", data);
+          // 
+          const check = data.filter(checks => checks.meeting != null);
+          console.log("60", check);
+          setMeeting(check);
+        }
+    } catch (error) {
+
+    }
+  }
   async function fetchMeeting() {
     try {
       const { data, error } = await supabase
@@ -59,9 +82,9 @@ function SharedMeetingList(props) {
         }
       }
 
-      // function statisticButton(){
-      //   navigate('/Folder/'+folder.folderid+'/statistic', { state: { folder } } );    
-      // }
+      function statisticButton(){
+        navigate('Folder/'+ folder.folders.folderId, { state: { folder } } );    
+      }
   
   
   return (
@@ -77,10 +100,10 @@ function SharedMeetingList(props) {
      
         
         <Grid align="center">
-          <Grid.Col span={0.8}><Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto'}}>Back</Button></Grid.Col>
+          <Link to = {"/SharedMeeting"}><Grid.Col span={0.8}><Button variant='outline' color='#EE5D20' radius="xl"  style={{width:'auto'}}>Back</Button></Grid.Col></Link>
+          
         {/* <Grid.Col span={10.4}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>My Meeting ❯ {folder[0].folderName}</Text></Grid.Col> */}
-          <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>Shared with me ❯ {folderid}</Text></Grid.Col>
-          {/* <Grid.Col span={1.3}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px'}}>Statistic</Button></Grid.Col> */}
+          <Grid.Col span={9}><Text size='30px' fw={'500'} style={{marginTop:'20px',marginBottom:'30px'}}>Shared with me ❯ {folderName}</Text></Grid.Col>
         </Grid>
       
         <Grid align="center" style={{ borderBottom: '1px solid black',paddingBottom:'10px'}}>
@@ -94,7 +117,6 @@ function SharedMeetingList(props) {
             {meeting.map((meeting) => (
             <SharedMeetingCard meeting = {meeting} user={session.user} key={meeting.meetId}/>
           ))}
-          {/* <SharedMeetingCard /> */}
             </div>
         </div>
            <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div> 

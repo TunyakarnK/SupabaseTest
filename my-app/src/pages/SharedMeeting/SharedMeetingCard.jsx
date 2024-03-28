@@ -45,7 +45,7 @@ function SharedMeetingCard(props) {
         user(full_name)
         `
       )
-      .eq("meetId", meeting.meetId)
+      .eq("meetId", meeting.meeting.meetId)
       if( data ){
         console.log("meet creator", data[0].user.full_name);
         setMeetOwner(data[0].user.full_name);
@@ -53,9 +53,9 @@ function SharedMeetingCard(props) {
   }
 
     function handleButtonClick (){
-      navigate('/MeetingPage/' + meeting.meetId, { state: { user } });    
+        navigate('/MeetingPage/' + meeting.meeting.meetId, { state: { user } });    
     }
-    
+
     function formatDateToText(textDate) {
       try {
         const dateObject = new Date(textDate);
@@ -90,10 +90,10 @@ function SharedMeetingCard(props) {
     style={{ padding: '10px',borderBottom: '1px solid #202F34',backgroundColor: isHovered ? '#eddecf' : 'transparent', transition: 'background-color 0.3s ease',cursor: 'pointer' }}
     >                
         <Grid align="center" >
-        <Grid.Col span={4} onClick={handleButtonClick} ><Text >{meeting.meetName}</Text></Grid.Col>
-        <Grid.Col span={2}><Text c="#4f5b5f" >{meeting.meetStatus === false ?(<Text>Incoming</Text>):(<Text>Ended</Text>)}</Text></Grid.Col>
+        <Grid.Col span={4} onClick={handleButtonClick} ><Text >{meeting.meeting.meetName}</Text></Grid.Col>
+        <Grid.Col span={2}><Text c="#4f5b5f" >{meeting.meeting.meetStatus === false ?(<Text>Incoming</Text>):(<Text>Ended</Text>)}</Text></Grid.Col>
         <Grid.Col span={2} onClick={handleButtonClick} ><Text>{meetOwner}</Text></Grid.Col>
-        <Grid.Col span={2} onClick={ handleButtonClick} >{formatDateToText(meeting.meetStartDate)}</Grid.Col>  
+        <Grid.Col span={2} onClick={ handleButtonClick} >{formatDateToText(meeting.meeting.meetStartDate)}</Grid.Col>  
         </Grid>            
        
     </div>
@@ -101,5 +101,3 @@ function SharedMeetingCard(props) {
 }
 
 export default SharedMeetingCard
-
-
