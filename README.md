@@ -11,6 +11,7 @@ npm install react-icons --save
 npm install @tabler/icons-react
 ```
 Then merge from brach dev-nun
+
  [http://127.0.0.1:5173/](http://127.0.0.1:5173/ "http://127.0.0.1:5173/")
  
 if you have config after install follow above. Tring to do below.
