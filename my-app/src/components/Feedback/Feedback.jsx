@@ -246,11 +246,10 @@ console.log(session.user.id);
 
        <div style={{backgroundColor:'#FDEFE9', margin:"30px", padding:'20px'}}>
        <Grid align="center">
-          <Grid.Col span={9.5}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'30px'}}>FeedBack</Text></Grid.Col>
+       <Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{marginLeft:rem(20),width:'auto'}}>Back</Button>
+          <Grid.Col span={9.5}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'10px'}}>FeedBack</Text></Grid.Col>
           <Grid.Col span={1}></Grid.Col>
           <Grid.Col span={0.5}></Grid.Col>
-          <Button variant='outline' color='#EE5D20' radius="xl" onClick={() => navigate(-1)} style={{width:'auto',marginBottom:'10px'}}>Back</Button>
-          <Grid.Col span={1}><Button color='#EE5D20' variant='outline' radius={60} onClick={()=>statisticButton()} fullWidth style={{marginTop:'10px',marginBottom:'30px'}} >Statistic</Button></Grid.Col>
         </Grid>
     <div>
       <Grid grow style={{height:"auto"}}><Grid.Col span='auto' >
@@ -339,110 +338,3 @@ console.log(session.user.id);
 }
 
 export default Feedback;
-
-
-// const feedback = {
-//   pages: [
-//     {
-//       name: "page1",
-//       elements: [
-//         {
-//           type: "rating",
-//           name: "q1",
-//           title:
-//             "How many new and important information did you get during the meeting?",
-//           description: "Numeric rating scale",
-//           autoGenerate: false,
-//           rateCount: 10,
-//           rateValues: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-//         },
-//         {
-//           type: "rating",
-//           name: "q2",
-//           title: "Did the meeting improve your team collaboration?",
-//           description: "Numeric rating scale",
-//           autoGenerate: false,
-//           rateCount: 10,
-//           rateValues: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-//         },
-//         {
-//           type: "rating",
-//           name: "q3",
-//           title:
-//             "How satisfied are you with the relation between the time spend for the preparation, the meeting itself and the outcome?",
-//           description: "Numeric rating scale",
-//           autoGenerate: false,
-//           rateCount: 10,
-//           rateValues: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-//         },
-//         {
-//           type: "rating",
-//           name: "q4",
-//           title: "How satisfied have you been with the meeting?",
-//           description: "Numeric rating scale",
-//           autoGenerate: false,
-//           rateCount: 10,
-//           rateValues: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-//         },
-//       ],
-//     },
-//   ],
-//   showQuestionNumbers: "off",
-// };
-// // function insertanswer() {
-// //     supabase.from("answer").insert({
-// //         quest: name,
-// //         answer: d,
-// //         meetId: d,
-// //         userId: d,
-// //       })
-// //       .eq('meetId', id)
-// //       .then(result => {
-// //         console.log(result);
-// //       });
-// // }
-
-// function SurveyComponent() {
-//   const { id } = useParams();
-//   const survey = new Model(feedback);
-//   survey.onComplete.add((sender, options) => {
-//     const res = JSON.stringify(sender.data, null, 3);
-//     const res1 = JSON.parse(res);
-//     // try {
-//     //   supabase
-//     //     .from("answers")
-//     //     .insert({
-//     //       questId: 2,
-//     //       answer: res1.q2,
-//     //       meetId: 7,
-//     //       userId: 9,
-//     //     })
-//     //     .single()
-//     //     .then((result) => {
-//     //       console.log(result);
-//     //     });
-//     //   if (error) throw error;
-//     //   window.location.reload();
-//     // } catch (error) {
-//     //   alert("error");
-//     // }
-//     // supabase.from("answers").update({
-//     //     answer: res1.q4,
-//     //     answer: res1.q3
-//     // })
-//     // .eq('ansId', 48)
-//     // .eq('questId', 4)
-//     // .eq('meetId', 7)
-//     // .eq('userId', 8)
-//     // .then(result => {
-//     //     console.log(result);
-//     // });
-//     console.log(res1.q1);
-//     console.log(res1.q2);
-//     console.log(res1.q3);
-//     console.log(res1.q4);
-//   });
-//   return <Survey model={survey} />;
-// }
-
-// export default SurveyComponent;

@@ -246,7 +246,7 @@ function Conclusion() {
         style={{ height: "60px", boxShadow: "1px 1px 10px 5px #dfd9ca" }}
       >
         <div className="container">
-          <NavLink to="/Profile" className="title">
+          <NavLink to="/MyMeeting" className="title">
             Logo
           </NavLink>
           <div className={'nav-elements  ${showNavbar && "active"}'}>
@@ -270,7 +270,7 @@ function Conclusion() {
         <Grid
           justify="center"
           align="center"
-          style={{ marginLeft: "70px", marginRight: "80px" }}
+          style={{ marginLeft: rem(60), marginRight: "80px" }}
         >
           <Grid.Col span={8}>
             <Text
@@ -278,11 +278,11 @@ function Conclusion() {
               fw={"500"}
               style={{
                 marginTop: "20px",
-                marginLeft: "20px",
+                marginLeft: rem(10),
                 marginBottom: "10px",
               }}
             >
-              Meeting: {meetData[0]?.meetName}
+              Meeting: {meetData?.meetName}
             </Text>
           </Grid.Col>
           <Grid.Col span={2.5} />
@@ -310,13 +310,13 @@ function Conclusion() {
               </Text>
 
               {/* map obj */}
-              <h2>Finish</h2>
+              <Text c="#EE5D20" size="lg" fw={500} style={{ marginTop: "3%", marginLeft:rem(10) }}>Finished </Text>
               {finishObj?.map((listobj) => (
-                <div>{listobj.objDes}</div>
+                <div style={{ marginLeft:rem(10) }}>{listobj.objDes}</div>
               ))}
-              <h2>Not finish yet</h2>
+              <Text c="#EE5D20" size="lg" fw={500} style={{ marginTop: "3%", marginLeft:rem(10) }}>Unfinished </Text>
               {notFinishObj?.map((listobj) => (
-                <div>{listobj.objDes}</div>
+                <div style={{ marginLeft:rem(10) }}>{listobj.objDes}</div>
               ))}
               <Center></Center>
             </div>
@@ -400,8 +400,8 @@ function Conclusion() {
       </Grid.Col>
       </Grid>
       </div>
-
-    //   </div>
+      <div style={{height:'10px', backgroundColor:'#EE5D20',position: 'fixed',bottom: '0', width: '100%'}}></div>
+       </div>
     // </div>
     // </div>
   );

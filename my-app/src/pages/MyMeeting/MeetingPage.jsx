@@ -132,7 +132,7 @@ const handleButtonClick = () => {
   
   
   </Grid.Col>
-  <Grid.Col span={7.5}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'30px'}}>My Meeting ❯ </Text></Grid.Col>
+  <Grid.Col span={7.5}><Text size='30px' fw={'500'} style={{marginTop:'10px',marginLeft:'20px',marginBottom:'30px'}}>{meetData.meetName}</Text></Grid.Col>
   <Grid.Col span={1.3}><Badge variant="outline" color="#EE5D20" size="xl">{meetData.meetStatus ? "Ended" : "Incoming"}</Badge></Grid.Col>
   <Grid.Col span={1}><Button color='#EE5D20' radius="xl" onClick={()=>feedBack()}>Feedback</Button></Grid.Col>
   <Grid.Col span={1}>
